@@ -1,0 +1,10 @@
+{
+    "id": "obsidian-vite-preact",
+    "name": "Vite Preact TypeScript",
+    "version": "0.0.1",
+    "minAppVersion": "0.12.0",
+    "description": "",
+    "author": "foreverjs",
+    "authorUrl": "https://obsidian.md",
+    "isDesktopOnly": false
+}

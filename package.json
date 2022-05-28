@@ -5,14 +5,17 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "vite --port 3000 --mode dev"
+    "dev": "vite --port 3000 --mode dev",
+    "build": "tsc && vite build"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@preact/preset-vite": "^2.2.0",
+    "@types/node": "^17.0.36",
     "autoprefixer": "^10.4.7",
+    "obsidian": "^0.14.8",
     "postcss": "^8.4.14",
     "preact": "^10.7.2",
     "preact-router": "^4.0.1",
