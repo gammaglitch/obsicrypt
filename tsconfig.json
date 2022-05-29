@@ -1,29 +1,41 @@
 {
-	"compilerOptions": {
-		"target": "ESNext",
-		"useDefineForClassFields": true,
-		"lib": ["DOM", "DOM.Iterable", "ESNext"],
-		"allowJs": false,
-		"skipLibCheck": true,
-		"esModuleInterop": false,
-		"allowSyntheticDefaultImports": true,
-		"strict": true,
-		"forceConsistentCasingInFileNames": true,
-		"module": "ESNext",
-		"moduleResolution": "Node",
-		"resolveJsonModule": true,
-		"isolatedModules": true,
-		"noEmit": true,
-		"jsx": "preserve",
-		"jsxFactory": "h",
-		"jsxFragmentFactory": "Fragment",
-		"paths": {
-			"react": ["./node_modules/preact/compat"],
-			"react-dom/test-utils": ["./node_modules/preact/test-utils"],
-			"react-dom": ["./node_modules/preact/compat"],
-			"react/jsx-runtime": ["./node_modules/preact/jsx-runtime"],
-			"@/*": ["./src/*"],
-		},
-	},
-	"include": ["src"]
+  "compilerOptions": {
+    "outDir": "build",
+    "allowSyntheticDefaultImports": true,
+    "jsx": "preserve",
+    "jsxFactory": "h",
+    "jsxFragmentFactory": "Fragment",
+    "module": "ESNext",
+    "target": "esnext",
+    "allowJs": true,
+    "noImplicitAny": true,
+    "moduleResolution": "node",
+    "importHelpers": true,
+    "lib": [
+      "DOM",
+      "DOM.Iterable",
+      "ESNext"
+    ]
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx"
+  ],
+  "paths": {
+    "react": [
+      "./node_modules/preact/compat"
+    ],
+    "react-dom/test-utils": [
+      "./node_modules/preact/test-utils"
+    ],
+    "react-dom": [
+      "./node_modules/preact/compat"
+    ],
+    "react/jsx-runtime": [
+      "./node_modules/preact/jsx-runtime"
+    ],
+    "@/*": [
+      "./src/*"
+    ],
+  },
 }

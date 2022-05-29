@@ -6,6 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "vite --port 3000 --mode dev",
+    "build:ts": "tsc",
     "build": "tsc && vite build"
   },
   "keywords": [],
