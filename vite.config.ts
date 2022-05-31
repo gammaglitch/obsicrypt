@@ -1,37 +1,34 @@
-import { defineConfig } from 'vite';
-import preact from '@preact/preset-vite';
+import { defineConfig, loadEnv } from 'vite';
 import path from 'path';
+import preact from '@preact/preset-vite';
 
-export default defineConfig({
-	plugins: [preact()],
-	resolve: {
-		alias: {
-			react: 'preact/compat',
-			'react-dom/test-utils': 'preact/test-utils',
-			'react-dom': 'preact/compat',
-			'react/jsx-runtime': 'preact/jsx-runtime',
-			'@': path.resolve(__dirname, './src')
+import manifest from './public/manifest.json';
+
+export default ({ mode }) => {
+	process.env = { ...process.env, ...loadEnv(mode, process.cwd(), '') };
+
+	return defineConfig({
+		plugins: [preact()],
+		resolve: {
+			alias: {
+				react: 'preact/compat',
+				'react-dom/test-utils': 'preact/test-utils',
+				'react-dom': 'preact/compat',
+				'react/jsx-runtime': 'preact/jsx-runtime',
+				'@': path.resolve(__dirname, './src')
+			}
+		},
+		build: {
+			minify: false,
+			lib: {
+				entry: path.resolve(__dirname, 'src/main.ts'),
+				name: manifest.name,
+				fileName: () => 'main.js'
+			},
+			rollupOptions: {
+				external: ["obsidian"]
+			},
+			outDir: `${process.env.OBSIDIAN_PATH}/.obsidian/plugins/${manifest.id}`
 		}
-	},
-	build: {
-		outDir: './build'
-	}
-});
-// import path = require('path');
-
-// export default defineConfig({
-// 	plugins: [preact()],
-// 	build: {
-// 		outDir: './build',
-// 		sourcemap: 'hidden',
-// 	},
-// 	resolve: {
-// 		alias: {
-// 			react: 'preact/compat',
-// 			'react-dom/test-utils': 'preact/test-utils',
-// 			'react-dom': 'preact/compat',
-// 			'react/jsx-runtime': 'preact/jsx-runtime',
-// 			'@': path.resolve(__dirname, './src'),
-// 		},
-// 	},
-// });
+	});
+}

@@ -1,52 +1,51 @@
-import { ItemView, Plugin, WorkspaceLeaf } from "obsidian";
-import Preact, { render } from "preact";
+import { ItemView, Plugin, WorkspaceLeaf } from 'obsidian';
+import { render, createElement } from 'preact';
+import { ReactView } from './components/ReactView';
 
-import DiceRoller from "./components/DicerRoller";
-
-const VIEW_TYPE = "react-view";
+const VIEW_TYPE = 'react-view';
 
 class MyReactView extends ItemView {
-  // private reactComponent: Preact.ReacPtElement;
-  private reactComponent: any;
+	getViewType(): string {
+		return VIEW_TYPE;
+	}
 
-  getViewType(): string {
-    return VIEW_TYPE;
-  }
+	getDisplayText(): string {
+		return 'Dice Roller';
+	}
 
-  getDisplayText(): string {
-    return "Dice Roller";
-  }
+	getIcon(): string {
+		return 'calendar-with-checkmark';
+	}
 
-  getIcon(): string {
-    return "calendar-with-checkmark";
-  }
-
-  async onOpen(): Promise<void> {
-    this.reactComponent = Preact.createElement(DiceRoller, null);
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    render(this.reactComponent, (this as any).contentEl);
-  }
+	async onOpen(): Promise<void> {
+		render(createElement(ReactView, null), this.contentEl);
+	}
 }
 
 export default class ReactStarterPlugin extends Plugin {
-  private view: MyReactView;
+	private view: MyReactView;
 
-  async onload(): Promise<void> {
-    this.registerView(
-      VIEW_TYPE,
-      (leaf: WorkspaceLeaf) => (this.view = new MyReactView(leaf))
-    );
+	onunload(): void {
+		this.app.workspace
+			.getLeavesOfType(VIEW_TYPE)
+			.forEach((leaf) => leaf.detach());
+	}
 
-    this.app.workspace.onLayoutReady(this.onLayoutReady.bind(this));
-  }
+	async onload(): Promise<void> {
+		this.registerView(
+			VIEW_TYPE,
+			(leaf: WorkspaceLeaf) => (this.view = new MyReactView(leaf))
+		);
 
-  onLayoutReady(): void {
-    if (this.app.workspace.getLeavesOfType(VIEW_TYPE).length) {
-      return;
-    }
-    this.app.workspace.getRightLeaf(false).setViewState({
-      type: VIEW_TYPE,
-    });
-  }
+		this.app.workspace.onLayoutReady(this.onLayoutReady.bind(this));
+	}
+
+	onLayoutReady(): void {
+		if (this.app.workspace.getLeavesOfType(VIEW_TYPE).length) {
+			return;
+		}
+		this.app.workspace.getRightLeaf(false).setViewState({
+			type: VIEW_TYPE,
+		});
+	}
 }
