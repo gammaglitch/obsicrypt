@@ -20,6 +20,7 @@ export default ({ mode }) => {
 		},
 		build: {
 			minify: false,
+			sourcemap: true,
 			lib: {
 				entry: path.resolve(__dirname, 'src/main.ts'),
 				name: manifest.name,
