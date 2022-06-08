@@ -15,8 +15,8 @@ export default ({ mode }) => {
 				'react-dom/test-utils': 'preact/test-utils',
 				'react-dom': 'preact/compat',
 				'react/jsx-runtime': 'preact/jsx-runtime',
-				'@': path.resolve(__dirname, './src')
-			}
+				'@': path.resolve(__dirname, './src'),
+			},
 		},
 		build: {
 			minify: false,
@@ -24,12 +24,13 @@ export default ({ mode }) => {
 			lib: {
 				entry: path.resolve(__dirname, 'src/main.ts'),
 				name: manifest.name,
-				fileName: () => 'main.js'
+				fileName: () => 'main.js',
 			},
 			rollupOptions: {
-				external: ["obsidian"]
+				external: ['obsidian'],
 			},
-			outDir: `${process.env.OBSIDIAN_PATH}/.obsidian/plugins/${manifest.id}`
-		}
+			// outDir: `${process.env.OBSIDIAN_PATH}/.obsidian/plugins/${manifest.id}`
+			outDir: './vite-build',
+		},
 	});
-}
+};

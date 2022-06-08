@@ -1,55 +1,7 @@
-@tailwind base;
+/* @tailwind base;
 @tailwind components;
-@tailwind utilities;
+@tailwind utilities; */
 
-body {
-	height: 100vh;
-}
-
-#app,
-#preact_root {
-	height: 100%;
-}
-
-input[type='radio'] {
-	appearance: none;
-	width: 18px;
-	height: 18px;
-	border: 1px solid #999;
-	border-radius: 50%;
-	background-clip: content-box;
-	padding: 3px;
-}
-
-input[type='radio']:checked {
-	background-color: #0dbedc;
-}
-
-@keyframes loading {
-	0% {
-		background-position: -100px;
-	}
-	100% {
-		background-position: 500px;
-	}
-}
-
-.loading-skeleton {
-	animation: loading 1.7s infinite linear;
-	background: #dedfe1;
-	background-image: -webkit-linear-gradient(
-		to right,
-		#dedfe1 0%,
-		#f2f3f5 20%,
-		#dedfe1 40%,
-		#dedfe1 100%
-	);
-	background-image: linear-gradient(
-		to right,
-		#dedfe1 0%,
-		#f2f3f5 20%,
-		#dedfe1 40%,
-		#dedfe1 100%
-	);
-	background-repeat: no-repeat;
+#my-plugin-view {
+	background-color: orange;
 }

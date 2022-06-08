@@ -1,10 +1,9 @@
+import './style/index.css';
 import {
 	CachedMetadata,
 	ItemView,
-	MetadataCache,
 	Plugin,
 	TFile,
-	Vault,
 	WorkspaceLeaf,
 	parseFrontMatterTags,
 } from 'obsidian';

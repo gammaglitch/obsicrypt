@@ -1,22 +1,13 @@
 import { ListItemCache, Plugin, TFile } from 'obsidian';
 import { useEffect, useState } from 'preact/hooks';
 
-export type Task = {
-	status: boolean;
-	text: string;
-	start: number;
-};
-
-export type File = {
-	name: string;
-	tasks: Task[];
-	path: string;
-};
+import { FileType } from './types/File';
+import { TaskType } from './types/Task';
 
 const buildTasks = (
 	listItems: ListItemCache[],
 	fileLines: string[]
-): Task[] => {
+): TaskType[] => {
 	return listItems
 		.filter((item) => item.hasOwnProperty('task'))
 		.map((item) => ({
@@ -27,9 +18,9 @@ const buildTasks = (
 };
 
 export function useFileManager(obsidian: Plugin) {
-	const [files, setFiles] = useState<File[]>([]);
+	const [files, setFiles] = useState<FileType[]>([]);
 
-	const getTasksFromFile = async (file: TFile): Promise<File> => {
+	const getTasksFromFile = async (file: TFile): Promise<FileType> => {
 		const fileCache = obsidian.app.metadataCache.getFileCache(file);
 		const fileContent = await obsidian.app.vault.cachedRead(file);
 		const fileLines = fileContent.split('\n');
@@ -48,7 +39,7 @@ export function useFileManager(obsidian: Plugin) {
 		setFiles(() => files);
 	};
 
-	const toggleTaskStatus = async (file: File) => {
+	const toggleTaskStatus = async (file: FileType) => {
 		const fileRef = obsidian.app.vault.getAbstractFileByPath(
 			file.path
 		) as TFile;
