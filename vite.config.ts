@@ -19,18 +19,19 @@ export default ({ mode }) => {
 			},
 		},
 		build: {
+			cssCodeSplit: true,
 			minify: false,
 			sourcemap: true,
 			lib: {
 				entry: path.resolve(__dirname, 'src/main.ts'),
 				name: manifest.name,
 				fileName: () => 'main.js',
+				formats: ['umd'],
 			},
 			rollupOptions: {
 				external: ['obsidian'],
 			},
-			// outDir: `${process.env.OBSIDIAN_PATH}/.obsidian/plugins/${manifest.id}`
-			outDir: './vite-build',
+			outDir: `${process.env.OBSIDIAN_PATH}/.obsidian/plugins/${manifest.id}`,
 		},
 	});
 };

@@ -10,11 +10,16 @@ const buildTasks = (
 ): TaskType[] => {
 	return listItems
 		.filter((item) => item.hasOwnProperty('task'))
-		.map((item) => ({
-			status: item.task === 'x',
-			text: fileLines[item.position.start.line],
-			start: item.position.start.line,
-		}));
+		.map((item) => {
+			const textLine = fileLines[item.position.start.line];
+			const textOnly = textLine.substring(textLine.indexOf(']') + 2);
+			console.log('buildTasks', textLine, item);
+			return {
+				status: item.task === 'x',
+				text: textLine,
+				start: item.position.start.line,
+			};
+		});
 };
 
 export function useFileManager(obsidian: Plugin) {
@@ -39,7 +44,7 @@ export function useFileManager(obsidian: Plugin) {
 		setFiles(() => files);
 	};
 
-	const toggleTaskStatus = async (file: FileType) => {
+	const toggleTaskStatus = async (file: FileType, task: TaskType) => {
 		const fileRef = obsidian.app.vault.getAbstractFileByPath(
 			file.path
 		) as TFile;
@@ -48,10 +53,15 @@ export function useFileManager(obsidian: Plugin) {
 		const fileContent = await obsidian.app.vault.read(fileRef);
 		const fileLines = fileContent.split('\n');
 
+		const newTaskText = task.status
+			? task.text.replace('[x]', '[ ]')
+			: task.text.replace('[ ]', '[x]');
+
 		await obsidian.app.vault.modify(
 			fileRef,
-			fileContent.replace(file.tasks[0].text, 'TOGGLED')
+			fileContent.replace(task.text, newTaskText)
 		);
+
 		loadTasksFromVault();
 	};
 
