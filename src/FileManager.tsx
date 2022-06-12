@@ -59,7 +59,7 @@ export function useFileManager(obsidian: Plugin) {
 
 		await obsidian.app.vault.modify(
 			fileRef,
-			fileContent.replace(task.text, newTaskText)
+			fileContent.replace(task.text, `- [ ] ${Math.random().toString()}`)
 		);
 
 		loadTasksFromVault();
@@ -70,5 +70,5 @@ export function useFileManager(obsidian: Plugin) {
 		console.log('onMount:FileManager');
 	}, []);
 
-	return { files, toggleTaskStatus };
+	return { files, toggleTaskStatus, loadTasksFromVault };
 }

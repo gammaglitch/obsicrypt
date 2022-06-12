@@ -10,11 +10,11 @@ type ReactViewProps = {
 export const ReactView: FunctionalComponent<ReactViewProps> = ({
 	obsidian,
 }) => {
-	const { files, toggleTaskStatus } = useFileManager(obsidian);
+	const { files, toggleTaskStatus, loadTasksFromVault } = useFileManager(obsidian);
 
 	return (
-		<div className="hover:bg-orange-500">
-			<h4>Hello, Vite?!</h4>
+		<div className="border p-4 border-green-500">
+			<button className='border bg-blue-500 hover:bg-blue-300' onClick={() => loadTasksFromVault()}>Please refresh uWu</button>
 			<div>
 				<FileOverview files={files} toggleTask={toggleTaskStatus} />
 			</div>
