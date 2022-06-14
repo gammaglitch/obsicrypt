@@ -13,9 +13,9 @@ const buildTasks = (
 		.map((item) => {
 			const textLine = fileLines[item.position.start.line];
 			const textOnly = textLine.substring(textLine.indexOf(']') + 2);
-			console.log('buildTasks', textLine, item);
+
 			return {
-				status: item.task === 'x',
+				status: textLine.includes('[x]'),
 				text: textLine,
 				start: item.position.start.line,
 			};
@@ -53,13 +53,22 @@ export function useFileManager(obsidian: Plugin) {
 		const fileContent = await obsidian.app.vault.read(fileRef);
 		const fileLines = fileContent.split('\n');
 
-		const newTaskText = task.status
-			? task.text.replace('[x]', '[ ]')
-			: task.text.replace('[ ]', '[x]');
+		console.log('status', task.status);
+		console.log('is', task.text);
+
+		let newTask;
+
+		if (task.status) {
+			newTask = task.text.replace('[x]', '[ ]');
+		} else {
+			newTask = task.text.replace('[ ]', '[x]');
+		}
+
+		console.log('should', newTask);
 
 		await obsidian.app.vault.modify(
 			fileRef,
-			fileContent.replace(task.text, `- [ ] ${Math.random().toString()}`)
+			fileContent.replace(task.text, newTask)
 		);
 
 		loadTasksFromVault();

@@ -14,10 +14,6 @@ const Task = ({ task, toggleTask }: TaskProps) => {
 
 	return (
 		<div className="bg-slate-500 flex" onClick={onToggleTask}>
-			<div>
-				{/* <input type="checkbox" checked={status} onClick={onToggleTask} /> */}
-				completed: {JSON.stringify(status)}
-			</div>
 			<div>{text}</div>
 		</div>
 	);
