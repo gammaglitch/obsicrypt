@@ -1,7 +1,9 @@
 import { Plugin } from 'obsidian';
 import { FunctionalComponent } from 'preact';
+import { useState } from 'preact/hooks';
 import { useFileManager } from '../FileManager';
 import FileOverview from './FileOverview';
+import FileList from './FileList';
 
 type ReactViewProps = {
 	obsidian: Plugin;
@@ -10,11 +12,21 @@ type ReactViewProps = {
 export const ReactView: FunctionalComponent<ReactViewProps> = ({
 	obsidian,
 }) => {
-	const { files, toggleTaskStatus, loadTasksFromVault } = useFileManager(obsidian);
+	const { files, toggleTaskStatus, loadTasksFromVault } =
+		useFileManager(obsidian);
+	const [activeFile, setActiveFile] = useState(null);
 
 	return (
 		<div className="border p-4 border-green-500">
-			<button className='border bg-blue-500 hover:bg-blue-300' onClick={() => loadTasksFromVault()}>Please refresh uWu</button>
+			<button
+				className="border bg-blue-500 hover:bg-blue-300"
+				onClick={() => loadTasksFromVault()}
+			>
+				Please refresh uWu
+			</button>
+			<div>
+				<FileList files={files} selectFile={(file) => setActiveFile(file)} />
+			</div>
 			<div>
 				<FileOverview files={files} toggleTask={toggleTaskStatus} />
 			</div>
