@@ -89,7 +89,6 @@ export default class ReactStarterPlugin extends Plugin {
 		const fileLines = fileContent.split('\n');
 		const { listItems } = fileCache;
 		const tasks = listItems.filter((item) => item.hasOwnProperty('task'));
-		console.log(file.name, listItems, tasks);
 	}
 
 	async buildIndex() {

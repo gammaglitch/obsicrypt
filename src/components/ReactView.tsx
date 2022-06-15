@@ -4,6 +4,7 @@ import { useState } from 'preact/hooks';
 import { useFileManager } from '../FileManager';
 import FileOverview from './FileOverview';
 import FileList from './FileList';
+import useStore from '../store/store';
 
 type ReactViewProps = {
 	obsidian: Plugin;
@@ -12,8 +13,8 @@ type ReactViewProps = {
 export const ReactView: FunctionalComponent<ReactViewProps> = ({
 	obsidian,
 }) => {
-	const { files, toggleTaskStatus, loadTasksFromVault } =
-		useFileManager(obsidian);
+	const { toggleTaskStatus, loadTasksFromVault } = useFileManager(obsidian);
+	const { files } = useStore();
 	const [activeFile, setActiveFile] = useState(null);
 
 	return (

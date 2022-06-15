@@ -1,5 +1,13 @@
 export type TaskType = {
-	status: boolean;
+	isComplete: boolean;
 	text: string;
-	start: number;
+	originalText: string;
+	line: {
+		start: number;
+		end: number;
+	};
+} & Metadata;
+
+export type Metadata = {
+	due: string | null;
 };
