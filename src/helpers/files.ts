@@ -2,6 +2,7 @@ import { Plugin, TFile } from 'obsidian';
 
 import { extractTaskFromListItem } from './tasks';
 import { FileType } from '../types/File';
+import { TaskType } from '../types/Task';
 
 function getTaskListItems(obsidian: Plugin, file: TFile) {
 	const fileCache = obsidian.app.metadataCache.getFileCache(file);
@@ -15,9 +16,10 @@ function getTaskListItems(obsidian: Plugin, file: TFile) {
 
 export async function parseAllFilesInVault(
 	obsidian: Plugin
-): Promise<FileType[]> {
+): Promise<{ files: FileType[]; tasks: TaskType[] }> {
 	const allFiles = await Promise.all(obsidian.app.vault.getMarkdownFiles());
-	const files = [];
+	const files: FileType[] = [];
+	const tasks: TaskType[] = [];
 
 	for (const file of allFiles) {
 		const taskListItems = getTaskListItems(obsidian, file);
@@ -25,15 +27,17 @@ export async function parseAllFilesInVault(
 		const fileContent = await obsidian.app.vault.cachedRead(file);
 		const fileLines = fileContent.split('\n');
 
-		const tasks = taskListItems.map((item) =>
-			extractTaskFromListItem(item, fileLines)
-		);
+		const fileTasks: TaskType[] = taskListItems.map((item) => ({
+			...extractTaskFromListItem(item, fileLines),
+			filePath: file.path,
+		}));
 
-		const loadedFile = { name: file.name, path: file.path, tasks };
+		const loadedFile = { name: file.name, path: file.path };
 		files.push(loadedFile);
+		tasks.push(...fileTasks);
 	}
 
-	return files;
+	return { files, tasks };
 }
 
 export async function searchAndReplaceInFile(
@@ -49,6 +53,22 @@ export async function searchAndReplaceInFile(
 		fileRef,
 		fileContent.replace(search, replace)
 	);
+}
+
+export async function searchAndReplaceLineInFile(
+	obsidian: Plugin,
+	filePath: string,
+	line: number,
+	search: string,
+	replace: string
+) {
+	const fileRef = obsidian.app.vault.getAbstractFileByPath(filePath) as TFile;
+	const fileContent = await obsidian.app.vault.read(fileRef);
+	const fileLines = fileContent.split('\n');
+
+	fileLines[line] = fileLines[line].replace(search, replace);
+
+	return obsidian.app.vault.modify(fileRef, fileLines.join('\n'));
 }
 
 export async function replaceLineInFile(

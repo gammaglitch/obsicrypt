@@ -6,7 +6,7 @@ type TaskProps = {
 };
 
 const Task = ({ task, toggleTask }: TaskProps) => {
-	const { status, text } = task;
+	const { isComplete, text } = task;
 
 	const onToggleTask = () => {
 		toggleTask(task);

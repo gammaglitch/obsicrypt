@@ -1,4 +1,5 @@
 export type TaskType = {
+	filePath: string;
 	isComplete: boolean;
 	text: string;
 	originalText: string;

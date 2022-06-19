@@ -17,6 +17,7 @@ export function extractTaskFromListItem(
 	const clearedText = removeMetadata(textLine);
 
 	return {
+		filePath: '',
 		isComplete: getTaskStatus(textLine),
 		text: clearedText,
 		originalText: textLine,
@@ -48,5 +49,5 @@ function extractMetadata(text: string): Metadata {
 }
 
 function removeMetadata(text: string): string {
-	return text.replaceAll(/(\{).*?(\})/g, '');
+	return text.replaceAll(/(\{).*?(\})/g, '').replaceAll(/- \[.\] /g, '');
 }
