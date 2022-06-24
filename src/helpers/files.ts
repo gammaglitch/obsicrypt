@@ -4,40 +4,23 @@ import { extractTaskFromListItem } from './tasks';
 import { FileType } from '../types/File';
 import { TaskType } from '../types/Task';
 
-function getTaskListItems(obsidian: Plugin, file: TFile) {
-	const fileCache = obsidian.app.metadataCache.getFileCache(file);
-	const allListItems = fileCache.listItems;
-	const taskListItems = allListItems.filter((item) =>
-		item.hasOwnProperty('task')
-	);
-
-	return taskListItems;
-}
-
-export async function parseAllFilesInVault(
-	obsidian: Plugin
-): Promise<{ files: FileType[]; tasks: TaskType[] }> {
-	const allFiles = await Promise.all(obsidian.app.vault.getMarkdownFiles());
-	const files: FileType[] = [];
+export async function getTasksFromFiles(files: FileType[]) {
 	const tasks: TaskType[] = [];
 
-	for (const file of allFiles) {
-		const taskListItems = getTaskListItems(obsidian, file);
-
-		const fileContent = await obsidian.app.vault.cachedRead(file);
-		const fileLines = fileContent.split('\n');
+	for (const file of files) {
+		const taskListItems = file.listItems.filter((item) =>
+			item.hasOwnProperty('task')
+		);
 
 		const fileTasks: TaskType[] = taskListItems.map((item) => ({
-			...extractTaskFromListItem(item, fileLines),
+			...extractTaskFromListItem(item, file.fileLines),
 			filePath: file.path,
 		}));
 
-		const loadedFile = { name: file.name, path: file.path };
-		files.push(loadedFile);
 		tasks.push(...fileTasks);
 	}
 
-	return { files, tasks };
+	return tasks;
 }
 
 export async function searchAndReplaceInFile(
@@ -84,4 +67,49 @@ export async function replaceLineInFile(
 	fileLines[line] = replace;
 
 	return obsidian.app.vault.modify(fileRef, fileLines.join('\n'));
+}
+
+async function buildFileType(obsidian: Plugin, file: TFile) {
+	const fileContent = await obsidian.app.vault.cachedRead(file);
+	const listItems =
+		obsidian.app.metadataCache.getFileCache(file).listItems || [];
+
+	return {
+		name: file.name,
+		path: file.path,
+		fileContent,
+		fileLines: fileContent.split('\n'),
+		listItems,
+	};
+}
+
+export async function getFileByPath(
+	obsidian: Plugin,
+	path: string
+): Promise<FileType> {
+	const fileRef = obsidian.app.vault.getAbstractFileByPath(path);
+
+	return buildFileType(obsidian, fileRef as TFile);
+}
+
+export async function getFiles(obsidian: Plugin): Promise<FileType[]> {
+	const allFiles = await Promise.all(obsidian.app.vault.getMarkdownFiles());
+
+	const files: FileType[] = [];
+
+	for (const file of allFiles) {
+		const fileContent = await obsidian.app.vault.cachedRead(file);
+		const listItems =
+			obsidian.app.metadataCache.getFileCache(file).listItems || [];
+
+		files.push({
+			name: file.name,
+			path: file.path,
+			fileContent,
+			fileLines: fileContent.split('\n'),
+			listItems,
+		});
+	}
+
+	return files;
 }

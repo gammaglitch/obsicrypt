@@ -15,8 +15,7 @@ type ReactViewProps = {
 export const ReactView: FunctionalComponent<ReactViewProps> = ({
 	obsidian,
 }) => {
-	const { toggleTaskStatus, loadTasksFromVault, updateTask } =
-		useFileManager(obsidian);
+	const { toggleTaskStatus, updateTask } = useFileManager(obsidian);
 	const { files, tasks } = useStore();
 	const [activeFile, setActiveFile] = useState(null);
 
@@ -25,19 +24,7 @@ export const ReactView: FunctionalComponent<ReactViewProps> = ({
 	};
 
 	return (
-		<div className="border p-4 border-green-500">
-			<button
-				className="border bg-blue-500 hover:bg-blue-300"
-				onClick={() => loadTasksFromVault()}
-			>
-				Please refresh uWu
-			</button>
-			{/* <div>
-				<FileList files={files} selectFile={(file) => setActiveFile(file)} />
-			</div>
-			<div>
-				<FileOverview files={files} toggleTask={toggleTaskStatus} />
-			</div> */}
+		<div className="p-4 border border-green-500">
 			<div>
 				{tasks.length > 0 && (
 					<TaskList tasks={tasks} updateText={onUpdateText} />

@@ -3,45 +3,7 @@ import { useState } from 'preact/hooks';
 import { useFileManager } from '../FileManager';
 
 import { TaskType } from '../types/Task';
-
-type TaskProps = {
-	task: TaskType;
-	isActive: boolean;
-	onClick: () => void;
-	updateText: (text: string) => void;
-};
-
-const Task: FunctionalComponent<TaskProps> = ({
-	task,
-	isActive,
-	onClick,
-	updateText,
-}) => {
-	const [text, setText] = useState(task.text);
-
-	return (
-		<div
-			className={`${isActive ? 'bg-blue-600' : ''} p-1 rounded`}
-			onClick={onClick}
-		>
-			{isActive ? (
-				<div className="flex">
-					<input
-						type="text"
-						value={text}
-						onChange={(e: any) => setText(e.target.value)}
-						autoFocus
-					/>
-					<button className="bg-green-600" onClick={() => updateText(text)}>
-						Save
-					</button>
-				</div>
-			) : (
-				<span>{text}</span>
-			)}
-		</div>
-	);
-};
+import Task from './Task';
 
 type TaskListProps = {
 	tasks: TaskType[];
@@ -67,7 +29,7 @@ const TaskList: FunctionalComponent<TaskListProps> = ({
 
 				return (
 					<Task
-						key={index}
+						key={`${task.filePath}-${index}`}
 						task={task}
 						isActive={isActive}
 						onClick={() => setSelectedTaskIndex(index)}

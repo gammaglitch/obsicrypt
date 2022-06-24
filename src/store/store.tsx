@@ -6,6 +6,9 @@ import { TaskType } from '../types/Task';
 type StoreState = {
 	files: FileType[];
 	setFiles: (files: FileType[]) => void;
+	replaceFile: (oldPath: string, file: FileType) => void;
+	addFile: (file: FileType) => void;
+	removeFile: (path: string) => void;
 	tasks: TaskType[];
 	setTasks: (tasks: TaskType[]) => void;
 };
@@ -16,6 +19,21 @@ const useStore = create<StoreState>((set) => ({
 		set((state) => ({
 			...state,
 			files,
+		})),
+	replaceFile: (oldPath, file) =>
+		set((state) => ({
+			...state,
+			files: state.files.map((f) => (f.path === oldPath ? file : f)),
+		})),
+	addFile: (file) =>
+		set((state) => ({
+			...state,
+			files: [...state.files, file],
+		})),
+	removeFile: (path) =>
+		set((state) => ({
+			...state,
+			files: state.files.filter((f) => f.path !== path),
 		})),
 	tasks: [],
 	setTasks: (tasks) =>

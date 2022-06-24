@@ -49,6 +49,14 @@ module.exports = {
 				ananas: '#ffdc0f',
 				orange: '#fa9600',
 			},
+			task: {
+				checkbox: {
+					border: '#5A6C91',
+				},
+				active: {
+					background: '#1C3060',
+				},
+			},
 		}),
 		columns: {
 			auto: 'auto',
