@@ -1,4 +1,4 @@
-import { Plugin, TAbstractFile, TFile } from 'obsidian';
+import { TAbstractFile, TFile } from 'obsidian';
 import { useEffect } from 'preact/hooks';
 
 import useStore from './store/store';
@@ -12,21 +12,30 @@ import {
 
 import { FileType } from './types/File';
 import { TaskType } from './types/Task';
+import { updateMetadata } from './helpers/tasks';
 
-export function useFileManager(obsidian: Plugin) {
-	const { files, setFiles, setTasks, replaceFile, addFile, removeFile } =
-		useStore();
+export function useFileManager() {
+	const {
+		obsidian,
+		files,
+		setFiles,
+		setTasks,
+		replaceFile,
+		addFile,
+		removeFile,
+	} = useStore();
 
-	const toggleTaskStatus = async (file: FileType, task: TaskType) => {
+	const toggleTaskStatus = async (task: TaskType) => {
+		console.log(task);
 		let newTask;
 
 		if (task.isComplete) {
-			newTask = task.text.replace('[x]', '[ ]');
+			newTask = task.originalText.replace('[x]', '[ ]');
 		} else {
-			newTask = task.text.replace('[ ]', '[x]');
+			newTask = task.originalText.replace('[ ]', '[x]');
 		}
 
-		await replaceLineInFile(obsidian, file.path, task.line.start, newTask);
+		await replaceLineInFile(obsidian, task.filePath, task.line.start, newTask);
 	};
 
 	const updateTask = async (task: TaskType, text: string) => {
@@ -37,6 +46,26 @@ export function useFileManager(obsidian: Plugin) {
 			task.text,
 			text
 		);
+	};
+
+	const updateTaskMetadata = async (
+		task: TaskType,
+		key: string,
+		value: string
+	) => {
+		const updatedText = updateMetadata(task.originalText, key, value);
+
+		await searchAndReplaceLineInFile(
+			obsidian,
+			task.filePath,
+			task.line.start,
+			task.originalText,
+			updatedText
+		);
+	};
+
+	const updateDate = async (task: TaskType, date: string) => {
+		await updateTaskMetadata(task, 'due', date);
 	};
 
 	const loadTasksIntoStore = async () => {
@@ -73,32 +102,37 @@ export function useFileManager(obsidian: Plugin) {
 	}, [files]);
 
 	useEffect(() => {
-		loadTasksIntoStore();
+		if (obsidian) {
+			loadTasksIntoStore();
 
-		obsidian.app.metadataCache.on('changed', (file: TFile) => {
-			if (file instanceof TFile) {
-				updateFileHandler(file.path);
-			}
-		});
+			obsidian.app.metadataCache.on('changed', (file: TFile) => {
+				if (file instanceof TFile) {
+					updateFileHandler(file.path);
+				}
+			});
 
-		obsidian.app.vault.on('create', (file: TAbstractFile) => {
-			if (file instanceof TFile) {
-				addFileToStore(file.path);
-			}
-		});
+			obsidian.app.vault.on('create', (file: TAbstractFile) => {
+				if (file instanceof TFile) {
+					addFileToStore(file.path);
+				}
+			});
 
-		obsidian.app.vault.on('delete', (file: TAbstractFile) => {
-			if (file instanceof TFile) {
-				deleteFileHandler(file.path);
-			}
-		});
+			obsidian.app.vault.on('delete', (file: TAbstractFile) => {
+				if (file instanceof TFile) {
+					deleteFileHandler(file.path);
+				}
+			});
 
-		obsidian.app.vault.on('rename', (file: TAbstractFile, oldPath: string) => {
-			if (file instanceof TFile) {
-				replaceFileHandler(oldPath, file.path);
-			}
-		});
-	}, []);
+			obsidian.app.vault.on(
+				'rename',
+				(file: TAbstractFile, oldPath: string) => {
+					if (file instanceof TFile) {
+						replaceFileHandler(oldPath, file.path);
+					}
+				}
+			);
+		}
+	}, [obsidian]);
 
-	return { files, toggleTaskStatus, updateTask };
+	return { files, toggleTaskStatus, updateTask, updateDate };
 }

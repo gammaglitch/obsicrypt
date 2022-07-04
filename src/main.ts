@@ -1,24 +1,19 @@
 import './style/index.css';
 
-import {
-	CachedMetadata,
-	ItemView,
-	Plugin,
-	TFile,
-	WorkspaceLeaf,
-	parseFrontMatterTags,
-} from 'obsidian';
+import { ItemView, Plugin, WorkspaceLeaf } from 'obsidian';
 import { render, createElement } from 'preact';
+
 import { ReactView } from './components/ReactView';
 
-const VIEW_TYPE = 'react-view';
+const VIEW_TYPE = 'task-manager';
 
-class MyReactView extends ItemView {
+class TaskManagerView extends ItemView {
 	private obsidian: Plugin;
 
 	constructor(leaf: WorkspaceLeaf, obsidian: ReactStarterPlugin) {
 		super(leaf);
 		this.obsidian = obsidian;
+		console.log(obsidian.app.workspace.getLeavesOfType(VIEW_TYPE));
 	}
 
 	getViewType(): string {
@@ -26,7 +21,7 @@ class MyReactView extends ItemView {
 	}
 
 	getDisplayText(): string {
-		return 'Dice Roller';
+		return 'Task-Manager';
 	}
 
 	getIcon(): string {
@@ -44,7 +39,7 @@ class MyReactView extends ItemView {
 }
 
 export default class ReactStarterPlugin extends Plugin {
-	private view: MyReactView;
+	private view: TaskManagerView;
 
 	onunload(): void {
 		this.app.workspace
@@ -52,72 +47,42 @@ export default class ReactStarterPlugin extends Plugin {
 			.forEach((leaf) => leaf.detach());
 	}
 
-	async parseTags(metadata: CachedMetadata) {
-		let tags: string[] = [];
-		if (metadata) {
-			// Get the tags from the frontmatter
-			if (metadata?.frontmatter?.tags) {
-				tags = parseFrontMatterTags(metadata.frontmatter);
-			}
-			// Also add the tags from the metadata object (these are present in document itself)
-			if (metadata?.tags) {
-				tags = tags.concat(metadata.tags.map((tag) => tag.tag));
-			}
-		}
-		return tags;
-	}
-
-	async parseFile(file: TFile): Promise<any> {
-		// Parse the metadata, tags & content of the file
-		let metadata = this.app.metadataCache.getFileCache(file);
-		let tags = await this.parseTags(metadata);
-		let content = await this.app.vault.read(file);
-
-		// Return a better formatted file for indexing
-		return <any>{
-			title: file.basename,
-			path: file.path,
-			content: content,
-			created: file.stat.ctime,
-			modified: file.stat.mtime,
-			tags: tags,
-		};
-	}
-
-	async indexFile(file: TFile) {
-		const fileCache = this.app.metadataCache.getFileCache(file);
-		const fileContent = await this.app.vault.cachedRead(file);
-		const fileLines = fileContent.split('\n');
-		const { listItems } = fileCache;
-		const tasks = listItems.filter((item) => item.hasOwnProperty('task'));
-	}
-
-	async buildIndex() {
-		const allFiles = await Promise.all(this.app.vault.getMarkdownFiles());
-
-		for (const file of allFiles) {
-			this.indexFile(file);
-		}
-	}
-
 	async onload(): Promise<void> {
 		this.registerView(
 			VIEW_TYPE,
-			(leaf: WorkspaceLeaf) => (this.view = new MyReactView(leaf, this))
+			(leaf: WorkspaceLeaf) => (this.view = new TaskManagerView(leaf, this))
 		);
-		this.app.workspace.onLayoutReady(this.onLayoutReady.bind(this));
-		// this.app.workspace.onLayoutReady(() => {
-		// 	this.onLayoutReady.bind(this);
-		// 	this.buildIndex();
-		// });
+
+		// if (this.app.workspace.layoutReady) {
+		// 	this.onLayoutReady();
+		// }
+		this.app.workspace.onLayoutReady(
+			async () => await this.openFileTreeLeaf(true)
+		);
+	}
+
+	async openFileTreeLeaf(showAfterAttach: boolean) {
+		const leafs = this.app.workspace.getLeavesOfType(VIEW_TYPE);
+
+		if (leafs.length === 0) {
+			const leaf = this.app.workspace.getLeftLeaf(false);
+			await leaf.setViewState({ type: VIEW_TYPE });
+
+			if (showAfterAttach) {
+				this.app.workspace.revealLeaf(leaf);
+			}
+		} else {
+			leafs.forEach((leaf) => this.app.workspace.revealLeaf(leaf));
+		}
 	}
 
 	onLayoutReady(): void {
-		if (this.app.workspace.getLeavesOfType(VIEW_TYPE).length) {
-			return;
-		}
-		this.app.workspace.getRightLeaf(false).setViewState({
-			type: VIEW_TYPE,
-		});
+		// if (this.app.workspace.getLeavesOfType(VIEW_TYPE).length) {
+		// 	return;
+		// }
+		// this.app.workspace.getRightLeaf(false).setViewState({
+		// 	type: VIEW_TYPE,
+		// });
+		this.openFileTreeLeaf(true);
 	}
 }

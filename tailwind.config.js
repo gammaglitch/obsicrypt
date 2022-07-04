@@ -39,22 +39,16 @@ module.exports = {
 			fuchsia: colors.fuchsia,
 			pink: colors.pink,
 			rose: colors.rose,
-			legacy: {
-				blue: '#0dbedc',
-				'blue-500': '#005aa0',
-				gray: '#dad9d5',
-				'gray-100': '#e5e5e5',
-				'gray-200': '#666666',
-				curacao: '#0dbedc',
-				ananas: '#ffdc0f',
-				orange: '#fa9600',
-			},
 			task: {
 				checkbox: {
-					border: '#5A6C91',
+					border: '#706F6F',
+					background: '#5C95F0',
 				},
 				active: {
-					background: '#1C3060',
+					background: '#2A4270',
+				},
+				text: {
+					completed: '#959494',
 				},
 			},
 		}),
@@ -884,6 +878,7 @@ module.exports = {
 			opacity: 'opacity',
 			shadow: 'box-shadow',
 			transform: 'transform',
+			spacing: 'padding',
 		},
 		transitionTimingFunction: {
 			DEFAULT: 'cubic-bezier(0.4, 0, 0.2, 1)',

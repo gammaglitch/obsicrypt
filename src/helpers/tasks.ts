@@ -51,3 +51,12 @@ function extractMetadata(text: string): Metadata {
 function removeMetadata(text: string): string {
 	return text.replaceAll(/(\{).*?(\})/g, '').replaceAll(/- \[.\] /g, '');
 }
+
+export function updateMetadata(text: string, key: string, value: string) {
+	const patternData = new RegExp(`(?<=${key}\:).*?(?=\})`);
+	const updatedText = patternData.test(text)
+		? text.replace(patternData, value)
+		: `${text} {${key}:${value}}`;
+
+	return updatedText;
+}

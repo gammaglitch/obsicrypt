@@ -1,9 +1,12 @@
 import create from 'zustand';
+import { Plugin } from 'obsidian';
 
 import { FileType } from '../types/File';
 import { TaskType } from '../types/Task';
 
 type StoreState = {
+	obsidian: Plugin | null;
+	setObsidian: (obsidian: Plugin) => void;
 	files: FileType[];
 	setFiles: (files: FileType[]) => void;
 	replaceFile: (oldPath: string, file: FileType) => void;
@@ -14,6 +17,8 @@ type StoreState = {
 };
 
 const useStore = create<StoreState>((set) => ({
+	obsidian: null,
+	setObsidian: (obsidian) => set((state) => ({ ...state, obsidian })),
 	files: [],
 	setFiles: (files) =>
 		set((state) => ({

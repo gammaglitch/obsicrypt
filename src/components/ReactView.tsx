@@ -1,6 +1,6 @@
 import { Plugin } from 'obsidian';
 import { FunctionalComponent } from 'preact';
-import { useState } from 'preact/hooks';
+import { useEffect, useState } from 'preact/hooks';
 import { useFileManager } from '../FileManager';
 import FileOverview from './FileOverview';
 import FileList from './FileList';
@@ -15,16 +15,20 @@ type ReactViewProps = {
 export const ReactView: FunctionalComponent<ReactViewProps> = ({
 	obsidian,
 }) => {
-	const { toggleTaskStatus, updateTask } = useFileManager(obsidian);
-	const { files, tasks } = useStore();
+	const { toggleTaskStatus, updateTask } = useFileManager();
+	const { files, tasks, setObsidian } = useStore();
 	const [activeFile, setActiveFile] = useState(null);
 
 	const onUpdateText = (task: TaskType, text: string) => {
 		updateTask(task, text);
 	};
 
+	useEffect(() => {
+		setObsidian(obsidian);
+	});
+
 	return (
-		<div className="p-4 border border-green-500">
+		<div className="p-2">
 			<div>
 				{tasks.length > 0 && (
 					<TaskList tasks={tasks} updateText={onUpdateText} />
