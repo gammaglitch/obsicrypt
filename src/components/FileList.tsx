@@ -1,5 +1,6 @@
 import { FunctionalComponent } from 'preact';
 import { useState } from 'preact/hooks';
+import useStore from '../store/store';
 
 import { FileType } from '../types/File';
 
@@ -10,19 +11,25 @@ type FileListProps = {
 
 const FileList: FunctionalComponent<FileListProps> = ({
 	files,
-	selectFile,
+	selectFile: asdf,
 }) => {
+	const { selectFile, selectedFile } = useStore();
 	const [activeFile, setActiveFile] = useState(null);
 
 	const onSelectFile = (file: FileType) => {
-		setActiveFile(file);
 		selectFile(file);
 	};
 
 	return (
 		<div>
 			{files.map((file) => (
-				<div key={file.name} onClick={() => onSelectFile(file)}>
+				<div
+					key={file.name}
+					onClick={() => onSelectFile(file)}
+					className={`p-1 rounded ${
+						selectedFile?.path === file.path ? 'bg-blue-600' : ''
+					} `}
+				>
 					{file.name}
 				</div>
 			))}

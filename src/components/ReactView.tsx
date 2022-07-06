@@ -16,7 +16,14 @@ export const ReactView: FunctionalComponent<ReactViewProps> = ({
 	obsidian,
 }) => {
 	const { toggleTaskStatus, updateTask } = useFileManager();
-	const { files, tasks, setObsidian } = useStore();
+	const {
+		files,
+		tasks,
+		selectedFile,
+		setObsidian,
+		selectFile,
+		selectedFilesTasks,
+	} = useStore();
 	const [activeFile, setActiveFile] = useState(null);
 
 	const onUpdateText = (task: TaskType, text: string) => {
@@ -28,10 +35,26 @@ export const ReactView: FunctionalComponent<ReactViewProps> = ({
 	});
 
 	return (
-		<div className="p-2">
+		<div className="flex p-2">
+			<div className="p-2 border-r border-gray-600">
+				<div className="mb-8">
+					<div className="border-b border-gray-600">Filter</div>
+					<button onClick={() => selectFile(null)}>All</button>
+				</div>
+
+				<div>
+					<div className="border-b border-gray-600">Files</div>
+					{files.length > 0 && (
+						<FileList files={files} selectFile={() => null} />
+					)}
+				</div>
+			</div>
 			<div>
 				{tasks.length > 0 && (
-					<TaskList tasks={tasks} updateText={onUpdateText} />
+					<TaskList
+						tasks={selectedFile ? selectedFilesTasks() : tasks}
+						updateText={onUpdateText}
+					/>
 				)}
 			</div>
 		</div>

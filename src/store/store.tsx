@@ -14,9 +14,12 @@ type StoreState = {
 	removeFile: (path: string) => void;
 	tasks: TaskType[];
 	setTasks: (tasks: TaskType[]) => void;
+	selectedFile: FileType | null;
+	selectFile: (file: FileType) => void;
+	selectedFilesTasks: () => TaskType[];
 };
 
-const useStore = create<StoreState>((set) => ({
+const useStore = create<StoreState>((set, get) => ({
 	obsidian: null,
 	setObsidian: (obsidian) => set((state) => ({ ...state, obsidian })),
 	files: [],
@@ -46,6 +49,10 @@ const useStore = create<StoreState>((set) => ({
 			...state,
 			tasks,
 		})),
+	selectedFile: null,
+	selectFile: (file) => set((state) => ({ ...state, selectedFile: file })),
+	selectedFilesTasks: () =>
+		get().tasks.filter((t) => t.filePath === get().selectedFile?.path),
 }));
 
 export default useStore;

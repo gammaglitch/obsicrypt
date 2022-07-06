@@ -59,7 +59,7 @@ const Task: FunctionalComponent<TaskProps> = ({ task, updateText }) => {
 		'rounded transition-spacing duration-250 text-white mb-2 flex flex-col py-1 px-2 w-full';
 
 	return (
-		<button
+		<div
 			className={`${taskClasses} ${
 				isActive && !showDetails ? activeClasses : ''
 			} ${showDetails ? detailClasses : ''}`}
@@ -67,15 +67,15 @@ const Task: FunctionalComponent<TaskProps> = ({ task, updateText }) => {
 			onDblClick={onDoubleClickHandler}
 			ref={ref}
 		>
-			<div className="flex items-center">
+			<div className="flex items-center w-full">
 				<Checkbox
 					active={task.isComplete}
 					onClick={() => toggleTaskStatus(task)}
 				/>
-				<div>
+				<div className="w-full">
 					{showDetails ? (
 						<input
-							className="text-white bg-transparent border border-gray-500"
+							className="w-full text-white bg-transparent border-b border-gray-500"
 							value={text}
 							onChange={(e: any) => setText(e.target.value)}
 							autoFocus
@@ -85,7 +85,7 @@ const Task: FunctionalComponent<TaskProps> = ({ task, updateText }) => {
 					)}
 				</div>
 			</div>
-		</button>
+		</div>
 	);
 };
 

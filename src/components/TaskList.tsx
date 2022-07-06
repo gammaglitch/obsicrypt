@@ -19,7 +19,7 @@ const TaskList: FunctionalComponent<TaskListProps> = ({
 	};
 
 	return (
-		<div>
+		<div className="w-full">
 			{tasks.map((task, index) => {
 				return (
 					<Task
