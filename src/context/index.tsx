@@ -1,5 +1,5 @@
 import { ComponentChildren, createContext } from 'preact';
-import { useMemo } from 'preact/hooks';
+import { useEffect, useMemo } from 'preact/hooks';
 import { ContextDefinition } from './types';
 
 export type ContextProviderProps = {
@@ -11,6 +11,8 @@ export const Context = createContext<ContextDefinition | null>(null);
 export function ContextProvider({
 	children,
 }: ContextProviderProps): JSX.Element {
+	useEffect(() => {}, []);
+
 	const value = useMemo(() => ({}), []);
 
 	return <Context.Provider value={value}>{children}</Context.Provider>;

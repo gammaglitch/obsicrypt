@@ -3,6 +3,7 @@ import { Plugin } from 'obsidian';
 
 import { FileType } from '../types/File';
 import { TaskType } from '../types/Task';
+import { Views } from '../types/Views';
 
 type StoreState = {
 	obsidian: Plugin | null;
@@ -17,6 +18,8 @@ type StoreState = {
 	selectedFile: FileType | null;
 	selectFile: (file: FileType) => void;
 	selectedFilesTasks: () => TaskType[];
+	selectedView: Views;
+	selectView: (view: Views) => void;
 };
 
 const useStore = create<StoreState>((set, get) => ({
@@ -53,6 +56,8 @@ const useStore = create<StoreState>((set, get) => ({
 	selectFile: (file) => set((state) => ({ ...state, selectedFile: file })),
 	selectedFilesTasks: () =>
 		get().tasks.filter((t) => t.filePath === get().selectedFile?.path),
+	selectedView: null,
+	selectView: (view) => set((state) => ({ ...state, selectedView: view })),
 }));
 
 export default useStore;

@@ -1,18 +1,18 @@
 import { TAbstractFile, TFile } from 'obsidian';
 import { useEffect } from 'preact/hooks';
 
-import useStore from './store/store';
+import useStore from '../store/store';
 import {
 	getFileByPath,
 	getFiles,
 	getTasksFromFiles,
 	replaceLineInFile,
 	searchAndReplaceLineInFile,
-} from './helpers/files';
+} from '../helpers/files';
 
-import { FileType } from './types/File';
-import { TaskType } from './types/Task';
-import { updateMetadata } from './helpers/tasks';
+import { FileType } from '../types/File';
+import { TaskType } from '../types/Task';
+import { updateMetadata } from '../helpers/tasks';
 
 export function useFileManager() {
 	const {
@@ -26,7 +26,6 @@ export function useFileManager() {
 	} = useStore();
 
 	const toggleTaskStatus = async (task: TaskType) => {
-		console.log(task);
 		let newTask;
 
 		if (task.isComplete) {
@@ -102,6 +101,7 @@ export function useFileManager() {
 	}, [files]);
 
 	useEffect(() => {
+		console.log('useFileManager:useEffect');
 		if (obsidian) {
 			loadTasksIntoStore();
 

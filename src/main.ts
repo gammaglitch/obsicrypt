@@ -3,7 +3,7 @@ import './style/index.css';
 import { ItemView, Plugin, WorkspaceLeaf } from 'obsidian';
 import { render, createElement } from 'preact';
 
-import { ReactView } from './components/ReactView';
+import { MainView } from './MainView';
 
 const VIEW_TYPE = 'task-manager';
 
@@ -13,7 +13,6 @@ class TaskManagerView extends ItemView {
 	constructor(leaf: WorkspaceLeaf, obsidian: ReactStarterPlugin) {
 		super(leaf);
 		this.obsidian = obsidian;
-		console.log(obsidian.app.workspace.getLeavesOfType(VIEW_TYPE));
 	}
 
 	getViewType(): string {
@@ -30,7 +29,7 @@ class TaskManagerView extends ItemView {
 
 	async onOpen(): Promise<void> {
 		render(
-			createElement(ReactView, {
+			createElement(MainView, {
 				obsidian: this.obsidian,
 			}),
 			this.contentEl
@@ -53,9 +52,6 @@ export default class ReactStarterPlugin extends Plugin {
 			(leaf: WorkspaceLeaf) => (this.view = new TaskManagerView(leaf, this))
 		);
 
-		// if (this.app.workspace.layoutReady) {
-		// 	this.onLayoutReady();
-		// }
 		this.app.workspace.onLayoutReady(
 			async () => await this.openFileTreeLeaf(true)
 		);

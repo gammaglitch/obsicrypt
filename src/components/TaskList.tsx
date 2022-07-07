@@ -1,6 +1,4 @@
 import { FunctionalComponent } from 'preact';
-import { useState } from 'preact/hooks';
-import { useFileManager } from '../FileManager';
 
 import { TaskType } from '../types/Task';
 import Task from './Task';

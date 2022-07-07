@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'preact/hooks';
 
 import DatePicker from './DatePicker';
 import type { TaskType } from '../types/Task';
-import { useFileManager } from '../FileManager';
+import { useFileManager } from '../hooks/useFileManager';
 import IconToggle from './IconToggle';
 import Checkbox from './Checkbox';
 import useOnClickOutside from '../hooks/useOnClickOutside';

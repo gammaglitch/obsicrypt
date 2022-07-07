@@ -1,20 +1,15 @@
 import { FunctionalComponent } from 'preact';
-import { useState } from 'preact/hooks';
-import useStore from '../store/store';
 
+import useStore from '../store/store';
 import { FileType } from '../types/File';
+import ViewRow from './views/ViewRow';
 
 type FileListProps = {
 	files: FileType[];
-	selectFile: (file: FileType) => void;
 };
 
-const FileList: FunctionalComponent<FileListProps> = ({
-	files,
-	selectFile: asdf,
-}) => {
+const FileList: FunctionalComponent<FileListProps> = ({ files }) => {
 	const { selectFile, selectedFile } = useStore();
-	const [activeFile, setActiveFile] = useState(null);
 
 	const onSelectFile = (file: FileType) => {
 		selectFile(file);
@@ -23,15 +18,11 @@ const FileList: FunctionalComponent<FileListProps> = ({
 	return (
 		<div>
 			{files.map((file) => (
-				<div
-					key={file.name}
+				<ViewRow
 					onClick={() => onSelectFile(file)}
-					className={`p-1 rounded ${
-						selectedFile?.path === file.path ? 'bg-blue-600' : ''
-					} `}
-				>
-					{file.name}
-				</div>
+					active={selectedFile?.path === file.path}
+					label={file.name.replace('.md', '')}
+				/>
 			))}
 		</div>
 	);
