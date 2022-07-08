@@ -4,6 +4,8 @@ import { Plugin } from 'obsidian';
 import { FileType } from '../types/File';
 import { TaskType } from '../types/Task';
 import { Views } from '../types/Views';
+import { Status } from '../types/Status';
+import { getTasksFromFiles } from '../helpers/files';
 
 type StoreState = {
 	obsidian: Plugin | null;
@@ -20,6 +22,8 @@ type StoreState = {
 	selectedFilesTasks: () => TaskType[];
 	selectedView: Views;
 	selectView: (view: Views) => void;
+	status: Status;
+	setStatus: (status: Status) => void;
 };
 
 const useStore = create<StoreState>((set, get) => ({
@@ -46,6 +50,7 @@ const useStore = create<StoreState>((set, get) => ({
 			...state,
 			files: state.files.filter((f) => f.path !== path),
 		})),
+	value: 123,
 	tasks: [],
 	setTasks: (tasks) =>
 		set((state) => ({
@@ -58,6 +63,20 @@ const useStore = create<StoreState>((set, get) => ({
 		get().tasks.filter((t) => t.filePath === get().selectedFile?.path),
 	selectedView: null,
 	selectView: (view) => set((state) => ({ ...state, selectedView: view })),
+	status: Status.LOADING,
+	setStatus: (status) => set((state) => ({ ...state, status })),
 }));
+
+export function useDerivedState() {
+	return useStore((state) => {
+		const allTasks = getTasksFromFiles(state.files);
+		return {
+			allTasks,
+			selectedFilesTasks: allTasks.filter(
+				(t) => t.filePath === state.selectedFile?.path
+			),
+		};
+	});
+}
 
 export default useStore;

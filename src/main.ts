@@ -3,7 +3,7 @@ import './style/index.css';
 import { ItemView, Plugin, WorkspaceLeaf } from 'obsidian';
 import { render, createElement } from 'preact';
 
-import { MainView } from './MainView';
+import { ViewWrapper } from './ViewWrapper';
 
 const VIEW_TYPE = 'task-manager';
 
@@ -29,7 +29,7 @@ class TaskManagerView extends ItemView {
 
 	async onOpen(): Promise<void> {
 		render(
-			createElement(MainView, {
+			createElement(ViewWrapper, {
 				obsidian: this.obsidian,
 			}),
 			this.contentEl

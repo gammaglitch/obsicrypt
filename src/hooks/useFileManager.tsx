@@ -96,43 +96,43 @@ export function useFileManager() {
 		removeFile(path);
 	};
 
-	useEffect(() => {
-		reloadTasksHandler();
-	}, [files]);
+	// useEffect(() => {
+	// 	reloadTasksHandler();
+	// }, [files]);
 
-	useEffect(() => {
-		console.log('useFileManager:useEffect');
-		if (obsidian) {
-			loadTasksIntoStore();
+	// useEffect(() => {
+	// 	console.log('useFileManager:useEffect');
+	// 	if (obsidian) {
+	// 		loadTasksIntoStore();
 
-			obsidian.app.metadataCache.on('changed', (file: TFile) => {
-				if (file instanceof TFile) {
-					updateFileHandler(file.path);
-				}
-			});
+	// 		obsidian.app.metadataCache.on('changed', (file: TFile) => {
+	// 			if (file instanceof TFile) {
+	// 				updateFileHandler(file.path);
+	// 			}
+	// 		});
 
-			obsidian.app.vault.on('create', (file: TAbstractFile) => {
-				if (file instanceof TFile) {
-					addFileToStore(file.path);
-				}
-			});
+	// 		obsidian.app.vault.on('create', (file: TAbstractFile) => {
+	// 			if (file instanceof TFile) {
+	// 				addFileToStore(file.path);
+	// 			}
+	// 		});
 
-			obsidian.app.vault.on('delete', (file: TAbstractFile) => {
-				if (file instanceof TFile) {
-					deleteFileHandler(file.path);
-				}
-			});
+	// 		obsidian.app.vault.on('delete', (file: TAbstractFile) => {
+	// 			if (file instanceof TFile) {
+	// 				deleteFileHandler(file.path);
+	// 			}
+	// 		});
 
-			obsidian.app.vault.on(
-				'rename',
-				(file: TAbstractFile, oldPath: string) => {
-					if (file instanceof TFile) {
-						replaceFileHandler(oldPath, file.path);
-					}
-				}
-			);
-		}
-	}, [obsidian]);
+	// 		obsidian.app.vault.on(
+	// 			'rename',
+	// 			(file: TAbstractFile, oldPath: string) => {
+	// 				if (file instanceof TFile) {
+	// 					replaceFileHandler(oldPath, file.path);
+	// 				}
+	// 			}
+	// 		);
+	// 	}
+	// }, [obsidian]);
 
 	return { files, toggleTaskStatus, updateTask, updateDate };
 }

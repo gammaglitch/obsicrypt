@@ -4,7 +4,7 @@ import { extractTaskFromListItem } from './tasks';
 import { FileType } from '../types/File';
 import { TaskType } from '../types/Task';
 
-export async function getTasksFromFiles(files: FileType[]) {
+export function getTasksFromFiles(files: FileType[]) {
 	const tasks: TaskType[] = [];
 
 	for (const file of files) {

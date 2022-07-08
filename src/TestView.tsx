@@ -11,6 +11,7 @@ import ViewSelector from './components/views/ViewSelector';
 import { Views } from './types/Views';
 import TodayView from './components/views/TodayView';
 import FileView from './components/views/FileView';
+import { useObsidianContext } from './hooks/useObsidianContext';
 
 type AvailableViews = Record<Views, ComponentChild>;
 
@@ -18,17 +19,13 @@ const test: AvailableViews = {
 	TODAY: TodayView,
 };
 
-type MainView = {
-	obsidian: Plugin;
-};
-
-export const MainView: FunctionalComponent<MainView> = ({ obsidian }) => {
+export const TestView: FunctionalComponent = () => {
 	const { toggleTaskStatus, updateTask } = useFileManager();
 	const {
 		files,
 		tasks,
 		selectedFile,
-		setObsidian,
+
 		selectFile,
 		selectedFilesTasks,
 	} = useStore();
@@ -38,21 +35,15 @@ export const MainView: FunctionalComponent<MainView> = ({ obsidian }) => {
 		updateTask(task, text);
 	};
 
-	useEffect(() => {
-		setObsidian(obsidian);
-	});
-
 	return (
 		<div className="flex h-full p-2">
-			<div className="w-1/4 h-full">
-				<ViewSelector />
-			</div>
-			<div
+			<div className="w-1/4 h-full">{/* <ViewSelector /> */}</div>
+			{/*<div
 				className="flex-1 px-2 py-1 border-t border-b border-r border-gray-800"
 				style={{ backgroundColor: '#221F1E' }}
 			>
 				{selectedFile && <FileView />}
-			</div>
+			</div> */}
 		</div>
 	);
 };

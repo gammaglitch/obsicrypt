@@ -72,7 +72,7 @@ const Task: FunctionalComponent<TaskProps> = ({ task, updateText }) => {
 					active={task.isComplete}
 					onClick={() => toggleTaskStatus(task)}
 				/>
-				<div className="w-full">
+				<div className="w-full overflow-hidden text-ellipsis">
 					{showDetails ? (
 						<input
 							className="w-full text-white bg-transparent border-b border-gray-500"

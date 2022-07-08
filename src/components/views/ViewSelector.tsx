@@ -6,12 +6,6 @@ import FileList from '../FileList';
 type ViewSelectorProps = {};
 
 const ViewSelector: FunctionalComponent<ViewSelectorProps> = () => {
-	const { selectFile, files } = useStore();
-
-	const onSelectFile = (file: FileType) => {
-		selectFile(file);
-	};
-
 	return (
 		<div
 			className="w-full h-full px-2 py-1 border border-gray-800 shadow-sm"
@@ -30,7 +24,7 @@ const ViewSelector: FunctionalComponent<ViewSelectorProps> = () => {
 			<div>
 				<h1>Files</h1>
 				<div className="pl-2">
-					<FileList files={files} selectFile={onSelectFile} />
+					<FileList />
 				</div>
 			</div>
 		</div>

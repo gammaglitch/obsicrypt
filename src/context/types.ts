@@ -1,1 +1,1 @@
-export type ContextDefinition = {};
+export type ObsidianContextDefinition = {};
