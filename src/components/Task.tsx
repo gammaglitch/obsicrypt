@@ -1,12 +1,11 @@
 import { FunctionalComponent } from 'preact';
 import { useEffect, useRef, useState } from 'preact/hooks';
 
-import DatePicker from './DatePicker';
 import type { TaskType } from '../types/Task';
 import { useFileManager } from '../hooks/useFileManager';
-import IconToggle from './IconToggle';
 import Checkbox from './Checkbox';
 import useOnClickOutside from '../hooks/useOnClickOutside';
+import DatePicker from './DatePicker';
 
 type TaskProps = {
 	task: TaskType;
@@ -67,12 +66,12 @@ const Task: FunctionalComponent<TaskProps> = ({ task, updateText }) => {
 			onDblClick={onDoubleClickHandler}
 			ref={ref}
 		>
-			<div className="flex items-center w-full">
+			<div className="flex items-center">
 				<Checkbox
 					active={task.isComplete}
 					onClick={() => toggleTaskStatus(task)}
 				/>
-				<div className="w-full overflow-hidden text-ellipsis">
+				<div>
 					{showDetails ? (
 						<input
 							className="w-full text-white bg-transparent border-b border-gray-500"
@@ -85,6 +84,11 @@ const Task: FunctionalComponent<TaskProps> = ({ task, updateText }) => {
 					)}
 				</div>
 			</div>
+			{showDetails && (
+				<div className="mt-auto ml-auto">
+					<DatePicker onUpdateDate={() => {}} />
+				</div>
+			)}
 		</div>
 	);
 };

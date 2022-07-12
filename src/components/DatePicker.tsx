@@ -1,5 +1,6 @@
 import { FunctionalComponent } from 'preact';
 import { useState } from 'preact/hooks';
+import * as chrono from 'chrono-node';
 
 type DatePickerProps = {
 	onUpdateDate: (date: string) => void;
@@ -14,7 +15,9 @@ const DatePicker: FunctionalComponent<DatePickerProps> = ({ onUpdateDate }) => {
 
 	const handleKeyDown = (event: any) => {
 		if (event.keyCode === 13) {
-			onUpdateDate(value);
+			console.log(value);
+			// onUpdateDate(value);
+			console.log(chrono.parseDate(value));
 		}
 	};
 
