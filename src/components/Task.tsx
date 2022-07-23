@@ -3,9 +3,11 @@ import { useEffect, useRef, useState } from 'preact/hooks';
 
 import type { TaskType } from '../types/Task';
 import { useFileManager } from '../hooks/useFileManager';
+import { useTaskManager } from '../hooks/useTaskUpdater';
 import Checkbox from './Checkbox';
 import useOnClickOutside from '../hooks/useOnClickOutside';
 import DatePicker from './DatePicker';
+import Textarea from './Textarea';
 
 type TaskProps = {
 	task: TaskType;
@@ -17,7 +19,8 @@ const Task: FunctionalComponent<TaskProps> = ({ task, updateText }) => {
 	const [text, setText] = useState(task.text);
 	const [showDetails, setShowDetails] = useState(false);
 
-	const { updateDate, updateTask, toggleTaskStatus } = useFileManager();
+	const { updateTask, toggleTaskStatus } = useFileManager();
+	const { updateDate } = useTaskManager();
 
 	const [isActive, setIsActive] = useState(false);
 
@@ -71,14 +74,15 @@ const Task: FunctionalComponent<TaskProps> = ({ task, updateText }) => {
 					active={task.isComplete}
 					onClick={() => toggleTaskStatus(task)}
 				/>
-				<div>
+				<div className="w-full">
 					{showDetails ? (
-						<input
-							className="w-full text-white bg-transparent border-b border-gray-500"
-							value={text}
-							onChange={(e: any) => setText(e.target.value)}
-							autoFocus
-						/>
+						// <input
+						// 	className="w-full text-white bg-transparent border-b border-gray-500"
+						// 	value={text}
+						// 	onChange={(e: any) => setText(e.target.value)}
+						// 	autoFocus
+						// />
+						<Textarea value={text} onChange={setText} />
 					) : (
 						text
 					)}
@@ -86,7 +90,7 @@ const Task: FunctionalComponent<TaskProps> = ({ task, updateText }) => {
 			</div>
 			{showDetails && (
 				<div className="mt-auto ml-auto">
-					<DatePicker onUpdateDate={() => {}} />
+					<DatePicker onUpdateDate={updateDateHandler} />
 				</div>
 			)}
 		</div>

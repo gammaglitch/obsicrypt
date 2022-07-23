@@ -11,4 +11,5 @@ export type TaskType = {
 
 export type Metadata = {
 	due: string | null;
+	start: string | null;
 };

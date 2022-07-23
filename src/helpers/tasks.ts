@@ -33,6 +33,7 @@ const keys = ['due'];
 
 function extractMetadata(text: string): Metadata {
 	const metadata: Metadata = {
+		start: null,
 		due: null,
 	};
 

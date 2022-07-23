@@ -15,9 +15,7 @@ const DatePicker: FunctionalComponent<DatePickerProps> = ({ onUpdateDate }) => {
 
 	const handleKeyDown = (event: any) => {
 		if (event.keyCode === 13) {
-			console.log(value);
-			// onUpdateDate(value);
-			console.log(chrono.parseDate(value));
+			onUpdateDate(value);
 		}
 	};
 

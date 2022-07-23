@@ -75,6 +75,8 @@ export function useDerivedState() {
 			selectedFilesTasks: allTasks.filter(
 				(t) => t.filePath === state.selectedFile?.path
 			),
+			filterTasksByDate: (date: string) =>
+				allTasks.filter((t) => t.due === date),
 		};
 	});
 }

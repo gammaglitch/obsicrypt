@@ -1,19 +1,18 @@
 import { FunctionalComponent } from 'preact';
+import { useFileManager } from '../hooks/useFileManager';
 
 import { TaskType } from '../types/Task';
 import Task from './Task';
 
 type TaskListProps = {
 	tasks: TaskType[];
-	updateText: (task: TaskType, text: string) => void;
 };
 
-const TaskList: FunctionalComponent<TaskListProps> = ({
-	tasks,
-	updateText,
-}) => {
+const TaskList: FunctionalComponent<TaskListProps> = ({ tasks }) => {
+	const { updateTask } = useFileManager();
+
 	const onUpdateText = (task: TaskType, text: string) => {
-		updateText(task, text);
+		updateTask(task, text);
 	};
 
 	return (

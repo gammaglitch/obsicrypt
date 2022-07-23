@@ -18,7 +18,7 @@ const FileView: FunctionalComponent<FileViewProps> = () => {
 
 	return (
 		<BaseView title={selectedFile.path}>
-			<TaskList tasks={selectedFilesTasks} updateText={onUpdateText} />
+			<TaskList tasks={selectedFilesTasks} />
 		</BaseView>
 	);
 };

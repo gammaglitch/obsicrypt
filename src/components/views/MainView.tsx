@@ -21,8 +21,7 @@ const AllViews: AvailableViews = {
 export const MainView: FunctionalComponent<ViewWrapperProps> = ({
 	obsidian,
 }) => {
-	const { status, selectedView, files, setObsidian } = useStore();
-	const tasks = useDerivedState();
+	const { status, selectedView, setObsidian } = useStore();
 
 	useEffect(() => {
 		setObsidian(obsidian);

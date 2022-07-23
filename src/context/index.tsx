@@ -22,6 +22,10 @@ export function ObsidianContextProvider({
 	const init = useRef<boolean>(false);
 
 	useEffect(() => {
+		console.log('context:obsidian', obsidian);
+	}, [obsidian]);
+
+	useEffect(() => {
 		console.log('Context:useEffect');
 		if (!init.current && obsidian) {
 			initStore();

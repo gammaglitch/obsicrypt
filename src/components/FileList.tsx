@@ -19,9 +19,9 @@ const FileList: FunctionalComponent<FileListProps> = () => {
 		<div>
 			{files.map((file) => (
 				<ViewRow
+					label={file.name.replace('.md', '')}
 					onClick={() => onSelectFile(file)}
 					active={selectedFile?.path === file.path}
-					label={file.name.replace('.md', '')}
 				/>
 			))}
 		</div>
