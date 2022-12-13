@@ -2,8 +2,7 @@ import { FunctionalComponent } from 'preact';
 import { useEffect, useRef, useState } from 'preact/hooks';
 
 type TextareaProps = {
-    value: string;
-    onChange:
+	value: string;
 };
 
 const Textarea: FunctionalComponent<TextareaProps> = () => {

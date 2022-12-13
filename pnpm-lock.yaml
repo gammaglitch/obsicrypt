@@ -8,6 +8,7 @@ specifiers:
   '@types/react-datepicker': ^4.4.2
   autoprefixer: ^10.4.7
   chrono-node: ^2.3.9
+  jotai: ^1.11.2
   obsidian: ^0.14.8
   postcss: ^8.4.14
   preact: ^10.7.2
@@ -17,7 +18,7 @@ specifiers:
   tailwindcss: ^3.0.24
   typescript: ^4.7.2
   vite: ^2.9.9
-  zustand: 4.0.0-rc.1
+  zustand: 3.7.2
 
 dependencies:
   '@babel/core': 7.18.2
@@ -26,16 +27,17 @@ dependencies:
   '@types/node': 17.0.36
   autoprefixer: 10.4.7_postcss@8.4.14
   chrono-node: 2.3.9
+  jotai: 1.11.2_@babel+core@7.18.2
   obsidian: 0.14.8
   postcss: 8.4.14
   preact: 10.7.2
   preact-router: 4.0.1_preact@10.7.2
   prettier: 2.6.2
   react-datepicker: 4.8.0
-  tailwindcss: 3.0.24
+  tailwindcss: 3.0.24_postcss@8.4.14
   typescript: 4.7.2
   vite: 2.9.9
-  zustand: 4.0.0-rc.1
+  zustand: 3.7.2
 
 devDependencies:
   '@types/react-datepicker': 4.4.2
@@ -1014,6 +1016,46 @@ packages:
     engines: {node: '>=0.12.0'}
     dev: false
 
+  /jotai/1.11.2_@babel+core@7.18.2:
+    resolution: {integrity: sha512-hVLn1aS1QprDy+NrvyWIOcaA/LEG5AY0Z7kWtx26EJ8eH8DY8pW1wUM0PrlqQzthqd6HdEVtXLY1rB//0n8LvA==}
+    engines: {node: '>=12.20.0'}
+    peerDependencies:
+      '@babel/core': '*'
+      '@babel/template': '*'
+      jotai-immer: '*'
+      jotai-optics: '*'
+      jotai-redux: '*'
+      jotai-tanstack-query: '*'
+      jotai-urql: '*'
+      jotai-valtio: '*'
+      jotai-xstate: '*'
+      jotai-zustand: '*'
+      react: '>=16.8'
+    peerDependenciesMeta:
+      '@babel/core':
+        optional: true
+      '@babel/template':
+        optional: true
+      jotai-immer:
+        optional: true
+      jotai-optics:
+        optional: true
+      jotai-redux:
+        optional: true
+      jotai-tanstack-query:
+        optional: true
+      jotai-urql:
+        optional: true
+      jotai-valtio:
+        optional: true
+      jotai-xstate:
+        optional: true
+      jotai-zustand:
+        optional: true
+    dependencies:
+      '@babel/core': 7.18.2
+    dev: false
+
   /js-tokens/4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
 
@@ -1318,10 +1360,12 @@ packages:
     engines: {node: '>= 0.4'}
     dev: false
 
-  /tailwindcss/3.0.24:
+  /tailwindcss/3.0.24_postcss@8.4.14:
     resolution: {integrity: sha512-H3uMmZNWzG6aqmg9q07ZIRNIawoiEcNFKDfL+YzOPuPsXuDXxJxB9icqzLgdzKNwjG3SAro2h9SYav8ewXNgig==}
     engines: {node: '>=12.13.0'}
     hasBin: true
+    peerDependencies:
+      postcss: ^8.0.9
     dependencies:
       arg: 5.0.1
       chokidar: 3.5.3
@@ -1364,12 +1408,6 @@ packages:
     resolution: {integrity: sha512-Mamb1iX2FDUpcTRzltPxgWMKy3fhg0TN378ylbktPGPK/99KbDtMQ4W1hwgsbPAsG3a0xKa1vmw4VKZQbkvz5A==}
     engines: {node: '>=4.2.0'}
     hasBin: true
-    dev: false
-
-  /use-sync-external-store/1.1.0:
-    resolution: {integrity: sha512-SEnieB2FPKEVne66NpXPd1Np4R1lTNKfjuy3XdIoPQKYBAFdzbzSZlSn1KJZUiihQLQC5Znot4SBz1EOTBwQAQ==}
-    peerDependencies:
-      react: ^16.8.0 || ^17.0.0 || ^18.0.0
     dev: false
 
   /util-deprecate/1.0.2:
@@ -1419,17 +1457,12 @@ packages:
     engines: {node: '>= 6'}
     dev: false
 
-  /zustand/4.0.0-rc.1:
-    resolution: {integrity: sha512-qgcs7zLqBdHu0PuT3GW4WCIY5SgXdsv30GQMu9Qpp1BA2aS+sNS8l4x0hWuyEhjXkN+701aGWawhKDv6oWJAcw==}
+  /zustand/3.7.2:
+    resolution: {integrity: sha512-PIJDIZKtokhof+9+60cpockVOq05sJzHCriyvaLBmEJixseQ1a5Kdov6fWZfWOu5SK9c+FhH1jU0tntLxRJYMA==}
     engines: {node: '>=12.7.0'}
     peerDependencies:
-      immer: '>=9.0'
       react: '>=16.8'
     peerDependenciesMeta:
-      immer:
-        optional: true
       react:
         optional: true
-    dependencies:
-      use-sync-external-store: 1.1.0
     dev: false

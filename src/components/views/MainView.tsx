@@ -10,6 +10,9 @@ import FileView from './FileView';
 import { ViewWrapperProps } from '../../ViewWrapper';
 import ViewSelector from './ViewSelector';
 import { Status } from '../../types/Status';
+import { useAtomValue, useUpdateAtom } from 'jotai/utils';
+import { loadableFiles, obsidianAtom } from '../../store/atoms/files';
+import { loadableTasks, tasksAtom } from '../../store/atoms/tasks';
 
 type AvailableViews = Record<Views, ComponentChild>;
 
@@ -21,7 +24,10 @@ const AllViews: AvailableViews = {
 export const MainView: FunctionalComponent<ViewWrapperProps> = ({
 	obsidian,
 }) => {
-	const { status, selectedView, setObsidian } = useStore();
+	const { status, selectedView } = useStore();
+	const files = useAtomValue(loadableFiles);
+	const tasks = useAtomValue(loadableTasks);
+	const setObsidian = useUpdateAtom(obsidianAtom);
 
 	useEffect(() => {
 		setObsidian(obsidian);
