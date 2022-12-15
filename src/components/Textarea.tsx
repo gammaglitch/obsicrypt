@@ -1,34 +1,16 @@
 import { FunctionalComponent } from 'preact';
-import { useEffect, useRef, useState } from 'preact/hooks';
 
 type TextareaProps = {
-	value: string;
+	text: string;
+	onChangeText: (value: string) => void;
 };
 
-const Textarea: FunctionalComponent<TextareaProps> = () => {
-	const textareaRef = useRef(null);
-	const [currentValue, setCurrentValue] = useState('');
-
-	useEffect(() => {
-		textareaRef.current.style.height = '0px';
-		const scrollHeight = textareaRef.current.scrollHeight;
-		textareaRef.current.style.height = scrollHeight + 'px';
-	}, [currentValue]);
-
+const Textarea: FunctionalComponent<TextareaProps> = ({
+	text,
+	onChangeText,
+}) => {
 	return (
-		<textarea
-			ref={textareaRef}
-			style={{
-				display: 'block',
-				overflow: 'hidden',
-				resize: 'none',
-				width: '100%',
-			}}
-			value={currentValue}
-			onChange={(e) => {
-				setCurrentValue(e.target.value);
-			}}
-		/>
+		<textarea value={text} onChange={(e) => onChangeText(e.target.value)} />
 	);
 };
 

@@ -6,6 +6,16 @@ import { FileType } from '../../types/File';
 
 export const obsidianAtom = atom<Plugin | null>(null);
 
+export const selectObsidian = atom((get) => {
+	const obsidian = get(obsidianAtom);
+
+	if (obsidian) {
+		return obsidian;
+	} else {
+		throw new Error('missing reference to obsidian');
+	}
+});
+
 export const filesAtom = atomWithDefault(async (get) => {
 	const obsidian = get(obsidianAtom);
 

@@ -19,80 +19,23 @@ const Task: FunctionalComponent<TaskProps> = ({ task, updateText }) => {
 	const [text, setText] = useState(task.text);
 	const [showDetails, setShowDetails] = useState(false);
 
-	const { updateTask, toggleTaskStatus } = useFileManager();
+	const { toggleTaskStatus } = useFileManager();
 	const { updateDate } = useTaskManager();
 
 	const [isActive, setIsActive] = useState(false);
-
-	useEffect(() => {
-		setText(task.text);
-	}, [task.text]);
-
-	const onClickHandler = () => {
-		setIsActive(true);
-	};
-
-	const onDoubleClickHandler = () => {
-		setShowDetails(true);
-	};
-
-	const updateDateHandler = (date: string) => {
-		updateDate(task, date);
-	};
-
-	const updateTextHandler = () => {
-		updateTask(task, text);
-	};
-
-	useOnClickOutside(ref, () => {
-		setIsActive(false);
-		setShowDetails(false);
-
-		if (task.text !== text) {
-			updateTextHandler();
-		}
-	});
-
-	const activeClasses = 'bg-task-active-background';
-	const detailClasses = 'h-20 border shadow-md bg-gray-800';
-	const defaultClasses = '';
 
 	const taskClasses =
 		'rounded transition-spacing duration-250 text-white mb-2 flex flex-col py-1 px-2 w-full';
 
 	return (
-		<div
-			className={`${taskClasses} ${
-				isActive && !showDetails ? activeClasses : ''
-			} ${showDetails ? detailClasses : ''}`}
-			onClick={onClickHandler}
-			onDblClick={onDoubleClickHandler}
-			ref={ref}
-		>
+		<div>
 			<div className="flex items-center">
 				<Checkbox
 					active={task.isComplete}
 					onClick={() => toggleTaskStatus(task)}
 				/>
-				<div className="w-full">
-					{showDetails ? (
-						// <input
-						// 	className="w-full text-white bg-transparent border-b border-gray-500"
-						// 	value={text}
-						// 	onChange={(e: any) => setText(e.target.value)}
-						// 	autoFocus
-						// />
-						<Textarea value={text} onChange={setText} />
-					) : (
-						text
-					)}
-				</div>
+				<div className="w-full">{text}</div>
 			</div>
-			{showDetails && (
-				<div className="mt-auto ml-auto">
-					<DatePicker onUpdateDate={updateDateHandler} />
-				</div>
-			)}
 		</div>
 	);
 };

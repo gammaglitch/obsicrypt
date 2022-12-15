@@ -13,19 +13,16 @@ import {
 import { FileType } from '../types/File';
 import { TaskType } from '../types/Task';
 import { updateMetadata } from '../helpers/tasks';
+import { useAtomValue } from 'jotai';
+import { obsidianAtom, selectObsidian } from '../store/atoms/files';
 
 export function useFileManager() {
-	const {
-		obsidian,
-		files,
-		setFiles,
-		setTasks,
-		replaceFile,
-		addFile,
-		removeFile,
-	} = useStore();
+	const obsidian = useAtomValue(selectObsidian);
+	const { files, setFiles, setTasks, replaceFile, addFile, removeFile } =
+		useStore();
 
 	const toggleTaskStatus = async (task: TaskType) => {
+		debugger;
 		let newTask;
 
 		if (task.isComplete) {
