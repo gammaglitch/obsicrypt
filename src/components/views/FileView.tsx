@@ -2,7 +2,7 @@ import { useAtomValue } from 'jotai';
 import { FunctionalComponent } from 'preact';
 import { useFileManager } from '../../hooks/useFileManager';
 import { activeFileAtom } from '../../store/atoms/files';
-import { activeFileTasks, activeFileTasksAtom } from '../../store/atoms/tasks';
+import { activeFileTasksAtom } from '../../store/atoms/tasks';
 import useStore, { useDerivedState } from '../../store/store';
 import { TaskType } from '../../types/Task';
 import TaskList from '../TaskList';

@@ -8,30 +8,20 @@ import { FileType } from '../types/File';
 import { Views } from '../types/Views';
 import ViewRow from './views/ViewRow';
 
-type FileListProps = {};
+type FileListProps = {
+	files: FileType[];
+	selectedFile: FileType | null;
+	onSelectFile: (file: FileType) => void;
+};
 
-const FileList: FunctionalComponent<FileListProps> = () => {
-	const { selectFile, selectedFile, selectView } = useStore();
-	const files = useAtomValue(loadableFiles);
-	const setActiveFile = useUpdateAtom(activeFileAtom);
-
-	const onSelectFile = (file: FileType) => {
-		selectFile(file);
-		setActiveFile(file);
-		selectView(Views.FILE);
-	};
-
-	if (files.state === 'loading') {
-		return <div>...</div>;
-	}
-
-	if (files.state === 'hasError') {
-		return <h1>error loading files</h1>;
-	}
-
+const FileList: FunctionalComponent<FileListProps> = ({
+	files,
+	selectedFile,
+	onSelectFile,
+}) => {
 	return (
 		<div>
-			{files.data.map((file) => (
+			{files.map((file) => (
 				<ViewRow
 					label={file.name.replace('.md', '')}
 					onClick={() => onSelectFile(file)}
