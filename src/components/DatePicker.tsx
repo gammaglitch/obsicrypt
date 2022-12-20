@@ -7,7 +7,7 @@ type DatePickerProps = {
 };
 
 const DatePicker: FunctionalComponent<DatePickerProps> = ({ onUpdateDate }) => {
-	const [value, setValue] = useState();
+	const [value, setValue] = useState('');
 
 	const onChangeHandler = (event: any) => {
 		setValue(event.target.value);

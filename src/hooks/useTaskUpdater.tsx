@@ -1,10 +1,11 @@
+import { useAtomValue } from 'jotai';
 import { searchAndReplaceLineInFile } from '../helpers/files';
 import { updateMetadata } from '../helpers/tasks';
-import useStore from '../store/store';
+import { selectObsidian } from '../store/atoms/files';
 import { TaskType } from '../types/Task';
 
 export function useTaskManager() {
-	const { obsidian } = useStore();
+	const obsidian = useAtomValue(selectObsidian);
 
 	const updateTaskMetadata = async (
 		task: TaskType,

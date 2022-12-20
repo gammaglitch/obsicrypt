@@ -41,14 +41,14 @@ module.exports = {
 			rose: colors.rose,
 			task: {
 				checkbox: {
-					border: '#706F6F',
+					border: '#706C74',
 					background: '#5C95F0',
 				},
 				active: {
-					background: '#2A4270',
+					background: '#312E37',
 				},
 				text: {
-					completed: '#959494',
+					completed: '#949297',
 				},
 			},
 		}),

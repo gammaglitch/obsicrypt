@@ -38,7 +38,7 @@ class TaskManagerView extends ItemView {
 }
 
 export default class ReactStarterPlugin extends Plugin {
-	private view: TaskManagerView;
+	private view!: TaskManagerView;
 
 	onunload(): void {
 		this.app.workspace
@@ -73,12 +73,6 @@ export default class ReactStarterPlugin extends Plugin {
 	}
 
 	onLayoutReady(): void {
-		// if (this.app.workspace.getLeavesOfType(VIEW_TYPE).length) {
-		// 	return;
-		// }
-		// this.app.workspace.getRightLeaf(false).setViewState({
-		// 	type: VIEW_TYPE,
-		// });
 		this.openFileTreeLeaf(true);
 	}
 }

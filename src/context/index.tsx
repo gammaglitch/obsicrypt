@@ -2,7 +2,6 @@ import { Plugin, TAbstractFile, TFile } from 'obsidian';
 import { ComponentChildren, createContext } from 'preact';
 import { useEffect, useMemo, useRef } from 'preact/hooks';
 import { getFileByPath, getFiles } from '../helpers/files';
-import useStore from '../store/store';
 import { Status } from '../types/Status';
 import { ObsidianContextDefinition } from './types';
 import { useAtom, useAtomValue } from 'jotai';
@@ -21,7 +20,6 @@ export const ObsidianContext = createContext<ObsidianContextDefinition | null>(
 export function ObsidianContextProvider({
 	children,
 }: ObsidianContextProviderProps): JSX.Element {
-	const { setStatus } = useStore();
 	const init = useRef<boolean>(false);
 	const obsidian = useAtomValue(obsidianAtom);
 
@@ -41,7 +39,6 @@ export function ObsidianContextProvider({
 
 	const initStore = async () => {
 		bindToObsidianEvents();
-		setStatus(Status.READY);
 	};
 
 	const replaceFileByPath = async (filePath: string, path: string) => {

@@ -9,7 +9,7 @@ type TaskListProps = {
 };
 
 const TaskList: FunctionalComponent<TaskListProps> = ({ tasks }) => {
-	const { updateTask } = useFileManager();
+	const { updateTask, toggleTaskStatus } = useFileManager();
 
 	const onUpdateText = (task: TaskType, text: string) => {
 		updateTask(task, text);
@@ -23,6 +23,7 @@ const TaskList: FunctionalComponent<TaskListProps> = ({ tasks }) => {
 						key={`${task.filePath}-${index}`}
 						task={task}
 						updateText={(text) => onUpdateText(task, text)}
+						toggle={() => toggleTaskStatus(task)}
 					/>
 				);
 			})}

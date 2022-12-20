@@ -1,4 +1,4 @@
-import { Plugin, TFile } from 'obsidian';
+import { ListItemCache, Plugin, TFile } from 'obsidian';
 
 import { extractTaskFromListItem } from './tasks';
 import { FileType } from '../types/File';
@@ -69,10 +69,19 @@ export async function replaceLineInFile(
 	return obsidian.app.vault.modify(fileRef, fileLines.join('\n'));
 }
 
+function getListItems(obsidian: Plugin, file: TFile): ListItemCache[] {
+	const cache = obsidian.app.metadataCache.getFileCache(file);
+
+	if (cache) {
+		return cache.listItems ?? [];
+	} else {
+		return [];
+	}
+}
+
 async function buildFileType(obsidian: Plugin, file: TFile) {
 	const fileContent = await obsidian.app.vault.cachedRead(file);
-	const listItems =
-		obsidian.app.metadataCache.getFileCache(file).listItems || [];
+	const listItems = getListItems(obsidian, file);
 
 	return {
 		name: file.name,
@@ -93,14 +102,13 @@ export async function getFileByPath(
 }
 
 export async function getFiles(obsidian: Plugin): Promise<FileType[]> {
-	const allFiles = await Promise.all(obsidian.app.vault.getMarkdownFiles());
+	const allFiles = obsidian.app.vault.getMarkdownFiles();
 
 	const files: FileType[] = [];
 
 	for (const file of allFiles) {
 		const fileContent = await obsidian.app.vault.cachedRead(file);
-		const listItems =
-			obsidian.app.metadataCache.getFileCache(file).listItems || [];
+		const listItems = getListItems(obsidian, file);
 
 		files.push({
 			name: file.name,

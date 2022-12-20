@@ -16,7 +16,10 @@ const ViewRow: FunctionalComponent<ViewRowProps> = ({
 	return (
 		<div
 			onClick={onClick}
-			className={`flex items-center p-1 rounded ${active ? 'bg-blue-600' : ''}`}
+			className={`flex items-center px-2 rounded ${
+				active ? 'bg-task-active-background' : ''
+			}`}
+			style={{ color: '#C4C3C7' }}
 		>
 			{icon ? icon : ''} {label}
 		</div>

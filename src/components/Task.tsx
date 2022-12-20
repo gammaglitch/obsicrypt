@@ -7,11 +7,11 @@ import { useTaskManager } from '../hooks/useTaskUpdater';
 import Checkbox from './Checkbox';
 import useOnClickOutside from '../hooks/useOnClickOutside';
 import DatePicker from './DatePicker';
-import Textarea from './Textarea';
 
 type TaskProps = {
 	task: TaskType;
 	updateText: (text: string) => void;
+	toggle: () => void;
 };
 
 const Task: FunctionalComponent<TaskProps> = ({ task, updateText }) => {
@@ -34,7 +34,13 @@ const Task: FunctionalComponent<TaskProps> = ({ task, updateText }) => {
 					active={task.isComplete}
 					onClick={() => toggleTaskStatus(task)}
 				/>
-				<div className="w-full">{text}</div>
+				<div
+					className={`w-full text-ellipsis overflow-hidden ${
+						task.isComplete ? 'text-task-text-completed' : ''
+					}`}
+				>
+					{text}
+				</div>
 			</div>
 		</div>
 	);

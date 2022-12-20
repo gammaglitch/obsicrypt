@@ -16,7 +16,7 @@ export const selectObsidian = atom((get) => {
 	}
 });
 
-export const filesAtom = atomWithDefault(async (get) => {
+export const filesAtom = atomWithDefault((get) => {
 	const obsidian = get(obsidianAtom);
 
 	if (obsidian) {

@@ -2,8 +2,6 @@ import { Plugin } from 'obsidian';
 import { ComponentChild, FunctionalComponent } from 'preact';
 import { useEffect } from 'preact/hooks';
 
-import useStore, { useDerivedState } from '../../store/store';
-
 import { Views } from '../../types/Views';
 import TodayView from './TodayView';
 import FileView from './FileView';
@@ -32,9 +30,7 @@ const AllViews: AvailableViews = {
 export const MainView: FunctionalComponent<ViewWrapperProps> = ({
 	obsidian,
 }) => {
-	const { status } = useStore();
 	const files = useAtomValue(loadableFiles);
-	const tasks = useAtomValue(loadableTasks);
 	const setObsidian = useUpdateAtom(obsidianAtom);
 	const [view, setView] = useAtom(viewAtom);
 	const [file, setFile] = useAtom(activeFileAtom);
@@ -63,26 +59,27 @@ export const MainView: FunctionalComponent<ViewWrapperProps> = ({
 
 	return (
 		<div className="flex w-full h-full">
-			<div className="flex-shrink-0 w-1/4 bg-gray-800">
-				<ViewSelector view={view} onSelectView={selectView} />
+			<div
+				className="flex-shrink-0 w-1/3 px-4 pt-4"
+				style={{ backgroundColor: '#201B27' }}
+			>
+				{/* <ViewSelector view={view} onSelectView={selectView} /> */}
 
-				<div>
-					<h1>Files</h1>
-					<div className="pl-2">
-						{files.state === 'hasData' && (
-							<>
-								<FileList
-									files={files.data}
-									selectedFile={file}
-									onSelectFile={selectFile}
-								/>
-							</>
-						)}
-					</div>
-				</div>
+				{files.state === 'hasData' && (
+					<FileList
+						files={files.data}
+						selectedFile={file}
+						onSelectFile={selectFile}
+					/>
+				)}
 			</div>
 
-			<div className="flex-1 w-3/4">{status === Status.READY && getView()}</div>
+			<div
+				className="flex-1 w-2/3 px-4 pt-8"
+				style={{ backgroundColor: '#292430' }}
+			>
+				{getView()}
+			</div>
 		</div>
 	);
 };

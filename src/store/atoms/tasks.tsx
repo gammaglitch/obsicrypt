@@ -20,3 +20,5 @@ export const activeFileTasksAtom = atom((get) => {
 
 	return get(tasksAtom).filter((t) => t.filePath === file?.path);
 });
+
+export const loadableCurrTasks = loadable(activeFileTasksAtom);

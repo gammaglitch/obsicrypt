@@ -3,7 +3,6 @@ import { useUpdateAtom } from 'jotai/utils';
 import { FunctionalComponent } from 'preact';
 import { activeFileAtom, filesAtom, loadableFiles } from '../store/atoms/files';
 
-import useStore from '../store/store';
 import { FileType } from '../types/File';
 import { Views } from '../types/Views';
 import ViewRow from './views/ViewRow';
@@ -20,7 +19,7 @@ const FileList: FunctionalComponent<FileListProps> = ({
 	onSelectFile,
 }) => {
 	return (
-		<div>
+		<div className="h-full overflow-scroll">
 			{files.map((file) => (
 				<ViewRow
 					label={file.name.replace('.md', '')}
