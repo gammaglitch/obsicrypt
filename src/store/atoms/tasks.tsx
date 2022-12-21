@@ -1,5 +1,6 @@
 import { atom } from 'jotai';
 import { loadable } from 'jotai/utils';
+
 import { getTasksFromFiles } from '../../helpers/files';
 import { activeFileAtom, filesAtom } from './files';
 
@@ -8,9 +9,8 @@ export const tasksAtom = atom(async (get) => {
 
 	if (files) {
 		return getTasksFromFiles(files);
-	} else {
-		return [];
 	}
+	return [];
 });
 
 export const loadableTasks = loadable(tasksAtom);

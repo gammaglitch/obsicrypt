@@ -1,13 +1,12 @@
+import { useAtomValue } from 'jotai';
+
 import {
 	replaceLineInFile,
 	searchAndReplaceLineInFile,
 } from '../helpers/files';
-
-import { FileType } from '../types/File';
-import { TaskType } from '../types/Task';
 import { updateMetadata } from '../helpers/tasks';
-import { useAtomValue } from 'jotai';
-import { obsidianAtom, selectObsidian } from '../store/atoms/files';
+import { selectObsidian } from '../store/atoms/files';
+import { TaskType } from '../types/Task';
 
 export function useFileManager() {
 	const obsidian = useAtomValue(selectObsidian);

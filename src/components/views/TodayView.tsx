@@ -1,5 +1,6 @@
 import { FunctionalComponent } from 'preact';
-import { useEffect, useState } from 'preact/hooks';
+import { useState } from 'preact/hooks';
+
 import TaskList from '../TaskList';
 import BaseView from './BaseView';
 

@@ -1,6 +1,7 @@
 import { atom } from 'jotai';
 import { atomWithDefault, loadable } from 'jotai/utils';
 import { Plugin } from 'obsidian';
+
 import { getFiles } from '../../helpers/files';
 import { FileType } from '../../types/File';
 
@@ -11,9 +12,8 @@ export const selectObsidian = atom((get) => {
 
 	if (obsidian) {
 		return obsidian;
-	} else {
-		throw new Error('missing reference to obsidian');
 	}
+	throw new Error('missing reference to obsidian');
 });
 
 export const filesAtom = atomWithDefault((get) => {
@@ -21,9 +21,8 @@ export const filesAtom = atomWithDefault((get) => {
 
 	if (obsidian) {
 		return getFiles(obsidian);
-	} else {
-		return [];
 	}
+	return [];
 });
 
 export const loadableFiles = loadable(filesAtom);

@@ -1,6 +1,5 @@
 import { FunctionalComponent } from 'preact';
 import { useState } from 'preact/hooks';
-import * as chrono from 'chrono-node';
 
 type DatePickerProps = {
 	onUpdateDate: (date: string) => void;

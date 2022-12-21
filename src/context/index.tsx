@@ -1,13 +1,12 @@
-import { Plugin, TAbstractFile, TFile } from 'obsidian';
-import { ComponentChildren, createContext } from 'preact';
-import { useEffect, useMemo, useRef } from 'preact/hooks';
-import { getFileByPath, getFiles } from '../helpers/files';
-import { Status } from '../types/Status';
-import { ObsidianContextDefinition } from './types';
-import { useAtom, useAtomValue } from 'jotai';
-import { filesAtom, obsidianAtom } from '../store/atoms/files';
+import { useAtomValue } from 'jotai';
 import { useUpdateAtom } from 'jotai/utils';
-import { FileType } from '../types/File';
+import { TAbstractFile, TFile } from 'obsidian';
+import { ComponentChildren, createContext } from 'preact';
+import { useEffect, useRef } from 'preact/hooks';
+
+import { getFileByPath } from '../helpers/files';
+import { filesAtom, obsidianAtom } from '../store/atoms/files';
+import { ObsidianContextDefinition } from './types';
 
 export type ObsidianContextProviderProps = {
 	children: ComponentChildren;

@@ -1,4 +1,5 @@
 import { useAtomValue } from 'jotai';
+
 import { searchAndReplaceLineInFile } from '../helpers/files';
 import { updateMetadata } from '../helpers/tasks';
 import { selectObsidian } from '../store/atoms/files';

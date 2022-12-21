@@ -1,10 +1,6 @@
-import { useAtom, useAtomValue } from 'jotai';
-import { useUpdateAtom } from 'jotai/utils';
 import { FunctionalComponent } from 'preact';
-import { activeFileAtom, filesAtom, loadableFiles } from '../store/atoms/files';
 
 import { FileType } from '../types/File';
-import { Views } from '../types/Views';
 import ViewRow from './views/ViewRow';
 
 type FileListProps = {
@@ -22,6 +18,7 @@ const FileList: FunctionalComponent<FileListProps> = ({
 		<div className="h-full overflow-scroll">
 			{files.map((file) => (
 				<ViewRow
+					key={file.path}
 					label={file.name.replace('.md', '')}
 					onClick={() => onSelectFile(file)}
 					active={selectedFile?.path === file.path}

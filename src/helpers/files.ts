@@ -1,8 +1,8 @@
 import { ListItemCache, Plugin, TFile } from 'obsidian';
 
-import { extractTaskFromListItem } from './tasks';
 import { FileType } from '../types/File';
 import { TaskType } from '../types/Task';
+import { extractTaskFromListItem } from './tasks';
 
 export function getTasksFromFiles(files: FileType[]) {
 	const tasks: TaskType[] = [];
@@ -74,9 +74,8 @@ function getListItems(obsidian: Plugin, file: TFile): ListItemCache[] {
 
 	if (cache) {
 		return cache.listItems ?? [];
-	} else {
-		return [];
 	}
+	return [];
 }
 
 async function buildFileType(obsidian: Plugin, file: TFile) {

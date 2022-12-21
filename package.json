@@ -1,38 +1,46 @@
 {
-  "name": "obsidian-preact-vite",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "vite build --watch",
-    "build:ts": "tsc",
-    "build:vite": "vite build",
-    "build": "tsc && vite build"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "@babel/core": "^7.18.2",
-    "@babel/plugin-transform-react-jsx": "^7.17.12",
-    "@preact/preset-vite": "^2.2.0",
-    "@types/node": "^17.0.36",
-    "autoprefixer": "^10.4.7",
-    "chrono-node": "^2.3.9",
-    "jotai": "^1.11.2",
-    "obsidian": "^0.14.8",
-    "postcss": "^8.4.14",
-    "preact": "^10.7.2",
-    "preact-router": "^4.0.1",
-    "prettier": "^2.6.2",
-    "react-datepicker": "^4.8.0",
-    "tailwindcss": "^3.0.24",
-    "typescript": "^4.7.2",
-    "vite": "^2.9.9",
-    "zustand": "3.7.2"
-  },
-  "devDependencies": {
-    "@types/react-datepicker": "^4.4.2"
-  }
+	"name": "obsidian-preact-vite",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"dev": "vite build --watch",
+		"build:ts": "tsc",
+		"build:vite": "vite build",
+		"build": "tsc && vite build",
+		"lint": "eslint --ext .tsx --ignore-path .gitignore src"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"@babel/core": "^7.18.2",
+		"@babel/plugin-transform-react-jsx": "^7.17.12",
+		"@preact/preset-vite": "^2.2.0",
+		"@types/node": "^17.0.36",
+		"autoprefixer": "^10.4.7",
+		"chrono-node": "^2.3.9",
+		"eslint-plugin-simple-import-sort": "^8.0.0",
+		"jotai": "^1.11.2",
+		"obsidian": "^0.14.8",
+		"postcss": "^8.4.14",
+		"preact": "^10.7.2",
+		"preact-router": "^4.0.1",
+		"prettier": "^2.6.2",
+		"react-datepicker": "^4.8.0",
+		"tailwindcss": "^3.0.24",
+		"vite": "^2.9.9",
+		"zustand": "3.7.2"
+	},
+	"devDependencies": {
+		"@types/react-datepicker": "^4.4.2",
+		"@typescript-eslint/parser": "^5.47.0",
+		"eslint": "^8.30.0",
+		"eslint-config-preact": "^1.3.0",
+		"eslint-plugin-prettier": "^4.2.1",
+		"eslint-plugin-unused-imports": "^2.0.0",
+		"jest": "^29.3.1",
+		"typescript": "^4.7.2"
+	}
 }

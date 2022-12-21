@@ -14,7 +14,7 @@ const Checkbox: FunctionalComponent<CheckboxProps> = ({ active, onClick }) => {
 		<div
 			className={`flex-shrink-0 w-3 h-3 mr-2 border rounded cursor-pointer ${classes}`}
 			onClick={onClick}
-		></div>
+		/>
 	);
 };
 

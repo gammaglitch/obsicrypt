@@ -1,12 +1,8 @@
 import { useAtomValue } from 'jotai';
 import { FunctionalComponent } from 'preact';
-import { useFileManager } from '../../hooks/useFileManager';
+
 import { activeFileAtom } from '../../store/atoms/files';
-import {
-	activeFileTasksAtom,
-	loadableCurrTasks,
-} from '../../store/atoms/tasks';
-import { TaskType } from '../../types/Task';
+import { loadableCurrTasks } from '../../store/atoms/tasks';
 import TaskList from '../TaskList';
 import BaseView from './BaseView';
 
@@ -22,9 +18,8 @@ const FileView: FunctionalComponent<FileViewProps> = () => {
 				<TaskList tasks={activeFileTasks.data} />
 			</BaseView>
 		);
-	} else {
-		return <div>no file selected</div>;
 	}
+	return <div>no file selected</div>;
 };
 
 export default FileView;

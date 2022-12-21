@@ -1,12 +1,10 @@
 import { FunctionalComponent } from 'preact';
-import { useEffect, useRef, useState } from 'preact/hooks';
+import { useRef, useState } from 'preact/hooks';
 
-import type { TaskType } from '../types/Task';
 import { useFileManager } from '../hooks/useFileManager';
 import { useTaskManager } from '../hooks/useTaskUpdater';
+import type { TaskType } from '../types/Task';
 import Checkbox from './Checkbox';
-import useOnClickOutside from '../hooks/useOnClickOutside';
-import DatePicker from './DatePicker';
 
 type TaskProps = {
 	task: TaskType;

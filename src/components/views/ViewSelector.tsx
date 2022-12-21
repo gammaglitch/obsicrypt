@@ -1,4 +1,5 @@
 import { FunctionalComponent } from 'preact';
+
 import { Views } from '../../types/Views';
 import ViewRow from './ViewRow';
 

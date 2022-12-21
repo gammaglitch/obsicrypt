@@ -1,24 +1,20 @@
-import { Plugin } from 'obsidian';
+import { useAtom } from 'jotai';
+import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import { ComponentChild, FunctionalComponent } from 'preact';
 import { useEffect } from 'preact/hooks';
 
-import { Views } from '../../types/Views';
-import TodayView from './TodayView';
-import FileView from './FileView';
-import { ViewWrapperProps } from '../../ViewWrapper';
-import ViewSelector from './ViewSelector';
-import { Status } from '../../types/Status';
-import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import {
 	activeFileAtom,
 	loadableFiles,
 	obsidianAtom,
 } from '../../store/atoms/files';
-import { loadableTasks, tasksAtom } from '../../store/atoms/tasks';
 import { viewAtom } from '../../store/atoms/view';
-import { useAtom } from 'jotai';
-import FileList from '../FileList';
 import { FileType } from '../../types/File';
+import { Views } from '../../types/Views';
+import { ViewWrapperProps } from '../../ViewWrapper';
+import FileList from '../FileList';
+import FileView from './FileView';
+import TodayView from './TodayView';
 
 type AvailableViews = Record<Views, ComponentChild>;
 
@@ -52,9 +48,8 @@ export const MainView: FunctionalComponent<ViewWrapperProps> = ({
 	const getView = () => {
 		if (view) {
 			return AllViews[view];
-		} else {
-			return <div>no active view</div>;
 		}
+		return <div>no active view</div>;
 	};
 
 	return (
