@@ -2,9 +2,8 @@ import { atom } from 'jotai';
 import { atomWithDefault, loadable, selectAtom } from 'jotai/utils';
 import { Plugin } from 'obsidian';
 
-import { getFiles } from '../../helpers/files';
+import { getFiles } from '../../helpers/files/util';
 import { FileType } from '../../types/File';
-import { tasksAtom } from './tasks';
 
 export const obsidianAtom = atom<Plugin | null>(null);
 

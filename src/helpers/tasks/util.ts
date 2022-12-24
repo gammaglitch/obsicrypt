@@ -1,6 +1,8 @@
-import { ListItemCache } from 'obsidian';
+import { ListItemCache, Plugin, TFile } from 'obsidian';
 
-import { Metadata, TaskType } from '../types/Task';
+import { Metadata, TaskType } from '../../types/Task';
+import { getListItems } from '../files/util';
+import { Taskey } from './types';
 
 function getTaskStatus(text: string): boolean {
 	const isComplete = text.includes('[x]');
@@ -60,4 +62,24 @@ export function updateMetadata(text: string, key: string, value: string) {
 		: `${text} {${key}:${value}}`;
 
 	return updatedText;
+}
+
+function isTask(item: ListItemCache): boolean {
+	return Object.hasOwn(item, 'task');
+}
+
+function mapTask(item: ListItemCache, lines: string[]): Taskey {
+	return { text: lines[item.position.start.line] };
+}
+
+export function makeTasks(
+	obsidian: Plugin,
+	file: TFile,
+	fileContent: string
+): Taskey[] {
+	const cachedItems = getListItems(obsidian, file);
+	const lines = fileContent.split('\n');
+	const tasks = cachedItems.filter(isTask).map((i) => mapTask(i, lines));
+
+	return tasks;
 }

@@ -1,8 +1,10 @@
 import { ListItemCache, Plugin, TFile } from 'obsidian';
 
-import { FileType } from '../types/File';
-import { TaskType } from '../types/Task';
-import { getTask } from './tasks';
+import { FileType } from '../../types/File';
+import { TaskType } from '../../types/Task';
+import { Taskey, TaskeyMap } from '../tasks/types';
+import { getTask, makeTasks } from '../tasks/util';
+import { Filey, FileyMap } from './types';
 
 function getTasks(file: FileType) {
 	const { path, listItems, fileLines } = file;
@@ -18,7 +20,7 @@ function getTasks(file: FileType) {
 	return fileTasks;
 }
 
-export function getTasksFromFiles(files: FileType[]): Map<string, TaskType[]> {
+function getTasksFromFiles(files: FileType[]): Map<string, TaskType[]> {
 	const tasks: Map<string, TaskType[]> = new Map();
 
 	for (const file of files) {
@@ -30,7 +32,7 @@ export function getTasksFromFiles(files: FileType[]): Map<string, TaskType[]> {
 	return tasks;
 }
 
-export async function searchAndReplaceInFile(
+async function searchAndReplaceInFile(
 	obsidian: Plugin,
 	filePath: string,
 	search: string,
@@ -76,17 +78,13 @@ export async function replaceLineInFile(
 	return obsidian.app.vault.modify(fileRef, fileLines.join('\n'));
 }
 
-function getListItems(obsidian: Plugin, file: TFile): ListItemCache[] {
+export function getListItems(obsidian: Plugin, file: TFile): ListItemCache[] {
 	const cache = obsidian.app.metadataCache.getFileCache(file);
 
 	if (cache) {
 		return cache.listItems ?? [];
 	}
 	return [];
-}
-
-function getTasksFromListItems(listItems: ListItemCache[]): ListItemCache[] {
-	return listItems.filter((item) => Object.hasOwn(item, 'task'));
 }
 
 async function buildFileType(obsidian: Plugin, file: TFile) {
@@ -111,87 +109,14 @@ export async function getFileByPath(
 	return buildFileType(obsidian, fileRef as TFile);
 }
 
-function buildTasks(fileContent: string, listItems: ListItemCache[]) {
-	const fileLines = fileContent.split('\n');
-	const tasks = [];
-
-	for (const item of listItems) {
-		const textLine = fileLines[item.position.start.line];
-		tasks.push({ text: textLine });
-	}
-
-	return tasks;
-}
-
-async function loadFile(obsidian: Plugin, file: TFile) {
-	const fileContent = await obsidian.app.vault.cachedRead(file);
-	const listItems = getListItems(obsidian, file);
-	const filteredListItems = getTasksFromListItems(listItems);
-
-	if (filteredListItems.length > 0) {
-		console.log(buildTasks(fileContent, filteredListItems));
-	}
-
+function makeFile(file: TFile, content: string): Filey {
 	return {
 		name: file.name,
 		path: file.path,
-		fileContent,
-		fileLines: fileContent.split('\n'),
-		listItems,
+		data: {
+			content,
+		},
 	};
-}
-
-type Taskey = {
-	text: string;
-};
-
-type TaskeyMap = Map<string, Taskey[]>;
-
-type Filey = {
-	name: string;
-	path: string;
-	// tasks: { text: string }[];
-	// data: {
-	// 	content: string;
-	// 	items: ListItemCache[];
-	// };
-};
-
-type FileyMap = Map<string, Filey>;
-
-function isTask(item: ListItemCache): boolean {
-	return Object.hasOwn(item, 'task');
-}
-
-function mapTask(item: ListItemCache, lines: string[]) {
-	return { text: lines[item.position.start.line] };
-}
-
-function makeTasks(obsidian: Plugin, file: TFile, content: string) {
-	const cachedItems = getListItems(obsidian, file);
-	const lines = content.split('\n');
-	const tasks = cachedItems.filter(isTask).map((i) => mapTask(i, lines));
-
-	return tasks;
-}
-
-function makeFile(obsidian: Plugin, file: TFile) {
-	// const content = await obsidian.app.vault.cachedRead(file);
-	// const cachedItems = getListItems(obsidian, file);
-	// const lines = content.split('\n');
-	// const tasks = cachedItems.filter(isTask).map((i) => mapTask(i, lines));
-
-	return { name: file.name, path: file.path };
-
-	// return {
-	// 	name: file.name,
-	// 	path: file.path,
-	// 	tasks,
-	// 	data: {
-	// 		content,
-	// 		items: cachedItems,
-	// 	},
-	// };
 }
 
 async function parseFiles(
@@ -206,7 +131,7 @@ async function parseFiles(
 	);
 
 	for (let i = 0; i < files.length; i++) {
-		fMap.set(files[i].name, files[i]);
+		fMap.set(files[i].name, makeFile(files[i], contents[i]));
 		tMap.set(files[i].name, makeTasks(obsidian, files[i], contents[i]));
 	}
 

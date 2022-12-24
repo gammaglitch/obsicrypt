@@ -3,7 +3,7 @@ import { useUpdateAtom } from 'jotai/utils';
 import { ComponentChildren, createContext } from 'preact';
 import { useEffect, useRef } from 'preact/hooks';
 
-import { getFileByPath } from '../helpers/files';
+import { getFileByPath } from '../helpers/files/util';
 import { filesAtom, obsidianAtom } from '../store/atoms/files';
 import { addObsidianListeners, Listeners } from './helpers';
 import { ObsidianContextDefinition } from './types';

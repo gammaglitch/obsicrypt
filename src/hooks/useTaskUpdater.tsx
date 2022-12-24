@@ -1,7 +1,7 @@
 import { useAtomValue } from 'jotai';
 
-import { searchAndReplaceLineInFile } from '../helpers/files';
-import { updateMetadata } from '../helpers/tasks';
+import { searchAndReplaceLineInFile } from '../helpers/files/util';
+import { updateMetadata } from '../helpers/tasks/util';
 import { selectObsidian } from '../store/atoms/files';
 import { TaskType } from '../types/Task';
 
