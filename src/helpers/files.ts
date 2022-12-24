@@ -2,22 +2,29 @@ import { ListItemCache, Plugin, TFile } from 'obsidian';
 
 import { FileType } from '../types/File';
 import { TaskType } from '../types/Task';
-import { extractTaskFromListItem } from './tasks';
+import { getTask } from './tasks';
 
-export function getTasksFromFiles(files: FileType[]) {
-	const tasks: TaskType[] = [];
+function getTasks(file: FileType) {
+	const { path, listItems, fileLines } = file;
+	const taskItems = listItems.filter((item) =>
+		Object.hasOwnProperty.call(item, 'task')
+	);
+
+	const fileTasks: TaskType[] = taskItems.map((item) => ({
+		...getTask(item, fileLines),
+		filePath: path,
+	}));
+
+	return fileTasks;
+}
+
+export function getTasksFromFiles(files: FileType[]): Map<string, TaskType[]> {
+	const tasks: Map<string, TaskType[]> = new Map();
 
 	for (const file of files) {
-		const taskListItems = file.listItems.filter((item) =>
-			item.hasOwnProperty('task')
-		);
+		const fileTasks = getTasks(file);
 
-		const fileTasks: TaskType[] = taskListItems.map((item) => ({
-			...extractTaskFromListItem(item, file.fileLines),
-			filePath: file.path,
-		}));
-
-		tasks.push(...fileTasks);
+		tasks.set(file.path, fileTasks);
 	}
 
 	return tasks;
@@ -78,6 +85,10 @@ function getListItems(obsidian: Plugin, file: TFile): ListItemCache[] {
 	return [];
 }
 
+function getTasksFromListItems(listItems: ListItemCache[]): ListItemCache[] {
+	return listItems.filter((item) => Object.hasOwn(item, 'task'));
+}
+
 async function buildFileType(obsidian: Plugin, file: TFile) {
 	const fileContent = await obsidian.app.vault.cachedRead(file);
 	const listItems = getListItems(obsidian, file);
@@ -100,23 +111,112 @@ export async function getFileByPath(
 	return buildFileType(obsidian, fileRef as TFile);
 }
 
-export async function getFiles(obsidian: Plugin): Promise<FileType[]> {
-	const allFiles = obsidian.app.vault.getMarkdownFiles();
+function buildTasks(fileContent: string, listItems: ListItemCache[]) {
+	const fileLines = fileContent.split('\n');
+	const tasks = [];
 
-	const files: FileType[] = [];
-
-	for (const file of allFiles) {
-		const fileContent = await obsidian.app.vault.cachedRead(file);
-		const listItems = getListItems(obsidian, file);
-
-		files.push({
-			name: file.name,
-			path: file.path,
-			fileContent,
-			fileLines: fileContent.split('\n'),
-			listItems,
-		});
+	for (const item of listItems) {
+		const textLine = fileLines[item.position.start.line];
+		tasks.push({ text: textLine });
 	}
 
-	return files;
+	return tasks;
+}
+
+async function loadFile(obsidian: Plugin, file: TFile) {
+	const fileContent = await obsidian.app.vault.cachedRead(file);
+	const listItems = getListItems(obsidian, file);
+	const filteredListItems = getTasksFromListItems(listItems);
+
+	if (filteredListItems.length > 0) {
+		console.log(buildTasks(fileContent, filteredListItems));
+	}
+
+	return {
+		name: file.name,
+		path: file.path,
+		fileContent,
+		fileLines: fileContent.split('\n'),
+		listItems,
+	};
+}
+
+type Taskey = {
+	text: string;
+};
+
+type Filey = {
+	name: string;
+	path: string;
+	// tasks: { text: string }[];
+	// data: {
+	// 	content: string;
+	// 	items: ListItemCache[];
+	// };
+};
+
+function isTask(item: ListItemCache): boolean {
+	return Object.hasOwn(item, 'task');
+}
+
+function mapTask(item: ListItemCache, lines: string[]) {
+	return { text: lines[item.position.start.line] };
+}
+
+async function makeTasks(obsidian: Plugin, file: TFile) {
+	const content = await obsidian.app.vault.cachedRead(file);
+	const cachedItems = getListItems(obsidian, file);
+	const lines = content.split('\n');
+	const tasks = cachedItems.filter(isTask).map((i) => mapTask(i, lines));
+
+	return tasks;
+}
+
+function makeFile(obsidian: Plugin, file: TFile) {
+	// const content = await obsidian.app.vault.cachedRead(file);
+	// const cachedItems = getListItems(obsidian, file);
+	// const lines = content.split('\n');
+	// const tasks = cachedItems.filter(isTask).map((i) => mapTask(i, lines));
+
+	return { name: file.name, path: file.path };
+
+	// return {
+	// 	name: file.name,
+	// 	path: file.path,
+	// 	tasks,
+	// 	data: {
+	// 		content,
+	// 		items: cachedItems,
+	// 	},
+	// };
+}
+
+async function parseFiles(
+	obsidian: Plugin,
+	files: TFile[]
+): Promise<{ files: Filey[]; tasks: Taskey[] }> {
+	const parsedFiles: Filey[] = [];
+	const tasks = [];
+
+	for (const file of files) {
+		parsedFiles.push(makeFile(obsidian, file));
+		tasks.push(makeTasks(obsidian, file));
+	}
+
+	const parsedTasks = await Promise.all(tasks);
+
+	return { files: parsedFiles, tasks: parsedTasks.flat() };
+}
+
+export async function getFiles(obsidian: Plugin): Promise<Map<string, Filey>> {
+	const { files, tasks } = await parseFiles(
+		obsidian,
+		obsidian.app.vault.getMarkdownFiles()
+	);
+	console.log('getFiles:', files, tasks);
+
+	return files.reduce((prev, curr) => {
+		prev.set(curr.path, curr);
+		return prev;
+	}, new Map());
 }

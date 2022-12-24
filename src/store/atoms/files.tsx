@@ -1,9 +1,10 @@
 import { atom } from 'jotai';
-import { atomWithDefault, loadable } from 'jotai/utils';
+import { atomWithDefault, loadable, selectAtom } from 'jotai/utils';
 import { Plugin } from 'obsidian';
 
 import { getFiles } from '../../helpers/files';
 import { FileType } from '../../types/File';
+import { tasksAtom } from './tasks';
 
 export const obsidianAtom = atom<Plugin | null>(null);
 
@@ -25,6 +26,15 @@ export const filesAtom = atomWithDefault((get) => {
 	return [];
 });
 
-export const loadableFiles = loadable(filesAtom);
+export const selectFiles = selectAtom(filesAtom, (files) => [
+	...files.values(),
+]);
+
+export const selectNonEmptyFiles = atom((get) => {
+	const files = get(filesAtom);
+	const tasks = get(tasksAtom);
+});
+
+export const loadableFiles = loadable(selectFiles);
 
 export const activeFileAtom = atom<FileType | null>(null);

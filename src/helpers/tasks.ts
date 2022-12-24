@@ -8,7 +8,7 @@ function getTaskStatus(text: string): boolean {
 	return isComplete;
 }
 
-export function extractTaskFromListItem(
+export function getTask(
 	listItem: ListItemCache,
 	fileLines: string[]
 ): TaskType {

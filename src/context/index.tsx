@@ -1,11 +1,11 @@
 import { useAtomValue } from 'jotai';
 import { useUpdateAtom } from 'jotai/utils';
-import { TAbstractFile, TFile } from 'obsidian';
 import { ComponentChildren, createContext } from 'preact';
 import { useEffect, useRef } from 'preact/hooks';
 
 import { getFileByPath } from '../helpers/files';
 import { filesAtom, obsidianAtom } from '../store/atoms/files';
+import { addObsidianListeners, Listeners } from './helpers';
 import { ObsidianContextDefinition } from './types';
 
 export type ObsidianContextProviderProps = {
@@ -19,25 +19,30 @@ export const ObsidianContext = createContext<ObsidianContextDefinition | null>(
 export function ObsidianContextProvider({
 	children,
 }: ObsidianContextProviderProps): JSX.Element {
+	const listeners: Listeners = {
+		changed: (file) => updateFileHandler(file.path),
+		create: (file) => addFileToStore(file.path),
+		delete: (file) => deleteFileHandler(file.path),
+		rename: (file, oldPath) => replaceFileHandler(oldPath, file.path),
+	};
+
 	const init = useRef<boolean>(false);
 	const obsidian = useAtomValue(obsidianAtom);
 
 	const setFiles = useUpdateAtom(filesAtom);
 
 	useEffect(() => {
-		console.log('context:obsidian', obsidian);
-	}, [obsidian]);
-
-	useEffect(() => {
-		console.log('Context:useEffect');
+		console.debug('Context:useEffect');
 		if (!init.current && obsidian) {
-			initStore();
+			bootstrap();
 			init.current = false;
 		}
 	}, [obsidian]);
 
-	const initStore = async () => {
-		bindToObsidianEvents();
+	const bootstrap = async () => {
+		if (obsidian) {
+			addObsidianListeners(obsidian, listeners);
+		}
 	};
 
 	const replaceFileByPath = async (filePath: string, path: string) => {
@@ -58,39 +63,6 @@ export function ObsidianContextProvider({
 
 	const deleteFileHandler = (path: string) =>
 		setFiles((curr) => curr.filter((f) => f.path !== path));
-
-	const bindToObsidianEvents = () => {
-		console.log('Context:bindToObsidianEvents');
-		if (obsidian) {
-			obsidian.app.metadataCache.on('changed', (file: TFile) => {
-				console.debug('changed');
-				if (file instanceof TFile) {
-					updateFileHandler(file.path);
-				}
-			});
-			obsidian.app.vault.on('create', (file: TAbstractFile) => {
-				console.debug('create');
-				if (file instanceof TFile) {
-					addFileToStore(file.path);
-				}
-			});
-			obsidian.app.vault.on('delete', (file: TAbstractFile) => {
-				console.debug('delete');
-				if (file instanceof TFile) {
-					deleteFileHandler(file.path);
-				}
-			});
-			obsidian.app.vault.on(
-				'rename',
-				(file: TAbstractFile, oldPath: string) => {
-					console.debug('rename');
-					if (file instanceof TFile) {
-						replaceFileHandler(oldPath, file.path);
-					}
-				}
-			);
-		}
-	};
 
 	const value = {};
 
