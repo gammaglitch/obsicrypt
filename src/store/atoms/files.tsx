@@ -23,18 +23,21 @@ export const filesAtom = atomWithDefault((get) => {
 	if (obsidian) {
 		return getFiles(obsidian);
 	}
-	return [];
+
+	throw new Error('missing obsidian');
 });
 
-export const selectFiles = selectAtom(filesAtom, (files) => [
-	...files.values(),
+export const selectFiles = selectAtom(filesAtom, (data) => [
+	...data.files.values(),
 ]);
 
-export const selectNonEmptyFiles = atom((get) => {
-	const files = get(filesAtom);
-	const tasks = get(tasksAtom);
-});
-
 export const loadableFiles = loadable(selectFiles);
+
+export const loadableAllDataAtom = loadable(
+	selectAtom(filesAtom, (data) => ({
+		files: [...data.files.values()],
+		tasks: [...data.tasks.values()],
+	}))
+);
 
 export const activeFileAtom = atom<FileType | null>(null);

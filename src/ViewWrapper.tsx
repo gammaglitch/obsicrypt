@@ -1,3 +1,4 @@
+import { useAtom } from 'jotai';
 import { useUpdateAtom } from 'jotai/utils';
 import { Plugin } from 'obsidian';
 import { FunctionalComponent } from 'preact';
@@ -14,15 +15,17 @@ export type ViewWrapperProps = {
 export const ViewWrapper: FunctionalComponent<ViewWrapperProps> = ({
 	obsidian,
 }) => {
-	const setObsidian = useUpdateAtom(obsidianAtom);
+	const [currObsidian, setObsidian] = useAtom(obsidianAtom);
 
 	useEffect(() => {
-		setObsidian(obsidian);
+		if (!currObsidian) {
+			setObsidian(obsidian);
+		}
 	}, []);
 
 	return (
 		<ObsidianContextProvider>
-			<MainView obsidian={obsidian} />
+			{currObsidian ? <MainView obsidian={obsidian} /> : <div>loading...</div>}
 		</ObsidianContextProvider>
 	);
 };

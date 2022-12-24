@@ -145,6 +145,8 @@ type Taskey = {
 	text: string;
 };
 
+type TaskeyMap = Map<string, Taskey[]>;
+
 type Filey = {
 	name: string;
 	path: string;
@@ -155,6 +157,8 @@ type Filey = {
 	// };
 };
 
+type FileyMap = Map<string, Filey>;
+
 function isTask(item: ListItemCache): boolean {
 	return Object.hasOwn(item, 'task');
 }
@@ -163,8 +167,7 @@ function mapTask(item: ListItemCache, lines: string[]) {
 	return { text: lines[item.position.start.line] };
 }
 
-async function makeTasks(obsidian: Plugin, file: TFile) {
-	const content = await obsidian.app.vault.cachedRead(file);
+function makeTasks(obsidian: Plugin, file: TFile, content: string) {
 	const cachedItems = getListItems(obsidian, file);
 	const lines = content.split('\n');
 	const tasks = cachedItems.filter(isTask).map((i) => mapTask(i, lines));
@@ -194,29 +197,24 @@ function makeFile(obsidian: Plugin, file: TFile) {
 async function parseFiles(
 	obsidian: Plugin,
 	files: TFile[]
-): Promise<{ files: Filey[]; tasks: Taskey[] }> {
-	const parsedFiles: Filey[] = [];
-	const tasks = [];
+): Promise<{ files: FileyMap; tasks: TaskeyMap }> {
+	const fMap: FileyMap = new Map();
+	const tMap: TaskeyMap = new Map();
 
-	for (const file of files) {
-		parsedFiles.push(makeFile(obsidian, file));
-		tasks.push(makeTasks(obsidian, file));
+	const contents = await Promise.all(
+		files.map((f) => obsidian.app.vault.cachedRead(f))
+	);
+
+	for (let i = 0; i < files.length; i++) {
+		fMap.set(files[i].name, files[i]);
+		tMap.set(files[i].name, makeTasks(obsidian, files[i], contents[i]));
 	}
 
-	const parsedTasks = await Promise.all(tasks);
-
-	return { files: parsedFiles, tasks: parsedTasks.flat() };
+	return { files: fMap, tasks: tMap };
 }
 
-export async function getFiles(obsidian: Plugin): Promise<Map<string, Filey>> {
-	const { files, tasks } = await parseFiles(
-		obsidian,
-		obsidian.app.vault.getMarkdownFiles()
-	);
-	console.log('getFiles:', files, tasks);
-
-	return files.reduce((prev, curr) => {
-		prev.set(curr.path, curr);
-		return prev;
-	}, new Map());
+export async function getFiles(
+	obsidian: Plugin
+): Promise<{ files: FileyMap; tasks: TaskeyMap }> {
+	return parseFiles(obsidian, obsidian.app.vault.getMarkdownFiles());
 }

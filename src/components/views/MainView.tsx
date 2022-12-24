@@ -2,7 +2,7 @@ import { useAtom } from 'jotai';
 import { useAtomValue } from 'jotai/utils';
 import { ComponentChild, FunctionalComponent } from 'preact';
 
-import { activeFileAtom, loadableFiles } from '../../store/atoms/files';
+import { activeFileAtom, loadableAllDataAtom } from '../../store/atoms/files';
 import { viewAtom } from '../../store/atoms/view';
 import { FileType } from '../../types/File';
 import { Views } from '../../types/Views';
@@ -21,7 +21,7 @@ const AllViews: AvailableViews = {
 export const MainView: FunctionalComponent<ViewWrapperProps> = ({
 	obsidian,
 }) => {
-	const files = useAtomValue(loadableFiles);
+	const data = useAtomValue(loadableAllDataAtom);
 	const [view, setView] = useAtom(viewAtom);
 	const [file, setFile] = useAtom(activeFileAtom);
 
@@ -42,8 +42,6 @@ export const MainView: FunctionalComponent<ViewWrapperProps> = ({
 		return <div>no active view</div>;
 	};
 
-	console.log(files);
-
 	return (
 		<div className="flex w-full h-full">
 			<div
@@ -52,9 +50,9 @@ export const MainView: FunctionalComponent<ViewWrapperProps> = ({
 			>
 				{/* <ViewSelector view={view} onSelectView={selectView} /> */}
 
-				{files.state === 'hasData' && (
+				{data.state === 'hasData' && (
 					<FileList
-						files={files.data}
+						files={data.data.files}
 						selectedFile={file}
 						onSelectFile={selectFile}
 					/>
