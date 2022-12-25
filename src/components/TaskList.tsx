@@ -1,29 +1,25 @@
 import { FunctionalComponent } from 'preact';
 
+import { Taskey } from '../helpers/tasks/types';
 import { useFileManager } from '../hooks/useFileManager';
-import { TaskType } from '../types/Task';
 import Task from './Task';
 
 type TaskListProps = {
-	tasks: TaskType[];
+	tasks: Taskey[];
 };
 
 const TaskList: FunctionalComponent<TaskListProps> = ({ tasks }) => {
-	const { updateTask, toggleTaskStatus } = useFileManager();
-
-	const onUpdateText = (task: TaskType, text: string) => {
-		updateTask(task, text);
-	};
+	const { toggleTaskStatus } = useFileManager();
 
 	return (
 		<div className="w-full">
 			{tasks.map((task, index) => {
 				return (
 					<Task
-						key={`${task.filePath}-${index}`}
-						task={task}
-						updateText={(text) => onUpdateText(task, text)}
-						toggle={() => toggleTaskStatus(task)}
+						key={index}
+						text={task.text}
+						done={task.done}
+						check={() => toggleTaskStatus(task)}
 					/>
 				);
 			})}
