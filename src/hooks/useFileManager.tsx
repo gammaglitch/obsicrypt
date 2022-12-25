@@ -26,7 +26,7 @@ export function useFileManager() {
 
 	const toggleTaskStatus = async (task: Taskey) => {
 		let newTask;
-		console.log('toggle', task);
+
 		if (task.done) {
 			newTask = task.text.replace('[x]', '[ ]');
 		} else {
@@ -41,7 +41,6 @@ export function useFileManager() {
 		if (file) {
 			const lines = file.data.content.split('\n');
 			lines[task.data.line] = newTask;
-			console.log('new', newTask);
 			return obsidian.app.vault.modify(fileRef, lines.join('\n'));
 		}
 	};

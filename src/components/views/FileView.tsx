@@ -21,6 +21,8 @@ const FileView: FunctionalComponent<FileViewProps> = () => {
 		}
 	}, [activeFileTasks]);
 
+	console.log(activeFile);
+
 	return (
 		<BaseView title={activeFile?.name ?? ''}>
 			<TaskList tasks={tasks} />
