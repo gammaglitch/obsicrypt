@@ -1,26 +1,49 @@
 import { useAtomValue } from 'jotai';
+import { TFile } from 'obsidian';
 
-import {
-	replaceLineInFile,
-	searchAndReplaceLineInFile,
-} from '../helpers/files/util';
+import { searchAndReplaceLineInFile } from '../helpers/files/util';
+import { Taskey } from '../helpers/tasks/types';
 import { updateMetadata } from '../helpers/tasks/util';
-import { selectObsidian } from '../store/atoms/files';
+import {
+	allDataAtom,
+	filesAtom,
+	selectFilesMap,
+	selectObsidian,
+} from '../store/atoms/files';
 import { TaskType } from '../types/Task';
 
 export function useFileManager() {
 	const obsidian = useAtomValue(selectObsidian);
+	const filesMap = useAtomValue(selectFilesMap);
 
-	const toggleTaskStatus = async (task: TaskType) => {
+	const replaceLineInFile = async () => {
+		// const fileRef = obsidian.app.vault.getAbstractFileByPath(filePath) as TFile;
+		// const fileContent = await obsidian.app.vault.read(fileRef);
+		// const fileLines = fileContent.split('\n');
+		// fileLines[line] = replace;
+		// return obsidian.app.vault.modify(fileRef, fileLines.join('\n'));
+	};
+
+	const toggleTaskStatus = async (task: Taskey) => {
 		let newTask;
-
-		if (task.isComplete) {
-			newTask = task.originalText.replace('[x]', '[ ]');
+		console.log('toggle', task);
+		if (task.done) {
+			newTask = task.text.replace('[x]', '[ ]');
 		} else {
-			newTask = task.originalText.replace('[ ]', '[x]');
+			newTask = task.text.replace('[ ]', '[x]');
 		}
 
-		await replaceLineInFile(obsidian, task.filePath, task.line.start, newTask);
+		const file = filesMap.get(task.filePath);
+		const fileRef = obsidian.app.vault.getAbstractFileByPath(
+			task.filePath
+		) as TFile;
+
+		if (file) {
+			const lines = file.data.content.split('\n');
+			lines[task.data.line] = newTask;
+			console.log('new', newTask);
+			return obsidian.app.vault.modify(fileRef, lines.join('\n'));
+		}
 	};
 
 	const updateTask = async (task: TaskType, text: string) => {

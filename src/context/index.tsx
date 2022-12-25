@@ -1,9 +1,10 @@
 import { useAtomValue } from 'jotai';
 import { useUpdateAtom } from 'jotai/utils';
+import { TFile } from 'obsidian';
 import { ComponentChildren, createContext } from 'preact';
 import { useEffect, useRef } from 'preact/hooks';
 
-import { getFileByPath } from '../helpers/files/util';
+import { getFileByPath, makeFile } from '../helpers/files/util';
 import { filesAtom, obsidianAtom } from '../store/atoms/files';
 import { addObsidianListeners, Listeners } from './helpers';
 import { ObsidianContextDefinition } from './types';
@@ -46,8 +47,22 @@ export function ObsidianContextProvider({
 	};
 
 	const replaceFileByPath = async (filePath: string, path: string) => {
-		const file = await getFileByPath(obsidian!, filePath);
-		setFiles((curr) => curr.map((f) => (f.path === path ? file : f)));
+		console.log('replaceFileByPath start');
+		console.log(filePath, path);
+		const fileRef = obsidian!.app.vault.getAbstractFileByPath(filePath);
+		console.log(fileRef);
+		if (fileRef) {
+			const content = await obsidian!.app.vault.cachedRead(fileRef as TFile);
+			console.log(content);
+			const file = makeFile(fileRef as TFile, content);
+			console.log(file);
+			setFiles((curr) => ({ ...curr, files: curr.files.set(path, file) }));
+		}
+		// TODO: the issue appears to be that we are not explicitly
+		// updating the tasks inside the filesAtom, they're not auto updating,
+		// which seems like a bad decision
+
+		console.log('replaceFileByPath end');
 	};
 
 	const replaceFileHandler = async (oldPath: string, newPath: string) =>

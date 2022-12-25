@@ -5,9 +5,7 @@ import { getListItems } from '../files/util';
 import { Taskey } from './types';
 
 function getTaskStatus(text: string): boolean {
-	const isComplete = text.includes('[x]');
-
-	return isComplete;
+	return text.includes('[x]');
 }
 
 export function getTask(
@@ -68,8 +66,9 @@ function isTask(item: ListItemCache): boolean {
 	return Object.hasOwn(item, 'task');
 }
 
-function mapTask(item: ListItemCache, lines: string[]): Taskey {
-	return { text: lines[item.position.start.line] };
+function mapTask(item: ListItemCache, lines: string[]) {
+	const text = lines[item.position.start.line];
+	return { text, done: getTaskStatus(text) };
 }
 
 export function makeTasks(
@@ -79,7 +78,11 @@ export function makeTasks(
 ): Taskey[] {
 	const cachedItems = getListItems(obsidian, file);
 	const lines = fileContent.split('\n');
-	const tasks = cachedItems.filter(isTask).map((i) => mapTask(i, lines));
+	const tasks = cachedItems.filter(isTask).map((i) => ({
+		...mapTask(i, lines),
+		filePath: file.path,
+		data: { line: i.position.start.line },
+	}));
 
 	return tasks;
 }

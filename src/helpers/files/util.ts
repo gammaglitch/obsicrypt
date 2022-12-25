@@ -2,7 +2,7 @@ import { ListItemCache, Plugin, TFile } from 'obsidian';
 
 import { FileType } from '../../types/File';
 import { TaskType } from '../../types/Task';
-import { Taskey, TaskeyMap } from '../tasks/types';
+import { TaskeyMap } from '../tasks/types';
 import { getTask, makeTasks } from '../tasks/util';
 import { Filey, FileyMap } from './types';
 
@@ -63,7 +63,7 @@ export async function searchAndReplaceLineInFile(
 	return obsidian.app.vault.modify(fileRef, fileLines.join('\n'));
 }
 
-export async function replaceLineInFile(
+async function replaceLineInFile(
 	obsidian: Plugin,
 	filePath: string,
 	line: number,
@@ -109,7 +109,7 @@ export async function getFileByPath(
 	return buildFileType(obsidian, fileRef as TFile);
 }
 
-function makeFile(file: TFile, content: string): Filey {
+export function makeFile(file: TFile, content: string): Filey {
 	return {
 		name: file.name,
 		path: file.path,
