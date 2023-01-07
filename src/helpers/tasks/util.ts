@@ -72,11 +72,10 @@ function mapTask(item: ListItemCache, lines: string[]) {
 }
 
 export function makeTasks(
-	obsidian: Plugin,
+	cachedItems: ListItemCache[],
 	file: TFile,
 	fileContent: string
 ): Taskey[] {
-	const cachedItems = getListItems(obsidian, file);
 	const lines = fileContent.split('\n');
 	const tasks = cachedItems.filter(isTask).map((i) => ({
 		...mapTask(i, lines),

@@ -131,8 +131,8 @@ async function parseFiles(
 	);
 
 	for (let i = 0; i < files.length; i++) {
-		fMap.set(files[i].name, makeFile(files[i], contents[i]));
-		tMap.set(files[i].name, makeTasks(obsidian, files[i], contents[i]));
+		fMap.set(files[i].path, makeFile(files[i], contents[i]));
+		tMap.set(files[i].path, makeTasks(getListItems(obsidian, files[i]), files[i], contents[i]));
 	}
 
 	return { files: fMap, tasks: tMap };
