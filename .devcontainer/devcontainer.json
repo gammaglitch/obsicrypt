@@ -28,6 +28,6 @@
 	// Comment out to connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
 	"remoteUser": "node",
 	"mounts": [
-		"source=${localEnv:HOME}${localEnv:USERPROFILE}/git/Obsidian,target=/obsidian,type=bind,consistency=cached",
+		"source=${localEnv:HOME}${localEnv:USERPROFILE}/git/Obsidian_DEV/DEV_VAULT,target=/obsidian,type=bind,consistency=cached",
 	]
 }
