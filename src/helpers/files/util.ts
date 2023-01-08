@@ -100,13 +100,23 @@ async function buildFileType(obsidian: Plugin, file: TFile) {
 	};
 }
 
-export async function getFileByPath(
+export async function _getFileByPath(
 	obsidian: Plugin,
 	path: string
 ): Promise<FileType> {
 	const fileRef = obsidian.app.vault.getAbstractFileByPath(path);
 
 	return buildFileType(obsidian, fileRef as TFile);
+}
+
+export async function getFileByPath(
+	obsidian: Plugin,
+	path: string
+): Promise<Filey> {
+	const fileRef = obsidian.app.vault.getAbstractFileByPath(path) as TFile;
+	const fileContent = await obsidian.app.vault.cachedRead(fileRef);
+
+	return makeFile(fileRef, fileContent)
 }
 
 export function makeFile(file: TFile, content: string): Filey {

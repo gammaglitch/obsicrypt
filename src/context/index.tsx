@@ -4,7 +4,7 @@ import { CachedMetadata, TFile } from 'obsidian';
 import { ComponentChildren, createContext } from 'preact';
 import { useEffect, useRef } from 'preact/hooks';
 
-import { getFileByPath, makeFile } from '../helpers/files/util';
+import { getFileByPath, getListItems, makeFile } from '../helpers/files/util';
 import { makeTasks } from '../helpers/tasks/util';
 import { filesAtom, obsidianAtom } from '../store/atoms/files';
 import { addObsidianListeners, Listeners } from './helpers';
@@ -49,15 +49,27 @@ export function ObsidianContextProvider({
 
 	const replaceFileByPath = async (filePath: string, path: string) => {
 		console.log('replaceFileByPath start');
-		const fileRef = obsidian!.app.vault.getAbstractFileByPath(filePath);
-		if (fileRef) {
-			const content = await obsidian!.app.vault.cachedRead(fileRef as TFile);
-			const file = makeFile(fileRef as TFile, content);
-			setFiles((curr) => ({ ...curr, files: curr.files.set(path, file) }));
-		}
-		// TODO: the issue appears to be that we are not explicitly
-		// updating the tasks inside the filesAtom, they're not auto updating,
-		// which seems like a bad decision
+		const fileRef = obsidian!.app.vault.getAbstractFileByPath(
+			filePath
+		) as TFile;
+		const fileContent = await obsidian!.app.vault.cachedRead(fileRef);
+
+		const file = makeFile(fileRef, fileContent);
+		const tasks = makeTasks(
+			getListItems(obsidian!, fileRef),
+			fileRef,
+			fileContent
+		);
+
+		setFiles((curr) => {
+			curr.files.delete(path);
+			curr.tasks.delete(path);
+
+			curr.files.set(filePath, file);
+			curr.tasks.set(filePath, tasks);
+
+			return { ...curr };
+		});
 	};
 
 	const replaceFileHandler = async (oldPath: string, newPath: string) =>
@@ -68,12 +80,6 @@ export function ObsidianContextProvider({
 		data: string,
 		cache: CachedMetadata
 	) => {
-		console.group('updateFileHandler');
-
-		console.log(file);
-		console.log(data);
-		console.log(cache);
-
 		setFiles((curr) => {
 			const currFile = curr.files.get(file.path);
 
@@ -87,20 +93,41 @@ export function ObsidianContextProvider({
 				}
 			}
 
-			return curr;
+			return { ...curr };
 		});
-
-		console.groupEnd();
-		// replaceFileByPath(path, path)
 	};
 
 	const addFileToStore = async (path: string) => {
-		const file = await getFileByPath(obsidian!, path);
-		setFiles((curr) => [...curr, file]);
+		if (obsidian) {
+			const fileRef = obsidian.app.vault.getAbstractFileByPath(path) as TFile;
+			const fileContent = await obsidian.app.vault.cachedRead(fileRef);
+
+			const file = makeFile(fileRef, fileContent);
+			const tasks = makeTasks(
+				getListItems(obsidian!, fileRef),
+				fileRef,
+				fileContent
+			);
+
+			setFiles((curr) => {
+				curr.files.set(file.path, file);
+				curr.tasks.set(file.path, tasks);
+
+				return { ...curr };
+			});
+		}
 	};
 
-	const deleteFileHandler = (path: string) =>
-		setFiles((curr) => curr.filter((f) => f.path !== path));
+	const deleteFileHandler = (path: string) => {
+		if (obsidian) {
+			setFiles((curr) => {
+				curr.files.delete(path);
+				curr.tasks.delete(path);
+
+				return { ...curr };
+			});
+		}
+	};
 
 	const value = {};
 

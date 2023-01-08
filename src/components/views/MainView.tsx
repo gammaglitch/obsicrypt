@@ -25,6 +25,8 @@ export const MainView: FunctionalComponent<ViewWrapperProps> = ({
 	const [view, setView] = useAtom(viewAtom);
 	const [file, setFile] = useAtom(activeFileAtom);
 
+	console.log(data);
+
 	const selectFile = (file: FileType) => {
 		setView(Views.FILE);
 		setFile(file);
