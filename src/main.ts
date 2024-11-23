@@ -61,7 +61,7 @@ export default class ReactStarterPlugin extends Plugin {
 		const leafs = this.app.workspace.getLeavesOfType(VIEW_TYPE);
 
 		if (leafs.length === 0) {
-			const leaf = this.app.workspace.getLeftLeaf(false);
+			const leaf = this.app.workspace.getLeaf('tab');
 			await leaf.setViewState({ type: VIEW_TYPE });
 
 			if (showAfterAttach) {

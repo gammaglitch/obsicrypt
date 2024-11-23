@@ -1,8 +1,10 @@
 import { FunctionalComponent } from 'preact';
+import { useState } from 'preact/hooks';
 
 import { Taskey } from '../helpers/tasks/types';
 import { useFileManager } from '../hooks/useFileManager';
 import Task from './Task';
+import TaskModal from './TaskModal';
 
 type TaskListProps = {
 	tasks: Taskey[];
@@ -10,6 +12,7 @@ type TaskListProps = {
 
 const TaskList: FunctionalComponent<TaskListProps> = ({ tasks }) => {
 	const { toggleTaskStatus } = useFileManager();
+	const [selectedTask, setSelectedTask] = useState<Taskey | null>(null);
 
 	return (
 		<div className="w-full">
@@ -17,12 +20,18 @@ const TaskList: FunctionalComponent<TaskListProps> = ({ tasks }) => {
 				return (
 					<Task
 						key={index}
-						text={task.text}
-						done={task.done}
+						task={task}
 						check={() => toggleTaskStatus(task)}
+						onClick={() => setSelectedTask(task)}
 					/>
 				);
 			})}
+
+			<TaskModal
+				task={selectedTask!}
+				isOpen={selectedTask !== null}
+				onClose={() => setSelectedTask(null)}
+			/>
 		</div>
 	);
 };

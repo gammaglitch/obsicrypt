@@ -25,12 +25,19 @@ export function useFileManager() {
 	};
 
 	const toggleTaskStatus = async (task: Taskey) => {
-		let newTask;
+		const currentMarker = task.done ? '[x]' : '[ ]';
+		const nextMarker = task.done ? '[ ]' : '[x]';
+		let newTask = task.originalText.replace(currentMarker, nextMarker);
 
-		if (task.done) {
-			newTask = task.text.replace('[x]', '[ ]');
+		// Add or remove completedOn metadata
+		if (!task.done) {
+			// Completing the task - add completedOn with today's date
+			const today = new Date().toISOString().split('T')[0]; // yyyy-mm-dd format
+			newTask = updateMetadata(newTask, 'completedOn', today);
 		} else {
-			newTask = task.text.replace('[ ]', '[x]');
+			// Uncompleting the task - remove completedOn metadata
+			const pattern = /\s*\{completedOn:[^}]+\}/gi;
+			newTask = newTask.replace(pattern, '');
 		}
 
 		const file = filesMap.get(task.filePath);
@@ -75,5 +82,18 @@ export function useFileManager() {
 		await updateTaskMetadata(task, 'due', date);
 	};
 
-	return { toggleTaskStatus, updateTask, updateDate };
+	const updateTaskText = async (task: Taskey, newText: string) => {
+		const fileRef = obsidian.app.vault.getAbstractFileByPath(
+			task.filePath
+		) as TFile;
+		const file = filesMap.get(task.filePath);
+
+		if (file) {
+			const lines = file.data.content.split('\n');
+			lines[task.data.line] = newText;
+			return obsidian.app.vault.modify(fileRef, lines.join('\n'));
+		}
+	};
+
+	return { toggleTaskStatus, updateTask, updateDate, updateTaskText };
 }

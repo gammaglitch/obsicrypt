@@ -42,3 +42,15 @@ export const allDataAtom = selectAtom(filesAtom, (data) => ({
 export const loadableAllDataAtom = loadable(allDataAtom);
 
 export const activeFileAtom = atom<FileType | null>(null);
+
+export const activeTagAtom = atom<string | null>(null);
+
+export const allTagsAtom = selectAtom(filesAtom, (data) => {
+	const tagSet = new Set<string>();
+	for (const tasks of data.tasks.values()) {
+		tasks.forEach((task) => {
+			task.tags.forEach((tag) => tagSet.add(tag));
+		});
+	}
+	return Array.from(tagSet).sort();
+});
