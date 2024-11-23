@@ -52,7 +52,7 @@ export const allDirectoriesAtom = selectAtom(filesAtom, (data) => {
 
 	for (const path of data.files.keys()) {
 		const dir = path.substring(0, path.lastIndexOf('/'));
-console.log("dir: ", dir);
+		
 		if (dir) {
 			dirSet.add(dir);
 		}

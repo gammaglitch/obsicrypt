@@ -1,7 +1,7 @@
 import './style/index.css';
 
 import { ItemView, Plugin, WorkspaceLeaf } from 'obsidian';
-import { createElement,render } from 'preact';
+import { createElement, render } from 'preact';
 
 import { ViewWrapper } from './ViewWrapper';
 

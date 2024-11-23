@@ -22,7 +22,7 @@ const TaskList: FunctionalComponent<TaskListProps> = ({ tasks }) => {
 						key={index}
 						task={task}
 						check={() => toggleTaskStatus(task)}
-						onClick={() => setSelectedTask(task)}
+						onOpenModal={() => setSelectedTask(task)}
 					/>
 				);
 			})}

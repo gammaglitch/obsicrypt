@@ -46,8 +46,7 @@ const keyToMetadataField: Record<NormalizedKey, keyof Metadata> = {
 	completedon: 'completedOn',
 };
 
-const BRACED_METADATA_PATTERN =
-	/\{(?<key>[a-zA-Z0-9_-]+):(?<value>[^}]+)\}/g;
+const BRACED_METADATA_PATTERN = /\{(?<key>[a-zA-Z0-9_-]+):(?<value>[^}]+)\}/g;
 
 function extractKeyValueMetadata(
 	state: MetadataExtractionState
@@ -118,8 +117,7 @@ function extractContexts(
 
 			if (normalized) {
 				const alreadyPresent = state.metadata.contexts.some(
-					(existing) =>
-						existing.toLowerCase() === normalized.toLowerCase()
+					(existing) => existing.toLowerCase() === normalized.toLowerCase()
 				);
 
 				if (!alreadyPresent) {
@@ -201,9 +199,7 @@ export function updateMetadata(text: string, key: string, value: string) {
 			const start = match.index ?? 0;
 			const end = start + match[0].length;
 
-			result = `${result.slice(0, start)}${replacement}${result.slice(
-				end
-			)}`;
+			result = `${result.slice(0, start)}${replacement}${result.slice(end)}`;
 			replaced = true;
 			break;
 		}

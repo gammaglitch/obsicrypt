@@ -10,12 +10,15 @@ export type Listeners = {
 type Events = keyof Listeners;
 
 export function addObsidianListeners(obsidian: Plugin, listeners: Listeners) {
-	obsidian.app.metadataCache.on('changed', (file: TFile, data: string, cache: CachedMetadata) => {
-		console.debug('changed');
-		if (file instanceof TFile) {
-			listeners.changed(file, data, cache);
+	obsidian.app.metadataCache.on(
+		'changed',
+		(file: TFile, data: string, cache: CachedMetadata) => {
+			console.debug('changed');
+			if (file instanceof TFile) {
+				listeners.changed(file, data, cache);
+			}
 		}
-	});
+	);
 	obsidian.app.vault.on('create', (file: TAbstractFile) => {
 		console.debug('create');
 		if (file instanceof TFile) {

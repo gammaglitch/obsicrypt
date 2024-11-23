@@ -116,7 +116,7 @@ export async function getFileByPath(
 	const fileRef = obsidian.app.vault.getAbstractFileByPath(path) as TFile;
 	const fileContent = await obsidian.app.vault.cachedRead(fileRef);
 
-	return makeFile(fileRef, fileContent)
+	return makeFile(fileRef, fileContent);
 }
 
 export function makeFile(file: TFile, content: string): Filey {
@@ -142,7 +142,10 @@ async function parseFiles(
 
 	for (let i = 0; i < files.length; i++) {
 		fMap.set(files[i].path, makeFile(files[i], contents[i]));
-		tMap.set(files[i].path, makeTasks(getListItems(obsidian, files[i]), files[i], contents[i]));
+		tMap.set(
+			files[i].path,
+			makeTasks(getListItems(obsidian, files[i]), files[i], contents[i])
+		);
 	}
 
 	return { files: fMap, tasks: tMap };
