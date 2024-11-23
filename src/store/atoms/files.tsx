@@ -45,6 +45,22 @@ export const activeFileAtom = atom<FileType | null>(null);
 
 export const activeTagAtom = atom<string | null>(null);
 
+export const activeDirectoryAtom = atom<string | null>(null);
+
+export const allDirectoriesAtom = selectAtom(filesAtom, (data) => {
+	const dirSet = new Set<string>();
+
+	for (const path of data.files.keys()) {
+		const dir = path.substring(0, path.lastIndexOf('/'));
+console.log("dir: ", dir);
+		if (dir) {
+			dirSet.add(dir);
+		}
+	}
+
+	return Array.from(dirSet);
+});
+
 export const allTagsAtom = selectAtom(filesAtom, (data) => {
 	const tagSet = new Set<string>();
 	for (const tasks of data.tasks.values()) {

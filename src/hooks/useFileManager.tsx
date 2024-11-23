@@ -4,12 +4,7 @@ import { TFile } from 'obsidian';
 import { searchAndReplaceLineInFile } from '../helpers/files/util';
 import { Taskey } from '../helpers/tasks/types';
 import { updateMetadata } from '../helpers/tasks/util';
-import {
-	allDataAtom,
-	filesAtom,
-	selectFilesMap,
-	selectObsidian,
-} from '../store/atoms/files';
+import { selectFilesMap, selectObsidian } from '../store/atoms/files';
 import { TaskType } from '../types/Task';
 
 export function useFileManager() {

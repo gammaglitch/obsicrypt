@@ -10,7 +10,11 @@ type TaskModalProps = {
 	onClose: () => void;
 };
 
-const TaskModal: FunctionalComponent<TaskModalProps> = ({ task, isOpen, onClose }) => {
+const TaskModal: FunctionalComponent<TaskModalProps> = ({
+	task,
+	isOpen,
+	onClose,
+}) => {
 	const { updateTaskText } = useFileManager();
 	const [isEditingText, setIsEditingText] = useState(false);
 	const [editedText, setEditedText] = useState('');
@@ -34,36 +38,38 @@ const TaskModal: FunctionalComponent<TaskModalProps> = ({ task, isOpen, onClose 
 			// Add key-value metadata (due, start, completedOn)
 			if (task.due) metadataParts.push(`{due:${task.due}}`);
 			if (task.start) metadataParts.push(`{start:${task.start}}`);
-			if (task.completedOn) metadataParts.push(`{completedOn:${task.completedOn}}`);
+			if (task.completedOn)
+				metadataParts.push(`{completedOn:${task.completedOn}}`);
 
 			// Add custom metadata
 			Object.entries(task.custom).forEach(([key, values]) => {
-				values.forEach(value => metadataParts.push(`{${key}:${value}}`));
+				values.forEach((value) => metadataParts.push(`{${key}:${value}}`));
 			});
 
 			// Add tags
-			task.tags.forEach(tag => metadataParts.push(`#${tag}`));
+			task.tags.forEach((tag) => metadataParts.push(`#${tag}`));
 
 			// Add contexts
-			task.contexts.forEach(context => metadataParts.push(`@${context}`));
+			task.contexts.forEach((context) => metadataParts.push(`@${context}`));
 
 			// Combine everything
-			const metadata = metadataParts.length > 0 ? ' ' + metadataParts.join(' ') : '';
+			const metadata =
+				metadataParts.length > 0 ? ` ${metadataParts.join(' ')}` : '';
 			const newText = `${listMarker} ${marker} ${editedText.trim()}${metadata}`;
 
 			console.log('TASK_SAVE_DEBUG', {
 				originalText: task.originalText,
-				editedText: editedText,
+				editedText,
 				taskMetadata: {
 					due: task.due,
 					start: task.start,
 					completedOn: task.completedOn,
 					tags: task.tags,
 					contexts: task.contexts,
-					custom: task.custom
+					custom: task.custom,
 				},
-				metadataParts: metadataParts,
-				finalNewText: newText
+				metadataParts,
+				finalNewText: newText,
 			});
 
 			await updateTaskText(task, newText);
@@ -106,7 +112,9 @@ const TaskModal: FunctionalComponent<TaskModalProps> = ({ task, isOpen, onClose 
 								<input
 									type="text"
 									value={editedText}
-									onInput={(e) => setEditedText((e.target as HTMLInputElement).value)}
+									onInput={(e) =>
+										setEditedText((e.target as HTMLInputElement).value)
+									}
 									className="flex-1 bg-[#1e1b26] border border-gray-600 rounded px-3 py-2 text-base focus:outline-none focus:border-gray-400"
 									autoFocus
 								/>
@@ -137,7 +145,9 @@ const TaskModal: FunctionalComponent<TaskModalProps> = ({ task, isOpen, onClose 
 						<label className="text-sm font-semibold text-gray-400 block mb-1">
 							Status
 						</label>
-						<div className="text-base">{task.done ? '✓ Completed' : '○ Incomplete'}</div>
+						<div className="text-base">
+							{task.done ? '✓ Completed' : '○ Incomplete'}
+						</div>
 					</div>
 
 					<div>

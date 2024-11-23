@@ -1,7 +1,12 @@
 import { atom } from 'jotai';
 import { loadable, selectAtom } from 'jotai/utils';
 
-import { activeFileAtom, activeTagAtom, filesAtom } from './files';
+import {
+	activeDirectoryAtom,
+	activeFileAtom,
+	activeTagAtom,
+	filesAtom,
+} from './files';
 
 export const tasksAtom = selectAtom(filesAtom, (data) => [
 	...data.tasks.values(),
@@ -35,3 +40,19 @@ export const activeTagTasksAtom = atom(async (get) => {
 });
 
 export const loadableTagTasks = loadable(activeTagTasksAtom);
+
+export const activeDirectoryTasksAtom = atom(async (get) => {
+	const dir = get(activeDirectoryAtom);
+	const { tasks } = get(filesAtom);
+
+	if (dir) {
+		const allTasks = [...tasks.entries()]
+			.filter(([path]) => path.startsWith(`${dir}/`))
+			.flatMap(([, tasks]) => tasks);
+		return allTasks;
+	}
+
+	return [];
+});
+
+export const loadableDirectoryTasks = loadable(activeDirectoryTasksAtom);

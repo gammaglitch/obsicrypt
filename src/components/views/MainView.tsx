@@ -2,13 +2,22 @@ import { useAtom } from 'jotai';
 import { useAtomValue } from 'jotai/utils';
 import { ComponentChild, FunctionalComponent } from 'preact';
 
-import { activeFileAtom, activeTagAtom, allTagsAtom, loadableAllDataAtom } from '../../store/atoms/files';
+import {
+	activeDirectoryAtom,
+	activeFileAtom,
+	activeTagAtom,
+	allDirectoriesAtom,
+	allTagsAtom,
+	loadableAllDataAtom,
+} from '../../store/atoms/files';
 import { viewAtom } from '../../store/atoms/view';
 import { FileType } from '../../types/File';
 import { Views } from '../../types/Views';
 import { ViewWrapperProps } from '../../ViewWrapper';
+import DirectoryList from '../DirectoryList';
 import FileList from '../FileList';
 import TagList from '../TagList';
+import DirectoryView from './DirectoryView';
 import FileView from './FileView';
 import TagView from './TagView';
 import TodayView from './TodayView';
@@ -19,6 +28,7 @@ const AllViews: AvailableViews = {
 	TODAY: <TodayView />,
 	FILE: <FileView />,
 	TAG: <TagView />,
+	DIR: <DirectoryView />,
 };
 
 type TagListWrapperProps = {
@@ -26,9 +36,37 @@ type TagListWrapperProps = {
 	onSelectTag: (tag: string) => void;
 };
 
-const TagListWrapper: FunctionalComponent<TagListWrapperProps> = ({ selectedTag, onSelectTag }) => {
+const TagListWrapper: FunctionalComponent<TagListWrapperProps> = ({
+	selectedTag,
+	onSelectTag,
+}) => {
 	const allTags = useAtomValue(allTagsAtom);
-	return <TagList tags={allTags} selectedTag={selectedTag} onSelectTag={onSelectTag} />;
+	return (
+		<TagList
+			tags={allTags}
+			selectedTag={selectedTag}
+			onSelectTag={onSelectTag}
+		/>
+	);
+};
+
+type DirectoryListWrapperProps = {
+	selectedDirectory: string | null;
+	onSelectDirectory: (dir: string) => void;
+};
+
+const DirectoryListWrapper: FunctionalComponent<DirectoryListWrapperProps> = ({
+	selectedDirectory,
+	onSelectDirectory,
+}) => {
+	const allDirectories = useAtomValue(allDirectoriesAtom);
+	return (
+		<DirectoryList
+			directories={allDirectories}
+			selectedDirectory={selectedDirectory}
+			onSelectDirectory={onSelectDirectory}
+		/>
+	);
 };
 
 export const MainView: FunctionalComponent<ViewWrapperProps> = ({
@@ -38,6 +76,7 @@ export const MainView: FunctionalComponent<ViewWrapperProps> = ({
 	const [view, setView] = useAtom(viewAtom);
 	const [file, setFile] = useAtom(activeFileAtom);
 	const [tag, setTag] = useAtom(activeTagAtom);
+	const [directory, setDirectory] = useAtom(activeDirectoryAtom);
 
 	console.log(data);
 
@@ -45,18 +84,28 @@ export const MainView: FunctionalComponent<ViewWrapperProps> = ({
 		setView(Views.FILE);
 		setFile(file);
 		setTag(null);
+		setDirectory(null);
 	};
 
 	const selectTag = (selectedTag: string) => {
 		setView(Views.TAG);
 		setTag(selectedTag);
 		setFile(null);
+		setDirectory(null);
+	};
+
+	const selectDirectory = (dir: string) => {
+		setView(Views.DIR);
+		setDirectory(dir);
+		setFile(null);
+		setTag(null);
 	};
 
 	const selectView = (view: Views) => {
 		setView(view);
 		setFile(null);
 		setTag(null);
+		setDirectory(null);
 	};
 
 	const getView = () => {
@@ -78,9 +127,15 @@ export const MainView: FunctionalComponent<ViewWrapperProps> = ({
 					<>
 						<div className="mb-6">
 							<h2 className="text-sm font-semibold mb-2 opacity-60">TAGS</h2>
-							<TagListWrapper
-								selectedTag={tag}
-								onSelectTag={selectTag}
+							<TagListWrapper selectedTag={tag} onSelectTag={selectTag} />
+						</div>
+						<div className="mb-6">
+							<h2 className="text-sm font-semibold mb-2 opacity-60">
+								DIRECTORIES
+							</h2>
+							<DirectoryListWrapper
+								selectedDirectory={directory}
+								onSelectDirectory={selectDirectory}
 							/>
 						</div>
 						<div className="mb-6">

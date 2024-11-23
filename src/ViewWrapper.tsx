@@ -1,5 +1,4 @@
 import { useAtom } from 'jotai';
-import { useUpdateAtom } from 'jotai/utils';
 import { Plugin } from 'obsidian';
 import { FunctionalComponent } from 'preact';
 import { useEffect } from 'preact/hooks';

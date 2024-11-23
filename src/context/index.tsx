@@ -4,7 +4,7 @@ import { CachedMetadata, TFile } from 'obsidian';
 import { ComponentChildren, createContext } from 'preact';
 import { useEffect, useRef } from 'preact/hooks';
 
-import { getFileByPath, getListItems, makeFile } from '../helpers/files/util';
+import { getListItems, makeFile } from '../helpers/files/util';
 import { makeTasks } from '../helpers/tasks/util';
 import { filesAtom, obsidianAtom } from '../store/atoms/files';
 import { addObsidianListeners, Listeners } from './helpers';
