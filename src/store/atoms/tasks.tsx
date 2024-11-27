@@ -19,7 +19,7 @@ export const activeFileTasksAtom = atom(async (get) => {
 	const { tasks } = get(filesAtom);
 
 	if (file) {
-		return tasks.get(file.name) ?? [];
+		return tasks.get(file.path) ?? [];
 	}
 
 	return [];
