@@ -11,7 +11,7 @@ type TaskListProps = {
 };
 
 const TaskList: FunctionalComponent<TaskListProps> = ({ tasks }) => {
-	const { toggleTaskStatus } = useFileManager();
+	const { toggleTaskStatus, updateTaskeyDate } = useFileManager();
 	const [selectedTask, setSelectedTask] = useState<Taskey | null>(null);
 
 	return (
@@ -22,6 +22,7 @@ const TaskList: FunctionalComponent<TaskListProps> = ({ tasks }) => {
 						key={index}
 						task={task}
 						check={() => toggleTaskStatus(task)}
+						onDateChange={(date) => updateTaskeyDate(task, date)}
 						onOpenModal={() => setSelectedTask(task)}
 					/>
 				);

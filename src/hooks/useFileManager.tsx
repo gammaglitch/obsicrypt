@@ -77,6 +77,20 @@ export function useFileManager() {
 		await updateTaskMetadata(task, 'due', date);
 	};
 
+	const updateTaskeyDate = async (task: Taskey, date: string) => {
+		const updatedText = updateMetadata(task.originalText, 'due', date);
+		const fileRef = obsidian.app.vault.getAbstractFileByPath(
+			task.filePath
+		) as TFile;
+		const file = filesMap.get(task.filePath);
+
+		if (file) {
+			const lines = file.data.content.split('\n');
+			lines[task.data.line] = updatedText;
+			return obsidian.app.vault.modify(fileRef, lines.join('\n'));
+		}
+	};
+
 	const updateTaskText = async (task: Taskey, newText: string) => {
 		const fileRef = obsidian.app.vault.getAbstractFileByPath(
 			task.filePath
@@ -90,5 +104,11 @@ export function useFileManager() {
 		}
 	};
 
-	return { toggleTaskStatus, updateTask, updateDate, updateTaskText };
+	return {
+		toggleTaskStatus,
+		updateTask,
+		updateDate,
+		updateTaskeyDate,
+		updateTaskText,
+	};
 }
