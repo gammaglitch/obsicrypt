@@ -1,6 +1,7 @@
 import { atom } from 'jotai';
 import { loadable, selectAtom } from 'jotai/utils';
 
+import { config } from '../../config';
 import { today } from '../../helpers/dates';
 import {
 	activeDirectoryAtom,
@@ -65,3 +66,10 @@ export const todayTasksAtom = atom(async (get) => {
 });
 
 export const loadableTodayTasks = loadable(todayTasksAtom);
+
+export const inboxTasksAtom = atom(async (get) => {
+	const { tasks } = get(filesAtom);
+	return tasks.get(config.inboxFilePath) ?? [];
+});
+
+export const loadableInboxTasks = loadable(inboxTasksAtom);

@@ -3,4 +3,5 @@ export enum Views {
 	'FILE' = 'FILE',
 	'TAG' = 'TAG',
 	'DIR' = 'DIR',
+	'INBOX' = 'INBOX',
 }

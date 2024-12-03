@@ -20,6 +20,7 @@ import TagList from '../TagList';
 import ViewRow from './ViewRow';
 import DirectoryView from './DirectoryView';
 import FileView from './FileView';
+import InboxView from './InboxView';
 import TagView from './TagView';
 import TodayView from './TodayView';
 
@@ -30,6 +31,7 @@ const AllViews: AvailableViews = {
 	FILE: <FileView />,
 	TAG: <TagView />,
 	DIR: <DirectoryView />,
+	INBOX: <InboxView />,
 };
 
 type TagListWrapperProps = {
@@ -126,6 +128,11 @@ export const MainView: FunctionalComponent<ViewWrapperProps> = ({
 
 				<div className="mb-6">
 					<h2 className="text-sm font-semibold mb-2 opacity-60">CUSTOM</h2>
+					<ViewRow
+						label="Inbox"
+						active={view === Views.INBOX}
+						onClick={() => selectView(Views.INBOX)}
+					/>
 					<ViewRow
 						label="Today"
 						active={view === Views.TODAY}
