@@ -3,6 +3,7 @@ import { loadable, selectAtom } from 'jotai/utils';
 
 import { config } from '../../config';
 import { today } from '../../helpers/dates';
+import { matchGlob } from '../../helpers/glob';
 import {
 	activeDirectoryAtom,
 	activeFileAtom,
@@ -69,7 +70,9 @@ export const loadableTodayTasks = loadable(todayTasksAtom);
 
 export const inboxTasksAtom = atom(async (get) => {
 	const { tasks } = get(filesAtom);
-	return tasks.get(config.inboxFilePath) ?? [];
+	return [...tasks.entries()]
+		.filter(([path]) => matchGlob(config.inboxPattern, path))
+		.flatMap(([, tasks]) => tasks);
 });
 
 export const loadableInboxTasks = loadable(inboxTasksAtom);
