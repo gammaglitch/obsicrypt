@@ -2,7 +2,10 @@ import { useAtomValue } from 'jotai';
 import { TFile } from 'obsidian';
 
 import { today } from '../helpers/dates';
-import { searchAndReplaceLineInFile } from '../helpers/files/util';
+import {
+	getListItems,
+	searchAndReplaceLineInFile,
+} from '../helpers/files/util';
 import { Taskey } from '../helpers/tasks/types';
 import { updateMetadata } from '../helpers/tasks/util';
 import { selectFilesMap, selectObsidian } from '../store/atoms/files';
@@ -91,6 +94,25 @@ export function useFileManager() {
 		}
 	};
 
+	const addTaskToFile = async (filePath: string, text: string) => {
+		const fileRef = obsidian.app.vault.getAbstractFileByPath(filePath) as TFile;
+		const fileContent = await obsidian.app.vault.read(fileRef);
+		const lines = fileContent.split('\n');
+
+		const listItems = getListItems(obsidian, fileRef);
+		const taskItems = listItems.filter((item) => Object.hasOwn(item, 'task'));
+
+		const newLine = `- [ ] ${text}`;
+		if (taskItems.length > 0) {
+			const lastTask = taskItems[taskItems.length - 1];
+			lines.splice(lastTask.position.end.line + 1, 0, newLine);
+		} else {
+			lines.push(newLine);
+		}
+
+		return obsidian.app.vault.modify(fileRef, lines.join('\n'));
+	};
+
 	const updateTaskText = async (task: Taskey, newText: string) => {
 		const fileRef = obsidian.app.vault.getAbstractFileByPath(
 			task.filePath
@@ -105,6 +127,7 @@ export function useFileManager() {
 	};
 
 	return {
+		addTaskToFile,
 		toggleTaskStatus,
 		updateTask,
 		updateDate,

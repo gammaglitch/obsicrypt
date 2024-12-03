@@ -25,7 +25,7 @@ const FileView: FunctionalComponent<FileViewProps> = () => {
 
 	return (
 		<BaseView title={activeFile?.name ?? ''}>
-			<TaskList tasks={tasks} />
+			<TaskList tasks={tasks} targetFilePath={activeFile?.path} />
 		</BaseView>
 	);
 };

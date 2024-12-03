@@ -2,10 +2,15 @@ import { useAtomValue } from 'jotai';
 import { FunctionalComponent } from 'preact';
 import { useEffect, useState } from 'preact/hooks';
 
+import { config } from '../../config';
 import { Taskey } from '../../helpers/tasks/types';
 import { loadableInboxTasks } from '../../store/atoms/tasks';
 import TaskList from '../TaskList';
 import BaseView from './BaseView';
+
+const inboxTargetFile = config.inboxPattern.includes('*')
+	? undefined
+	: config.inboxPattern;
 
 type InboxViewProps = {};
 
@@ -21,7 +26,7 @@ const InboxView: FunctionalComponent<InboxViewProps> = () => {
 
 	return (
 		<BaseView title="Inbox">
-			<TaskList tasks={tasks} />
+			<TaskList tasks={tasks} targetFilePath={inboxTargetFile} />
 		</BaseView>
 	);
 };
