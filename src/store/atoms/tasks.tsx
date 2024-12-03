@@ -1,6 +1,7 @@
 import { atom } from 'jotai';
 import { loadable, selectAtom } from 'jotai/utils';
 
+import { today } from '../../helpers/dates';
 import {
 	activeDirectoryAtom,
 	activeFileAtom,
@@ -56,3 +57,11 @@ export const activeDirectoryTasksAtom = atom(async (get) => {
 });
 
 export const loadableDirectoryTasks = loadable(activeDirectoryTasksAtom);
+
+export const todayTasksAtom = atom(async (get) => {
+	const { tasks } = get(filesAtom);
+	const allTasks = [...tasks.values()].flat();
+	return allTasks.filter((task) => task.due === today());
+});
+
+export const loadableTodayTasks = loadable(todayTasksAtom);

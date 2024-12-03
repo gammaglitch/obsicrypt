@@ -1,6 +1,7 @@
 import { useAtomValue } from 'jotai';
 import { TFile } from 'obsidian';
 
+import { today } from '../helpers/dates';
 import { searchAndReplaceLineInFile } from '../helpers/files/util';
 import { Taskey } from '../helpers/tasks/types';
 import { updateMetadata } from '../helpers/tasks/util';
@@ -27,8 +28,7 @@ export function useFileManager() {
 		// Add or remove completedOn metadata
 		if (!task.done) {
 			// Completing the task - add completedOn with today's date
-			const today = new Date().toISOString().split('T')[0]; // yyyy-mm-dd format
-			newTask = updateMetadata(newTask, 'completedOn', today);
+			newTask = updateMetadata(newTask, 'completedOn', today());
 		} else {
 			// Uncompleting the task - remove completedOn metadata
 			const pattern = /\s*\{completedOn:[^}]+\}/gi;

@@ -17,6 +17,7 @@ import { ViewWrapperProps } from '../../ViewWrapper';
 import DirectoryList from '../DirectoryList';
 import FileList from '../FileList';
 import TagList from '../TagList';
+import ViewRow from './ViewRow';
 import DirectoryView from './DirectoryView';
 import FileView from './FileView';
 import TagView from './TagView';
@@ -122,6 +123,15 @@ export const MainView: FunctionalComponent<ViewWrapperProps> = ({
 				style={{ backgroundColor: '#201B27' }}
 			>
 				{/* <ViewSelector view={view} onSelectView={selectView} /> */}
+
+				<div className="mb-6">
+					<h2 className="text-sm font-semibold mb-2 opacity-60">CUSTOM</h2>
+					<ViewRow
+						label="Today"
+						active={view === Views.TODAY}
+						onClick={() => selectView(Views.TODAY)}
+					/>
+				</div>
 
 				{data.state === 'hasData' && (
 					<>
