@@ -21,7 +21,7 @@ const TodayView: FunctionalComponent<TodayViewProps> = () => {
 
 	return (
 		<BaseView title="Today">
-			<TaskList tasks={tasks} />
+			<TaskList tasks={tasks} highlightOverdue />
 		</BaseView>
 	);
 };

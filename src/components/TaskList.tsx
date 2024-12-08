@@ -9,11 +9,13 @@ import TaskModal from './TaskModal';
 type TaskListProps = {
 	tasks: Taskey[];
 	targetFilePath?: string;
+	highlightOverdue?: boolean;
 };
 
 const TaskList: FunctionalComponent<TaskListProps> = ({
 	tasks,
 	targetFilePath,
+	highlightOverdue = false,
 }) => {
 	const { addTaskToFile, toggleTaskStatus, updateTaskeyDate } =
 		useFileManager();
@@ -37,6 +39,7 @@ const TaskList: FunctionalComponent<TaskListProps> = ({
 						check={() => toggleTaskStatus(task)}
 						onDateChange={(date) => updateTaskeyDate(task, date)}
 						onOpenModal={() => setSelectedTask(task)}
+						highlightOverdue={highlightOverdue}
 					/>
 				);
 			})}

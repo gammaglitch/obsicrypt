@@ -1,6 +1,7 @@
 import { FunctionalComponent } from 'preact';
 import { useRef, useState } from 'preact/hooks';
 
+import { today } from '../helpers/dates';
 import { Taskey } from '../helpers/tasks/types';
 import Checkbox from './Checkbox';
 
@@ -9,6 +10,7 @@ type TaskProps = {
 	check: (value: boolean) => void;
 	onDateChange: (date: string) => void;
 	onOpenModal: () => void;
+	highlightOverdue?: boolean;
 };
 
 const Task: FunctionalComponent<TaskProps> = ({
@@ -16,6 +18,7 @@ const Task: FunctionalComponent<TaskProps> = ({
 	check,
 	onDateChange,
 	onOpenModal,
+	highlightOverdue = false,
 }) => {
 	const [hovered, setHovered] = useState(false);
 	const dateInputRef = useRef<HTMLInputElement>(null);
@@ -58,7 +61,11 @@ const Task: FunctionalComponent<TaskProps> = ({
 			/>
 			{task.due ? (
 				<div
-					className="flex-shrink-0 ml-2 text-xs opacity-50 cursor-pointer hover:opacity-80"
+					className={`flex-shrink-0 ml-2 text-xs cursor-pointer hover:opacity-80 ${
+						highlightOverdue && task.due < today()
+							? 'text-task-overdue'
+							: 'opacity-50'
+					}`}
 					onClick={openDatePicker}
 				>
 					{task.due}

@@ -50,6 +50,7 @@ module.exports = {
 				text: {
 					completed: '#949297',
 				},
+				overdue: '#F87171',
 			},
 		}),
 		columns: {

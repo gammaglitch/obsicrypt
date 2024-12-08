@@ -63,7 +63,7 @@ export const loadableDirectoryTasks = loadable(activeDirectoryTasksAtom);
 export const todayTasksAtom = atom(async (get) => {
 	const { tasks } = get(filesAtom);
 	const allTasks = [...tasks.values()].flat();
-	return allTasks.filter((task) => task.due === today());
+	return allTasks.filter((task) => task.due && task.due <= today());
 });
 
 export const loadableTodayTasks = loadable(todayTasksAtom);
