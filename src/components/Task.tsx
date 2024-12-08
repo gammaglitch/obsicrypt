@@ -5,6 +5,12 @@ import { today } from '../helpers/dates';
 import { Taskey } from '../helpers/tasks/types';
 import Checkbox from './Checkbox';
 
+const priorityColors: Record<string, string> = {
+	'1': '#F87171',
+	'2': '#FB923C',
+	'3': '#60A5FA',
+};
+
 type TaskProps = {
 	task: Taskey;
 	check: (value: boolean) => void;
@@ -37,6 +43,7 @@ const Task: FunctionalComponent<TaskProps> = ({
 		>
 			<Checkbox
 				active={task.done}
+				color={priorityColors[task.custom?.priority?.[0]]}
 				onClick={(e) => {
 					e.stopPropagation();
 					check(!task.done);
