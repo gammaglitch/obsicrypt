@@ -17,8 +17,12 @@ const TaskList: FunctionalComponent<TaskListProps> = ({
 	targetFilePath,
 	highlightOverdue = false,
 }) => {
-	const { addTaskToFile, toggleTaskStatus, updateTaskeyDate } =
-		useFileManager();
+	const {
+		addTaskToFile,
+		toggleTaskStatus,
+		updateTaskeyDate,
+		updateTaskeyMetadata,
+	} = useFileManager();
 	const [selectedTask, setSelectedTask] = useState<Taskey | null>(null);
 	const [newTaskText, setNewTaskText] = useState('');
 
@@ -38,6 +42,7 @@ const TaskList: FunctionalComponent<TaskListProps> = ({
 						task={task}
 						check={() => toggleTaskStatus(task)}
 						onDateChange={(date) => updateTaskeyDate(task, date)}
+						onPriorityChange={(p) => updateTaskeyMetadata(task, 'priority', p)}
 						onOpenModal={() => setSelectedTask(task)}
 						highlightOverdue={highlightOverdue}
 					/>
