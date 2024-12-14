@@ -122,10 +122,7 @@ export const MainView: FunctionalComponent<ViewWrapperProps> = ({
 
 	return (
 		<div className="flex w-full h-full">
-			<div
-				className="flex-shrink-0 w-1/3 px-4 pt-4 overflow-auto"
-				style={{ backgroundColor: '#201B27' }}
-			>
+			<div className="flex-shrink-0 w-1/3 px-4 pt-4 overflow-auto bg-obsidian-bg-secondary">
 				{/* <ViewSelector view={view} onSelectView={selectView} /> */}
 
 				<SidebarSection title="CUSTOM">
@@ -169,12 +166,7 @@ export const MainView: FunctionalComponent<ViewWrapperProps> = ({
 				)}
 			</div>
 
-			<div
-				className="flex-1 w-2/3 px-4 pt-8"
-				style={{ backgroundColor: '#292430' }}
-			>
-				{getView()}
-			</div>
+			<div className="flex-1 w-2/3 px-4 pt-8 bg-obsidian-bg">{getView()}</div>
 		</div>
 	);
 };

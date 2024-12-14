@@ -89,7 +89,7 @@ const TaskModal: FunctionalComponent<TaskModalProps> = ({
 			onClick={onClose}
 		>
 			<div
-				className="bg-[#2a2738] rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-auto"
+				className="bg-obsidian-bg-secondary rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-auto"
 				onClick={(e) => e.stopPropagation()}
 			>
 				<div className="flex justify-between items-start mb-4">
@@ -115,7 +115,7 @@ const TaskModal: FunctionalComponent<TaskModalProps> = ({
 									onInput={(e) =>
 										setEditedText((e.target as HTMLInputElement).value)
 									}
-									className="flex-1 bg-[#1e1b26] border border-gray-600 rounded px-3 py-2 text-base focus:outline-none focus:border-gray-400"
+									className="flex-1 bg-obsidian-bg border border-gray-600 rounded px-3 py-2 text-base focus:outline-none focus:border-gray-400"
 									autoFocus
 								/>
 								<button
@@ -133,7 +133,7 @@ const TaskModal: FunctionalComponent<TaskModalProps> = ({
 							</div>
 						) : (
 							<div
-								className="text-base cursor-pointer hover:bg-[#3d3a4b] p-2 rounded -ml-2"
+								className="text-base cursor-pointer hover:bg-obsidian-bg-hover p-2 rounded -ml-2"
 								onClick={handleEditClick}
 							>
 								{task.displayText}
@@ -193,7 +193,7 @@ const TaskModal: FunctionalComponent<TaskModalProps> = ({
 								{task.tags.map((tag) => (
 									<span
 										key={tag}
-										className="px-2 py-1 bg-[#3d3a4b] rounded text-sm"
+										className="px-2 py-1 bg-obsidian-bg-hover rounded text-sm"
 									>
 										#{tag}
 									</span>
@@ -211,7 +211,7 @@ const TaskModal: FunctionalComponent<TaskModalProps> = ({
 								{task.contexts.map((context) => (
 									<span
 										key={context}
-										className="px-2 py-1 bg-[#3d3a4b] rounded text-sm"
+										className="px-2 py-1 bg-obsidian-bg-hover rounded text-sm"
 									>
 										@{context}
 									</span>
@@ -240,7 +240,7 @@ const TaskModal: FunctionalComponent<TaskModalProps> = ({
 						<label className="text-sm font-semibold text-gray-400 block mb-1">
 							Original Text
 						</label>
-						<div className="text-sm text-gray-300 font-mono bg-[#1e1b26] p-2 rounded">
+						<div className="text-sm text-gray-300 font-mono bg-obsidian-bg p-2 rounded">
 							{task.originalText}
 						</div>
 					</div>

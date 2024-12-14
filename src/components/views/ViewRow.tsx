@@ -19,7 +19,7 @@ const ViewRow: FunctionalComponent<ViewRowProps> = ({
 			className={`flex items-center px-2 rounded ${
 				active ? 'bg-task-active-background' : ''
 			}`}
-			style={{ color: '#C4C3C7' }}
+			style={{ color: 'var(--text-normal)' }}
 		>
 			{icon ? icon : ''} {label}
 		</div>

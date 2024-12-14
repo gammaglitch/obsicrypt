@@ -42,7 +42,7 @@ const Task: FunctionalComponent<TaskProps> = ({
 
 	return (
 		<div
-			className={`relative flex items-center rounded px-2 py-1 ${
+			className={`relative flex items-center px-2 py-2 border-b border-obsidian-border ${
 				hovered ? 'bg-task-active-background' : ''
 			}`}
 			onMouseEnter={() => setHovered(true)}
@@ -108,15 +108,12 @@ const Task: FunctionalComponent<TaskProps> = ({
 						{currentPriority ? `p${currentPriority}` : '+p'}
 					</div>
 					{priorityOpen && (
-						<div
-							className="absolute right-0 top-full mt-1 rounded shadow-lg z-50 flex flex-col"
-							style={{ backgroundColor: '#312E37' }}
-						>
+						<div className="absolute right-0 top-full mt-1 rounded shadow-lg z-50 flex flex-col bg-obsidian-bg-secondary">
 							{priorityOptions.map((p) => (
 								<div
 									key={p}
 									className="px-3 py-1 cursor-pointer hover:opacity-80 text-xs whitespace-nowrap"
-									style={{ color: priorityColors[p] ?? '#9CA3AF' }}
+									style={{ color: priorityColors[p] ?? 'var(--text-muted)' }}
 									onClick={() => {
 										onPriorityChange(p);
 										setPriorityOpen(false);

@@ -39,16 +39,27 @@ module.exports = {
 			fuchsia: colors.fuchsia,
 			pink: colors.pink,
 			rose: colors.rose,
+			obsidian: {
+				bg: 'var(--background-primary)',
+				'bg-secondary': 'var(--background-secondary)',
+				'bg-hover': 'var(--background-modifier-hover)',
+				'bg-active': 'var(--background-modifier-active-hover, var(--background-modifier-hover))',
+				border: 'var(--background-modifier-border)',
+				text: 'var(--text-normal)',
+				'text-muted': 'var(--text-muted)',
+				'text-faint': 'var(--text-faint)',
+				accent: 'var(--interactive-accent)',
+			},
 			task: {
 				checkbox: {
-					border: '#706C74',
-					background: '#5C95F0',
+					border: 'var(--text-faint)',
+					background: 'var(--interactive-accent)',
 				},
 				active: {
-					background: '#312E37',
+					background: 'var(--background-modifier-hover)',
 				},
 				text: {
-					completed: '#949297',
+					completed: 'var(--text-muted)',
 				},
 				overdue: '#F87171',
 			},
