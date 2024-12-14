@@ -60,11 +60,22 @@ const Task: FunctionalComponent<TaskProps> = ({
 				}}
 			/>
 			<div
-				className={`flex-1 text-ellipsis overflow-hidden ${
+				className={`flex-1 min-w-0 ${
 					task.done ? 'text-task-text-completed' : ''
 				}`}
 			>
-				{task.displayText}
+				<div className="text-ellipsis overflow-hidden">{task.displayText}</div>
+				{task.due && (
+					<div
+						className={`text-xs ${
+							highlightOverdue && task.due < today()
+								? 'text-task-overdue'
+								: 'opacity-50'
+						}`}
+					>
+						{task.due}
+					</div>
+				)}
 			</div>
 			<input
 				ref={dateInputRef}
@@ -76,34 +87,25 @@ const Task: FunctionalComponent<TaskProps> = ({
 					if (value) onDateChange(value);
 				}}
 			/>
-			{task.due ? (
+			<div className="flex items-center flex-shrink-0 ml-2 w-16 justify-end">
 				<div
-					className={`flex-shrink-0 ml-2 text-xs cursor-pointer hover:opacity-80 ${
-						highlightOverdue && task.due < today()
-							? 'text-task-overdue'
-							: 'opacity-50'
+					className={`text-xs cursor-pointer hover:opacity-70 ${
+						hovered ? 'opacity-40' : 'opacity-0 pointer-events-none'
 					}`}
 					onClick={openDatePicker}
 				>
-					{task.due}
+					+d
 				</div>
-			) : (
-				hovered && (
-					<div
-						className="flex-shrink-0 ml-2 text-xs opacity-40 cursor-pointer hover:opacity-70"
-						onClick={openDatePicker}
-					>
-						+d
-					</div>
-				)
-			)}
-			{hovered && (
-				<div className="relative flex-shrink-0 ml-2">
+				<div
+					className={`relative ml-2 ${
+						hovered ? '' : 'opacity-0 pointer-events-none'
+					}`}
+				>
 					<div
 						className="cursor-pointer opacity-60 hover:opacity-100 text-xs"
 						onClick={() => setPriorityOpen(!priorityOpen)}
 					>
-						{currentPriority ? `p${currentPriority}` : '+ p'}
+						{currentPriority ? `p${currentPriority}` : '+p'}
 					</div>
 					{priorityOpen && (
 						<div
@@ -126,15 +128,15 @@ const Task: FunctionalComponent<TaskProps> = ({
 						</div>
 					)}
 				</div>
-			)}
-			{hovered && (
 				<div
-					className="flex-shrink-0 ml-2 cursor-pointer opacity-60 hover:opacity-100"
+					className={`ml-2 cursor-pointer hover:opacity-100 ${
+						hovered ? 'opacity-60' : 'opacity-0 pointer-events-none'
+					}`}
 					onClick={onOpenModal}
 				>
 					...
 				</div>
-			)}
+			</div>
 		</div>
 	);
 };
