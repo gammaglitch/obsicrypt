@@ -93,7 +93,7 @@ const Task: FunctionalComponent<TaskProps> = ({
 						className="flex-shrink-0 ml-2 text-xs opacity-40 cursor-pointer hover:opacity-70"
 						onClick={openDatePicker}
 					>
-						+ date
+						+d
 					</div>
 				)
 			)}

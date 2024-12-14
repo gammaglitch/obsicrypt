@@ -14,8 +14,10 @@ import { viewAtom } from '../../store/atoms/view';
 import { FileType } from '../../types/File';
 import { Views } from '../../types/Views';
 import { ViewWrapperProps } from '../../ViewWrapper';
+import { config } from '../../config';
 import DirectoryList from '../DirectoryList';
 import FileList from '../FileList';
+import SidebarSection from '../SidebarSection';
 import TagList from '../TagList';
 import ViewRow from './ViewRow';
 import DirectoryView from './DirectoryView';
@@ -126,8 +128,7 @@ export const MainView: FunctionalComponent<ViewWrapperProps> = ({
 			>
 				{/* <ViewSelector view={view} onSelectView={selectView} /> */}
 
-				<div className="mb-6">
-					<h2 className="text-sm font-semibold mb-2 opacity-60">CUSTOM</h2>
+				<SidebarSection title="CUSTOM">
 					<ViewRow
 						label="Inbox"
 						active={view === Views.INBOX}
@@ -138,31 +139,32 @@ export const MainView: FunctionalComponent<ViewWrapperProps> = ({
 						active={view === Views.TODAY}
 						onClick={() => selectView(Views.TODAY)}
 					/>
-				</div>
+				</SidebarSection>
 
 				{data.state === 'hasData' && (
 					<>
-						<div className="mb-6">
-							<h2 className="text-sm font-semibold mb-2 opacity-60">TAGS</h2>
-							<TagListWrapper selectedTag={tag} onSelectTag={selectTag} />
-						</div>
-						<div className="mb-6">
-							<h2 className="text-sm font-semibold mb-2 opacity-60">
-								DIRECTORIES
-							</h2>
-							<DirectoryListWrapper
-								selectedDirectory={directory}
-								onSelectDirectory={selectDirectory}
-							/>
-						</div>
-						<div className="mb-6">
-							<h2 className="text-sm font-semibold mb-2 opacity-60">FILES</h2>
-							<FileList
-								files={data.data.files}
-								selectedFile={file}
-								onSelectFile={selectFile}
-							/>
-						</div>
+						{config.sidebar.tags && (
+							<SidebarSection title="TAGS">
+								<TagListWrapper selectedTag={tag} onSelectTag={selectTag} />
+							</SidebarSection>
+						)}
+						{config.sidebar.directories && (
+							<SidebarSection title="DIRECTORIES">
+								<DirectoryListWrapper
+									selectedDirectory={directory}
+									onSelectDirectory={selectDirectory}
+								/>
+							</SidebarSection>
+						)}
+						{config.sidebar.files && (
+							<SidebarSection title="FILES">
+								<FileList
+									files={data.data.files}
+									selectedFile={file}
+									onSelectFile={selectFile}
+								/>
+							</SidebarSection>
+						)}
 					</>
 				)}
 			</div>
