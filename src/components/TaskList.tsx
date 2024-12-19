@@ -1,10 +1,19 @@
 import { FunctionalComponent } from 'preact';
-import { useState } from 'preact/hooks';
+import { useMemo, useState } from 'preact/hooks';
 
+import { SortOption, sortTasks } from '../helpers/tasks/sort';
 import { Taskey } from '../helpers/tasks/types';
 import { useFileManager } from '../hooks/useFileManager';
 import Task from './Task';
 import TaskModal from './TaskModal';
+
+const sortOptions: { value: SortOption; label: string }[] = [
+	{ value: 'default', label: 'Default' },
+	{ value: 'due', label: 'Due date' },
+	{ value: 'priority', label: 'Priority' },
+	{ value: 'name', label: 'Name' },
+	{ value: 'status', label: 'Status' },
+];
 
 type TaskListProps = {
 	tasks: Taskey[];
@@ -25,6 +34,10 @@ const TaskList: FunctionalComponent<TaskListProps> = ({
 	} = useFileManager();
 	const [selectedTask, setSelectedTask] = useState<Taskey | null>(null);
 	const [newTaskText, setNewTaskText] = useState('');
+	const [sort, setSort] = useState<SortOption>('default');
+	const [sortOpen, setSortOpen] = useState(false);
+
+	const sortedTasks = useMemo(() => sortTasks(tasks, sort), [tasks, sort]);
 
 	const handleAddTask = async () => {
 		const text = newTaskText.trim();
@@ -35,7 +48,34 @@ const TaskList: FunctionalComponent<TaskListProps> = ({
 
 	return (
 		<div className="w-full">
-			{tasks.map((task, index) => {
+			<div className="flex justify-end mb-2 relative">
+				<div
+					className="text-xs cursor-pointer opacity-50 hover:opacity-80 select-none"
+					onClick={() => setSortOpen(!sortOpen)}
+				>
+					Sort: {sortOptions.find((o) => o.value === sort)?.label}
+				</div>
+				{sortOpen && (
+					<div className="absolute right-0 top-full mt-1 rounded shadow-lg z-50 flex flex-col bg-obsidian-bg-secondary">
+						{sortOptions.map((option) => (
+							<div
+								key={option.value}
+								className={`px-3 py-1 cursor-pointer text-xs whitespace-nowrap hover:bg-obsidian-bg-hover ${
+									sort === option.value ? 'opacity-100' : 'opacity-60'
+								}`}
+								onClick={() => {
+									setSort(option.value);
+									setSortOpen(false);
+								}}
+							>
+								{option.label}
+							</div>
+						))}
+					</div>
+				)}
+			</div>
+
+			{sortedTasks.map((task, index) => {
 				return (
 					<Task
 						key={index}
