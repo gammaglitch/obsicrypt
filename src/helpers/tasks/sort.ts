@@ -30,7 +30,7 @@ export function sortTasks(tasks: Taskey[], sort: SortOption): Taskey[] {
 				if (!a.due) {
 					return 1;
 				}
-				
+
 				if (!b.due) {
 					return -1;
 				}

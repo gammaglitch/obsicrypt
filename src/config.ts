@@ -1,8 +1,8 @@
+export type SidebarSection = 'custom' | 'tags' | 'directories' | 'files';
+
 export const config = {
 	inboxPattern: 'example/*.md',
 	sidebar: {
-		tags: true,
-		directories: true,
-		files: true,
+		sections: ['custom', 'tags', 'directories', 'files'] as SidebarSection[],
 	},
 };

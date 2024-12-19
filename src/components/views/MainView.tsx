@@ -14,7 +14,7 @@ import { viewAtom } from '../../store/atoms/view';
 import { FileType } from '../../types/File';
 import { Views } from '../../types/Views';
 import { ViewWrapperProps } from '../../ViewWrapper';
-import { config } from '../../config';
+import { config, SidebarSection as SidebarSectionId } from '../../config';
 import DirectoryList from '../DirectoryList';
 import FileList from '../FileList';
 import SidebarSection from '../SidebarSection';
@@ -113,6 +113,48 @@ export const MainView: FunctionalComponent<ViewWrapperProps> = ({
 		setDirectory(null);
 	};
 
+	const sidebarSections: Record<SidebarSectionId, ComponentChild> = {
+		custom: (
+			<SidebarSection key="custom" title="CUSTOM">
+				<ViewRow
+					label="Inbox"
+					active={view === Views.INBOX}
+					onClick={() => selectView(Views.INBOX)}
+				/>
+				<ViewRow
+					label="Today"
+					active={view === Views.TODAY}
+					onClick={() => selectView(Views.TODAY)}
+				/>
+			</SidebarSection>
+		),
+		tags:
+			data.state === 'hasData' ? (
+				<SidebarSection key="tags" title="TAGS">
+					<TagListWrapper selectedTag={tag} onSelectTag={selectTag} />
+				</SidebarSection>
+			) : null,
+		directories:
+			data.state === 'hasData' ? (
+				<SidebarSection key="directories" title="DIRECTORIES">
+					<DirectoryListWrapper
+						selectedDirectory={directory}
+						onSelectDirectory={selectDirectory}
+					/>
+				</SidebarSection>
+			) : null,
+		files:
+			data.state === 'hasData' ? (
+				<SidebarSection key="files" title="FILES">
+					<FileList
+						files={data.data.files}
+						selectedFile={file}
+						onSelectFile={selectFile}
+					/>
+				</SidebarSection>
+			) : null,
+	};
+
 	const getView = () => {
 		if (view) {
 			return AllViews[view];
@@ -123,47 +165,7 @@ export const MainView: FunctionalComponent<ViewWrapperProps> = ({
 	return (
 		<div className="flex w-full h-full">
 			<div className="flex-shrink-0 w-1/3 px-4 pt-4 overflow-auto bg-obsidian-bg-secondary">
-				{/* <ViewSelector view={view} onSelectView={selectView} /> */}
-
-				<SidebarSection title="CUSTOM">
-					<ViewRow
-						label="Inbox"
-						active={view === Views.INBOX}
-						onClick={() => selectView(Views.INBOX)}
-					/>
-					<ViewRow
-						label="Today"
-						active={view === Views.TODAY}
-						onClick={() => selectView(Views.TODAY)}
-					/>
-				</SidebarSection>
-
-				{data.state === 'hasData' && (
-					<>
-						{config.sidebar.tags && (
-							<SidebarSection title="TAGS">
-								<TagListWrapper selectedTag={tag} onSelectTag={selectTag} />
-							</SidebarSection>
-						)}
-						{config.sidebar.directories && (
-							<SidebarSection title="DIRECTORIES">
-								<DirectoryListWrapper
-									selectedDirectory={directory}
-									onSelectDirectory={selectDirectory}
-								/>
-							</SidebarSection>
-						)}
-						{config.sidebar.files && (
-							<SidebarSection title="FILES">
-								<FileList
-									files={data.data.files}
-									selectedFile={file}
-									onSelectFile={selectFile}
-								/>
-							</SidebarSection>
-						)}
-					</>
-				)}
+				{config.sidebar.sections.map((id) => sidebarSections[id])}
 			</div>
 
 			<div className="flex-1 w-2/3 px-4 pt-8 bg-obsidian-bg">{getView()}</div>
