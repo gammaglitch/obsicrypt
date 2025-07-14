@@ -1,0 +1,1 @@
+This project is a PoC and aims to provide an interface for your todos stored accross different markdown files. The interface tries to be somewhat like Todoist.
