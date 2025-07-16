@@ -4,7 +4,7 @@
 	"description": "",
 	"main": "index.js",
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1",
+		"test": "jest",
 		"dev": "vite build --watch",
 		"build:ts": "tsc",
 		"build:vite": "vite build",
@@ -36,6 +36,8 @@
 		"zustand": "3.7.2"
 	},
 	"devDependencies": {
+		"@babel/preset-env": "^7.27.1",
+		"@babel/preset-typescript": "^7.27.1",
 		"@types/react-datepicker": "^4.4.2",
 		"@typescript-eslint/parser": "^5.47.0",
 		"eslint": "^8.30.0",
