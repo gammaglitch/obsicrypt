@@ -5,6 +5,7 @@
 	"main": "index.js",
 	"scripts": {
 		"test": "jest",
+		"test:tasks": "jest src/helpers/tasks",
 		"dev": "vite build --watch",
 		"build:ts": "tsc",
 		"build:vite": "vite build",

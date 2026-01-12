@@ -70,10 +70,7 @@ describe('sortTasks', () => {
 		});
 
 		it('pushes tasks without due date to the end', () => {
-			const tasks = [
-				makeTask({ due: null }),
-				makeTask({ due: '2024-12-01' }),
-			];
+			const tasks = [makeTask({ due: null }), makeTask({ due: '2024-12-01' })];
 			const result = sortTasks(tasks, 'due');
 			expect(result[0].due).toBe('2024-12-01');
 			expect(result[1].due).toBeNull();
@@ -88,11 +85,7 @@ describe('sortTasks', () => {
 				makeTask({ custom: { priority: ['2'] } }),
 			];
 			const result = sortTasks(tasks, 'priority');
-			expect(result.map((t) => t.custom.priority[0])).toEqual([
-				'1',
-				'2',
-				'3',
-			]);
+			expect(result.map((t) => t.custom.priority[0])).toEqual(['1', '2', '3']);
 		});
 
 		it('tasks without priority sort last', () => {
@@ -107,10 +100,7 @@ describe('sortTasks', () => {
 
 	describe('sort by status', () => {
 		it('puts incomplete tasks before completed ones', () => {
-			const tasks = [
-				makeTask({ done: true }),
-				makeTask({ done: false }),
-			];
+			const tasks = [makeTask({ done: true }), makeTask({ done: false })];
 			const result = sortTasks(tasks, 'status');
 			expect(result[0].done).toBe(false);
 			expect(result[1].done).toBe(true);

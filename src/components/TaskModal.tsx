@@ -1,6 +1,7 @@
 import { FunctionalComponent } from 'preact';
 import { useState } from 'preact/hooks';
 
+import { serializeTaskLine } from '../helpers/tasks/serialize';
 import { Taskey } from '../helpers/tasks/types';
 import { useFileManager } from '../hooks/useFileManager';
 
@@ -28,48 +29,10 @@ const TaskModal: FunctionalComponent<TaskModalProps> = ({
 
 	const handleSave = async () => {
 		if (editedText.trim()) {
-			// Preserve the list marker and checkbox
-			const marker = task.done ? '[x]' : '[ ]';
-			const listMarker = task.originalText.match(/^\s*[-*]/)?.[0] || '-';
-
-			// Build metadata strings
-			const metadataParts: string[] = [];
-
-			// Add key-value metadata (due, start, completedOn)
-			if (task.due) metadataParts.push(`{due:${task.due}}`);
-			if (task.start) metadataParts.push(`{start:${task.start}}`);
-			if (task.completedOn)
-				metadataParts.push(`{completedOn:${task.completedOn}}`);
-
-			// Add custom metadata
-			Object.entries(task.custom).forEach(([key, values]) => {
-				values.forEach((value) => metadataParts.push(`{${key}:${value}}`));
-			});
-
-			// Add tags
-			task.tags.forEach((tag) => metadataParts.push(`#${tag}`));
-
-			// Add contexts
-			task.contexts.forEach((context) => metadataParts.push(`@${context}`));
-
-			// Combine everything
-			const metadata =
-				metadataParts.length > 0 ? ` ${metadataParts.join(' ')}` : '';
-			const newText = `${listMarker} ${marker} ${editedText.trim()}${metadata}`;
-
-			console.log('TASK_SAVE_DEBUG', {
-				originalText: task.originalText,
-				editedText,
-				taskMetadata: {
-					due: task.due,
-					start: task.start,
-					completedOn: task.completedOn,
-					tags: task.tags,
-					contexts: task.contexts,
-					custom: task.custom,
-				},
-				metadataParts,
-				finalNewText: newText,
+			const newText = serializeTaskLine({
+				...task,
+				text: editedText,
+				isComplete: task.done,
 			});
 
 			await updateTaskText(task, newText);

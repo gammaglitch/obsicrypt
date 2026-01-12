@@ -89,7 +89,11 @@ describe('parseTaskContent', () => {
 
 describe('updateMetadata', () => {
 	it('updates existing metadata value', () => {
-		const result = updateMetadata('Buy milk {due:2024-12-01}', 'due', '2024-12-15');
+		const result = updateMetadata(
+			'Buy milk {due:2024-12-01}',
+			'due',
+			'2024-12-15'
+		);
 		expect(result).toBe('Buy milk {due:2024-12-15}');
 	});
 
