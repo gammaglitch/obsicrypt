@@ -3,7 +3,7 @@ import { atomWithDefault, loadable, selectAtom } from 'jotai/utils';
 import { Plugin } from 'obsidian';
 
 import { getFiles } from '../../helpers/files/util';
-import { FileType } from '../../types/File';
+import { Filey } from '../../helpers/files/types';
 
 export const obsidianAtom = atom<Plugin | null>(null);
 
@@ -41,7 +41,7 @@ export const allDataAtom = selectAtom(filesAtom, (data) => ({
 
 export const loadableAllDataAtom = loadable(allDataAtom);
 
-export const activeFileAtom = atom<FileType | null>(null);
+export const activeFileAtom = atom<Filey | null>(null);
 
 export const activeTagAtom = atom<string | null>(null);
 

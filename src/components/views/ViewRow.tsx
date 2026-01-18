@@ -21,7 +21,7 @@ const ViewRow: FunctionalComponent<ViewRowProps> = ({
 			}`}
 			style={{ color: 'var(--text-normal)' }}
 		>
-			{icon ? icon : ''} {label}
+			{icon ?? null} {label}
 		</div>
 	);
 };

@@ -1,12 +1,12 @@
 import { FunctionalComponent } from 'preact';
 
-import { FileType } from '../types/File';
+import { Filey } from '../helpers/files/types';
 import ViewRow from './views/ViewRow';
 
 type FileListProps = {
-	files: FileType[];
-	selectedFile: FileType | null;
-	onSelectFile: (file: FileType) => void;
+	files: Filey[];
+	selectedFile: Filey | null;
+	onSelectFile: (file: Filey) => void;
 };
 
 const FileList: FunctionalComponent<FileListProps> = ({

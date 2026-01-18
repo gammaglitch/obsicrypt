@@ -2,6 +2,7 @@ import { useAtom } from 'jotai';
 import { useAtomValue } from 'jotai';
 import { ComponentChild, FunctionalComponent } from 'preact';
 
+import { Filey } from '../../helpers/files/types';
 import {
 	activeDirectoryAtom,
 	activeFileAtom,
@@ -11,7 +12,6 @@ import {
 	loadableAllDataAtom,
 } from '../../store/atoms/files';
 import { viewAtom } from '../../store/atoms/view';
-import { FileType } from '../../types/File';
 import { Views } from '../../types/Views';
 import { ViewWrapperProps } from '../../ViewWrapper';
 import { config, SidebarSection as SidebarSectionId } from '../../config';
@@ -77,13 +77,14 @@ const DirectoryListWrapper: FunctionalComponent<DirectoryListWrapperProps> = ({
 export const MainView: FunctionalComponent<ViewWrapperProps> = ({
 	obsidian,
 }) => {
+	void obsidian;
 	const data = useAtomValue(loadableAllDataAtom);
 	const [view, setView] = useAtom(viewAtom);
 	const [file, setFile] = useAtom(activeFileAtom);
 	const [tag, setTag] = useAtom(activeTagAtom);
 	const [directory, setDirectory] = useAtom(activeDirectoryAtom);
 
-	const selectFile = (file: FileType) => {
+	const selectFile = (file: Filey) => {
 		setView(Views.FILE);
 		setFile(file);
 		setTag(null);
