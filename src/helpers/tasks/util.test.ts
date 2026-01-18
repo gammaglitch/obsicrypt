@@ -1,4 +1,11 @@
-import { stripTaskCheckbox, parseTaskContent, updateMetadata } from './util';
+import {
+	clearTaskLineMetadata,
+	parseTaskContent,
+	parseTaskLine,
+	stripTaskCheckbox,
+	updateMetadata,
+	updateTaskLineMetadata,
+} from './util';
 
 describe('stripTaskCheckbox', () => {
 	it('strips unchecked checkbox', () => {
@@ -87,6 +94,25 @@ describe('parseTaskContent', () => {
 	});
 });
 
+describe('parseTaskLine', () => {
+	it('returns structured task-line data for serializer-backed edits', () => {
+		expect(
+			parseTaskLine('- [x] Plan sprint {due:2024-12-15} #work @desk')
+		).toEqual({
+			text: 'Plan sprint',
+			displayText: 'Plan sprint',
+			originalText: '- [x] Plan sprint {due:2024-12-15} #work @desk',
+			isComplete: true,
+			due: '2024-12-15',
+			start: null,
+			completedOn: null,
+			tags: ['work'],
+			contexts: ['desk'],
+			custom: {},
+		});
+	});
+});
+
 describe('updateMetadata', () => {
 	it('updates existing metadata value', () => {
 		const result = updateMetadata(
@@ -110,5 +136,38 @@ describe('updateMetadata', () => {
 	it('handles empty string', () => {
 		const result = updateMetadata('', 'due', '2024-12-15');
 		expect(result).toBe('{due:2024-12-15}');
+	});
+});
+
+describe('updateTaskLineMetadata', () => {
+	it('updates standard task metadata through parse and serialize', () => {
+		const result = updateTaskLineMetadata(
+			'- [ ] Buy milk #errands',
+			'due',
+			'2024-12-15'
+		);
+
+		expect(result).toBe('- [ ] Buy milk {due:2024-12-15} #errands');
+	});
+
+	it('replaces repeated custom metadata with a single canonical value', () => {
+		const result = updateTaskLineMetadata(
+			'- [ ] Task {priority:1} {priority:2}',
+			'priority',
+			'3'
+		);
+
+		expect(result).toBe('- [ ] Task {priority:3}');
+	});
+});
+
+describe('clearTaskLineMetadata', () => {
+	it('removes standard metadata through parse and serialize', () => {
+		const result = clearTaskLineMetadata(
+			'- [x] Buy milk {due:2024-12-15} {completedOn:2024-12-01}',
+			'completedOn'
+		);
+
+		expect(result).toBe('- [x] Buy milk {due:2024-12-15}');
 	});
 });

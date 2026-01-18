@@ -1,7 +1,7 @@
 import { useAtomValue } from 'jotai';
 
 import { searchAndReplaceLineInFile } from '../helpers/files/util';
-import { updateMetadata } from '../helpers/tasks/util';
+import { updateTaskLineMetadata } from '../helpers/tasks/util';
 import { selectObsidian } from '../store/atoms/files';
 import { TaskType } from '../types/Task';
 
@@ -13,7 +13,7 @@ export function useTaskManager() {
 		key: string,
 		value: string
 	) => {
-		const updatedText = updateMetadata(task.originalText, key, value);
+		const updatedText = updateTaskLineMetadata(task.originalText, key, value);
 
 		await searchAndReplaceLineInFile(
 			obsidian,

@@ -59,3 +59,5 @@ If an LLM is editing this repo, these are the safest seams:
 - Derived task/file state: `src/store/atoms/files.tsx`
 
 Avoid duplicating task-line construction in UI components. Use the shared serializer instead.
+
+Representative task syntax examples live in `docs/task-format.md`.

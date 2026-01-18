@@ -9,7 +9,7 @@ import {
 	replaceTaskLine,
 	toggleTaskLine,
 } from '../helpers/tasks/transforms';
-import { updateMetadata } from '../helpers/tasks/util';
+import { updateTaskLineMetadata } from '../helpers/tasks/util';
 import { selectFilesMap, selectObsidian } from '../store/atoms/files';
 import { TaskType } from '../types/Task';
 
@@ -53,7 +53,7 @@ export function useFileManager() {
 		key: string,
 		value: string
 	) => {
-		const updatedText = updateMetadata(task.originalText, key, value);
+		const updatedText = updateTaskLineMetadata(task.originalText, key, value);
 		const fileRef = obsidian.app.vault.getAbstractFileByPath(
 			task.filePath
 		) as TFile;
@@ -76,7 +76,7 @@ export function useFileManager() {
 		key: string,
 		value: string
 	) => {
-		const updatedText = updateMetadata(task.originalText, key, value);
+		const updatedText = updateTaskLineMetadata(task.originalText, key, value);
 		const fileRef = obsidian.app.vault.getAbstractFileByPath(
 			task.filePath
 		) as TFile;

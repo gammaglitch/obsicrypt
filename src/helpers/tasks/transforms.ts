@@ -1,18 +1,25 @@
 import { today } from '../dates';
-import { updateMetadata } from './util';
+import { serializeTaskLine } from './serialize';
+import { clearTaskLineMetadata, parseTaskLine } from './util';
 
 export function toggleTaskLine(originalText: string, isDone: boolean): string {
-	const currentMarker = isDone ? '[x]' : '[ ]';
-	const nextMarker = isDone ? '[ ]' : '[x]';
-	let newText = originalText.replace(currentMarker, nextMarker);
+	const task = parseTaskLine(originalText);
 
 	if (!isDone) {
-		newText = updateMetadata(newText, 'completedOn', today());
-	} else {
-		newText = newText.replace(/\s*\{completedOn:[^}]+\}/gi, '');
+		return serializeTaskLine({
+			...task,
+			isComplete: true,
+			completedOn: today(),
+		});
 	}
 
-	return newText;
+	return clearTaskLineMetadata(
+		serializeTaskLine({
+			...task,
+			isComplete: false,
+		}),
+		'completedOn'
+	);
 }
 
 export function replaceTaskLine(
@@ -33,7 +40,16 @@ export function insertTaskIntoLines(
 	text: string
 ): string {
 	const lines = content.split('\n');
-	const newLine = `- [ ] ${text}`;
+	const newLine = serializeTaskLine({
+		text,
+		isComplete: false,
+		due: null,
+		start: null,
+		completedOn: null,
+		tags: [],
+		contexts: [],
+		custom: {},
+	});
 
 	if (taskItems.length > 0) {
 		const lastTask = taskItems[taskItems.length - 1];

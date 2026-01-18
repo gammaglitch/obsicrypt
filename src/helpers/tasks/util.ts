@@ -2,6 +2,7 @@ import { ListItemCache, TFile } from 'obsidian';
 
 import { Metadata, TaskType } from '../../types/Task';
 import { getListItems } from '../files/util';
+import { serializeTaskLine } from './serialize';
 import { Taskey } from './types';
 
 type MetadataExtractionState = {
@@ -14,7 +15,7 @@ type MetadataExtractor = (
 ) => MetadataExtractionState;
 
 function getTaskStatus(text: string): boolean {
-	return text.includes('[x]');
+	return /\[[xX]\]/.test(text);
 }
 
 export function stripTaskCheckbox(text: string): string {
@@ -164,6 +165,18 @@ export function parseTaskContent(text: string) {
 	};
 }
 
+export function parseTaskLine(text: string) {
+	const { displayText, metadata } = parseTaskContent(text);
+
+	return {
+		text: displayText,
+		displayText,
+		originalText: text,
+		isComplete: getTaskStatus(text),
+		...metadata,
+	};
+}
+
 export function getTask(
 	listItem: ListItemCache,
 	fileLines: string[]
@@ -183,6 +196,67 @@ export function getTask(
 		},
 		...metadata,
 	};
+}
+
+function updateTaskMetadataObject(
+	metadata: Metadata,
+	key: string,
+	value: string
+): Metadata {
+	const normalizedKey = key.toLowerCase();
+
+	if (normalizedKey in normalizeKeyValue) {
+		const typedKey = normalizedKey as NormalizedKey;
+		const metadataField = keyToMetadataField[typedKey];
+
+		return {
+			...metadata,
+			[metadataField]: normalizeKeyValue[typedKey](value),
+		};
+	}
+
+	return {
+		...metadata,
+		custom: {
+			...metadata.custom,
+			[normalizedKey]: [value.trim()],
+		},
+	};
+}
+
+export function updateTaskLineMetadata(
+	text: string,
+	key: string,
+	value: string
+) {
+	const task = parseTaskLine(text);
+
+	return serializeTaskLine({
+		...task,
+		...updateTaskMetadataObject(task, key, value),
+	});
+}
+
+export function clearTaskLineMetadata(text: string, key: string) {
+	const task = parseTaskLine(text);
+	const normalizedKey = key.toLowerCase();
+
+	if (normalizedKey in normalizeKeyValue) {
+		const typedKey = normalizedKey as NormalizedKey;
+		const metadataField = keyToMetadataField[typedKey];
+
+		return serializeTaskLine({
+			...task,
+			[metadataField]: null,
+		});
+	}
+
+	const { [normalizedKey]: _removed, ...custom } = task.custom;
+
+	return serializeTaskLine({
+		...task,
+		custom,
+	});
 }
 
 export function updateMetadata(text: string, key: string, value: string) {
