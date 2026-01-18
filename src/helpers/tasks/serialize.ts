@@ -19,8 +19,8 @@ export function serializeTaskLine(task: SerializableTask): string {
 	if (task.start) metadataParts.push(`{start:${task.start}}`);
 	if (task.completedOn) metadataParts.push(`{completedOn:${task.completedOn}}`);
 
-	Object.entries(task.custom).forEach(([key, values]) => {
-		values.forEach((value) => metadataParts.push(`{${key}:${value}}`));
+	Object.entries(task.custom).forEach(([key, values]: [string, string[]]) => {
+		values.forEach((value: string) => metadataParts.push(`{${key}:${value}}`));
 	});
 
 	task.tags.forEach((tag) => metadataParts.push(`#${tag}`));

@@ -10,3 +10,4 @@
 
 - Added `docs/task-format.md` with canonical task examples and edge cases for future automated edits.
 - Moved completion and task-metadata rewrites onto parse/mutate/serialize helpers so task edits use the same formatting path.
+- Cleaned up TypeScript config hygiene by moving `paths` into `compilerOptions`, enabling `skipLibCheck`, and adding local Jest global declarations to reduce verification noise.

@@ -54,10 +54,7 @@ const Task: FunctionalComponent<TaskProps> = ({
 			<Checkbox
 				active={task.done}
 				color={priorityColors[currentPriority]}
-				onClick={(e) => {
-					e.stopPropagation();
-					check(!task.done);
-				}}
+				onClick={() => check(!task.done)}
 			/>
 			<div
 				className={`flex-1 min-w-0 ${
