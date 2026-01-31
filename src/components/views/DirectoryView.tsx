@@ -2,7 +2,7 @@ import { useAtomValue } from 'jotai';
 import { FunctionalComponent } from 'preact';
 import { useEffect, useState } from 'preact/hooks';
 
-import { Taskey } from '../../helpers/tasks/types';
+import { StoredTask } from '../../helpers/tasks/types';
 import { activeDirectoryAtom } from '../../store/atoms/files';
 import { loadableDirectoryTasks } from '../../store/atoms/tasks';
 import TaskList from '../TaskList';
@@ -13,7 +13,7 @@ type DirectoryViewProps = {};
 const DirectoryView: FunctionalComponent<DirectoryViewProps> = () => {
 	const activeDirectory = useAtomValue(activeDirectoryAtom);
 	const activeDirectoryTasks = useAtomValue(loadableDirectoryTasks);
-	const [tasks, setTasks] = useState<Taskey[]>([]);
+	const [tasks, setTasks] = useState<StoredTask[]>([]);
 
 	useEffect(() => {
 		if (activeDirectoryTasks.state === 'hasData') {

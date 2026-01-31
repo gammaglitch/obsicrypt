@@ -2,7 +2,7 @@ import { useAtom } from 'jotai';
 import { useAtomValue } from 'jotai';
 import { ComponentChild, FunctionalComponent } from 'preact';
 
-import { Filey } from '../../helpers/files/types';
+import { StoredFile } from '../../helpers/files/types';
 import {
 	activeDirectoryAtom,
 	activeFileAtom,
@@ -84,7 +84,7 @@ export const MainView: FunctionalComponent<ViewWrapperProps> = ({
 	const [tag, setTag] = useAtom(activeTagAtom);
 	const [directory, setDirectory] = useAtom(activeDirectoryAtom);
 
-	const selectFile = (file: Filey) => {
+	const selectFile = (file: StoredFile) => {
 		setView(Views.FILE);
 		setFile(file);
 		setTag(null);

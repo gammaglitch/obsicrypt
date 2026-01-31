@@ -2,7 +2,7 @@ import { useAtomValue } from 'jotai';
 import { FunctionalComponent } from 'preact';
 import { useEffect, useState } from 'preact/hooks';
 
-import { Taskey } from '../../helpers/tasks/types';
+import { StoredTask } from '../../helpers/tasks/types';
 import { activeFileAtom } from '../../store/atoms/files';
 import { loadableCurrTasks } from '../../store/atoms/tasks';
 import TaskList from '../TaskList';
@@ -13,7 +13,7 @@ type FileViewProps = {};
 const FileView: FunctionalComponent<FileViewProps> = () => {
 	const activeFile = useAtomValue(activeFileAtom);
 	const activeFileTasks = useAtomValue(loadableCurrTasks);
-	const [tasks, setTasks] = useState<Taskey[]>([]);
+	const [tasks, setTasks] = useState<StoredTask[]>([]);
 
 	useEffect(() => {
 		if (activeFileTasks.state === 'hasData') {

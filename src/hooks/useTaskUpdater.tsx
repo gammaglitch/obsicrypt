@@ -3,13 +3,13 @@ import { useAtomValue } from 'jotai';
 import { searchAndReplaceLineInFile } from '../helpers/files/util';
 import { updateTaskLineMetadata } from '../helpers/tasks/util';
 import { selectObsidian } from '../store/atoms/files';
-import { TaskType } from '../types/Task';
+import { ParsedTask } from '../types/Task';
 
 export function useTaskManager() {
 	const obsidian = useAtomValue(selectObsidian);
 
 	const updateTaskMetadata = async (
-		task: TaskType,
+		task: ParsedTask,
 		key: string,
 		value: string
 	) => {
@@ -24,7 +24,7 @@ export function useTaskManager() {
 		);
 	};
 
-	const updateDate = async (task: TaskType, date: string) => {
+	const updateDate = async (task: ParsedTask, date: string) => {
 		await updateTaskMetadata(task, 'due', date);
 	};
 

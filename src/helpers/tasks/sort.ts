@@ -1,4 +1,4 @@
-import { Taskey } from './types';
+import { StoredTask } from './types';
 
 export type SortOption = 'default' | 'due' | 'priority' | 'name' | 'status';
 
@@ -9,13 +9,13 @@ const priorityOrder: Record<string, number> = {
 	'4': 4,
 };
 
-function getPriority(task: Taskey): number {
+function getPriority(task: StoredTask): number {
 	const p = task.custom?.priority?.[0];
 
 	return priorityOrder[p] ?? 5;
 }
 
-export function sortTasks(tasks: Taskey[], sort: SortOption): Taskey[] {
+export function sortTasks(tasks: StoredTask[], sort: SortOption): StoredTask[] {
 	if (sort === 'default') {
 		return tasks;
 	}

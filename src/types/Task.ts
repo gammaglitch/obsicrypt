@@ -1,4 +1,4 @@
-export type TaskType = {
+export type ParsedTask = {
 	filePath: string;
 	isComplete: boolean;
 	text: string;

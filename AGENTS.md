@@ -13,3 +13,10 @@ Safe edit seams for task-related work:
 - `src/store/atoms/*.tsx` for derived file and task state
 
 Avoid duplicating task serialization logic inside UI components.
+
+Checklist for task-related changes:
+
+- If task syntax or canonical formatting changes, update `docs/task-format.md`.
+- If task parsing, serialization, or transforms change, run `pnpm test:tasks`.
+- If TypeScript-facing component or state types change, run `pnpm build:ts`.
+- If behavior or architecture changes in a non-obvious way, add a short note to `docs/log.md`.

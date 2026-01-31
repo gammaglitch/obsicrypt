@@ -2,11 +2,11 @@ import { FunctionalComponent } from 'preact';
 import { useState } from 'preact/hooks';
 
 import { serializeTaskLine } from '../helpers/tasks/serialize';
-import { Taskey } from '../helpers/tasks/types';
+import { StoredTask } from '../helpers/tasks/types';
 import { useFileManager } from '../hooks/useFileManager';
 
 type TaskModalProps = {
-	task: Taskey;
+	task: StoredTask;
 	isOpen: boolean;
 	onClose: () => void;
 };

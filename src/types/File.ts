@@ -1,6 +1,6 @@
 import { ListItemCache } from 'obsidian';
 
-export type FileType = {
+export type ParsedFile = {
 	name: string;
 	path: string;
 	fileContent: string;

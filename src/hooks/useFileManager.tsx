@@ -2,7 +2,7 @@ import { useAtomValue } from 'jotai';
 import { TFile } from 'obsidian';
 
 import { getListItems } from '../helpers/files/util';
-import { Taskey } from '../helpers/tasks/types';
+import { StoredTask } from '../helpers/tasks/types';
 import {
 	insertTaskIntoLines,
 	replaceLineContent,
@@ -11,13 +11,13 @@ import {
 } from '../helpers/tasks/transforms';
 import { updateTaskLineMetadata } from '../helpers/tasks/util';
 import { selectFilesMap, selectObsidian } from '../store/atoms/files';
-import { TaskType } from '../types/Task';
+import { ParsedTask } from '../types/Task';
 
 export function useFileManager() {
 	const obsidian = useAtomValue(selectObsidian);
 	const filesMap = useAtomValue(selectFilesMap);
 
-	const toggleTaskStatus = async (task: Taskey) => {
+	const toggleTaskStatus = async (task: StoredTask) => {
 		const newText = toggleTaskLine(task.originalText, task.done);
 		const file = filesMap.get(task.filePath);
 		const fileRef = obsidian.app.vault.getAbstractFileByPath(
@@ -34,7 +34,7 @@ export function useFileManager() {
 		}
 	};
 
-	const updateTask = async (task: TaskType, text: string) => {
+	const updateTask = async (task: ParsedTask, text: string) => {
 		const fileRef = obsidian.app.vault.getAbstractFileByPath(
 			task.filePath
 		) as TFile;
@@ -49,7 +49,7 @@ export function useFileManager() {
 	};
 
 	const updateTaskMetadata = async (
-		task: TaskType,
+		task: ParsedTask,
 		key: string,
 		value: string
 	) => {
@@ -67,12 +67,12 @@ export function useFileManager() {
 		return obsidian.app.vault.modify(fileRef, newContent);
 	};
 
-	const updateDate = async (task: TaskType, date: string) => {
+	const updateDate = async (task: ParsedTask, date: string) => {
 		await updateTaskMetadata(task, 'due', date);
 	};
 
-	const updateTaskeyMetadata = async (
-		task: Taskey,
+	const updateStoredTaskMetadata = async (
+		task: StoredTask,
 		key: string,
 		value: string
 	) => {
@@ -92,8 +92,8 @@ export function useFileManager() {
 		}
 	};
 
-	const updateTaskeyDate = async (task: Taskey, date: string) => {
-		return updateTaskeyMetadata(task, 'due', date);
+	const updateStoredTaskDate = async (task: StoredTask, date: string) => {
+		return updateStoredTaskMetadata(task, 'due', date);
 	};
 
 	const addTaskToFile = async (filePath: string, text: string) => {
@@ -107,7 +107,7 @@ export function useFileManager() {
 		return obsidian.app.vault.modify(fileRef, newContent);
 	};
 
-	const updateTaskText = async (task: Taskey, newText: string) => {
+	const updateTaskText = async (task: StoredTask, newText: string) => {
 		const fileRef = obsidian.app.vault.getAbstractFileByPath(
 			task.filePath
 		) as TFile;
@@ -126,10 +126,10 @@ export function useFileManager() {
 	return {
 		addTaskToFile,
 		toggleTaskStatus,
-		updateTaskeyMetadata,
+		updateStoredTaskMetadata,
 		updateTask,
 		updateDate,
-		updateTaskeyDate,
+		updateStoredTaskDate,
 		updateTaskText,
 	};
 }

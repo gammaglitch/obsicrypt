@@ -1,11 +1,9 @@
-export type Filey = {
+export type StoredFile = {
 	name: string;
 	path: string;
-	// tasks: { text: string }[];
 	data: {
 		content: string;
-		// 	items: ListItemCache[];
 	};
 };
 
-export type FileyMap = Map<string, Filey>;
+export type StoredFileMap = Map<string, StoredFile>;

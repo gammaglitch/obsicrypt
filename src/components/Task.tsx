@@ -2,7 +2,7 @@ import { FunctionalComponent } from 'preact';
 import { useRef, useState } from 'preact/hooks';
 
 import { today } from '../helpers/dates';
-import { Taskey } from '../helpers/tasks/types';
+import { StoredTask } from '../helpers/tasks/types';
 import Checkbox from './Checkbox';
 
 const priorityColors: Record<string, string> = {
@@ -14,7 +14,7 @@ const priorityColors: Record<string, string> = {
 const priorityOptions = ['1', '2', '3', '4'];
 
 type TaskProps = {
-	task: Taskey;
+	task: StoredTask;
 	check: (value: boolean) => void;
 	onDateChange: (date: string) => void;
 	onPriorityChange: (priority: string) => void;

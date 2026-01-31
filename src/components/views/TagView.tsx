@@ -2,7 +2,7 @@ import { useAtomValue } from 'jotai';
 import { FunctionalComponent } from 'preact';
 import { useEffect, useState } from 'preact/hooks';
 
-import { Taskey } from '../../helpers/tasks/types';
+import { StoredTask } from '../../helpers/tasks/types';
 import { activeTagAtom } from '../../store/atoms/files';
 import { loadableTagTasks } from '../../store/atoms/tasks';
 import TaskList from '../TaskList';
@@ -13,7 +13,7 @@ type TagViewProps = {};
 const TagView: FunctionalComponent<TagViewProps> = () => {
 	const activeTag = useAtomValue(activeTagAtom);
 	const activeTagTasks = useAtomValue(loadableTagTasks);
-	const [tasks, setTasks] = useState<Taskey[]>([]);
+	const [tasks, setTasks] = useState<StoredTask[]>([]);
 
 	useEffect(() => {
 		if (activeTagTasks.state === 'hasData') {

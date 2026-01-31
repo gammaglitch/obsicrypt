@@ -1,7 +1,7 @@
 import { sortTasks, SortOption } from './sort';
-import { Taskey } from './types';
+import { StoredTask } from './types';
 
-function makeTask(overrides: Partial<Taskey> = {}): Taskey {
+function makeTask(overrides: Partial<StoredTask> = {}): StoredTask {
 	return {
 		text: '',
 		displayText: '',

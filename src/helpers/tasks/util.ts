@@ -1,9 +1,9 @@
 import { ListItemCache, TFile } from 'obsidian';
 
-import { Metadata, TaskType } from '../../types/Task';
+import { Metadata, ParsedTask } from '../../types/Task';
 import { getListItems } from '../files/util';
 import { serializeTaskLine } from './serialize';
-import { Taskey } from './types';
+import { StoredTask } from './types';
 
 type MetadataExtractionState = {
 	text: string;
@@ -180,7 +180,7 @@ export function parseTaskLine(text: string) {
 export function getTask(
 	listItem: ListItemCache,
 	fileLines: string[]
-): TaskType {
+): ParsedTask {
 	const textLine = fileLines[listItem.position.start.line];
 	const { text, displayText, metadata } = parseTaskContent(textLine);
 
@@ -310,7 +310,7 @@ export function makeTasks(
 	cachedItems: ListItemCache[],
 	file: TFile,
 	fileContent: string
-): Taskey[] {
+): StoredTask[] {
 	const lines = fileContent.split('\n');
 	const tasks = cachedItems.filter(isTask).map((i) => ({
 		...mapTask(i, lines),

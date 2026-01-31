@@ -2,7 +2,7 @@ import { FunctionalComponent } from 'preact';
 import { useMemo, useState } from 'preact/hooks';
 
 import { SortOption, sortTasks } from '../helpers/tasks/sort';
-import { Taskey } from '../helpers/tasks/types';
+import { StoredTask } from '../helpers/tasks/types';
 import { useFileManager } from '../hooks/useFileManager';
 import Task from './Task';
 import TaskModal from './TaskModal';
@@ -16,7 +16,7 @@ const sortOptions: { value: SortOption; label: string }[] = [
 ];
 
 type TaskListProps = {
-	tasks: Taskey[];
+	tasks: StoredTask[];
 	targetFilePath?: string;
 	highlightOverdue?: boolean;
 };
@@ -29,10 +29,10 @@ const TaskList: FunctionalComponent<TaskListProps> = ({
 	const {
 		addTaskToFile,
 		toggleTaskStatus,
-		updateTaskeyDate,
-		updateTaskeyMetadata,
+		updateStoredTaskDate,
+		updateStoredTaskMetadata,
 	} = useFileManager();
-	const [selectedTask, setSelectedTask] = useState<Taskey | null>(null);
+	const [selectedTask, setSelectedTask] = useState<StoredTask | null>(null);
 	const [newTaskText, setNewTaskText] = useState('');
 	const [sort, setSort] = useState<SortOption>('default');
 	const [sortOpen, setSortOpen] = useState(false);
@@ -81,8 +81,10 @@ const TaskList: FunctionalComponent<TaskListProps> = ({
 						key={index}
 						task={task}
 						check={() => toggleTaskStatus(task)}
-						onDateChange={(date) => updateTaskeyDate(task, date)}
-						onPriorityChange={(p) => updateTaskeyMetadata(task, 'priority', p)}
+						onDateChange={(date) => updateStoredTaskDate(task, date)}
+						onPriorityChange={(p) =>
+							updateStoredTaskMetadata(task, 'priority', p)
+						}
 						onOpenModal={() => setSelectedTask(task)}
 						highlightOverdue={highlightOverdue}
 					/>

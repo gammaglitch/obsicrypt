@@ -1,6 +1,6 @@
 import { Metadata } from '../../types/Task';
 
-export type Taskey = {
+export type StoredTask = {
 	text: string;
 	displayText: string;
 	originalText: string;
@@ -11,4 +11,4 @@ export type Taskey = {
 	};
 } & Metadata;
 
-export type TaskeyMap = Map<string, Taskey[]>;
+export type StoredTaskMap = Map<string, StoredTask[]>;

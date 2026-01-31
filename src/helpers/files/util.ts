@@ -1,18 +1,18 @@
 import { ListItemCache, Plugin, TFile } from 'obsidian';
 
-import { FileType } from '../../types/File';
-import { TaskType } from '../../types/Task';
-import { TaskeyMap } from '../tasks/types';
+import { ParsedFile } from '../../types/File';
+import { ParsedTask } from '../../types/Task';
+import { StoredTaskMap } from '../tasks/types';
 import { getTask, makeTasks } from '../tasks/util';
-import { Filey, FileyMap } from './types';
+import { StoredFile, StoredFileMap } from './types';
 
-function getTasks(file: FileType) {
+function getTasks(file: ParsedFile) {
 	const { path, listItems, fileLines } = file;
 	const taskItems = listItems.filter((item) =>
 		Object.hasOwnProperty.call(item, 'task')
 	);
 
-	const fileTasks: TaskType[] = taskItems.map((item) => ({
+	const fileTasks: ParsedTask[] = taskItems.map((item) => ({
 		...getTask(item, fileLines),
 		filePath: path,
 	}));
@@ -20,8 +20,8 @@ function getTasks(file: FileType) {
 	return fileTasks;
 }
 
-function getTasksFromFiles(files: FileType[]): Map<string, TaskType[]> {
-	const tasks: Map<string, TaskType[]> = new Map();
+function getTasksFromFiles(files: ParsedFile[]): Map<string, ParsedTask[]> {
+	const tasks: Map<string, ParsedTask[]> = new Map();
 
 	for (const file of files) {
 		const fileTasks = getTasks(file);
@@ -103,7 +103,7 @@ async function buildFileType(obsidian: Plugin, file: TFile) {
 export async function _getFileByPath(
 	obsidian: Plugin,
 	path: string
-): Promise<FileType> {
+): Promise<ParsedFile> {
 	const fileRef = obsidian.app.vault.getAbstractFileByPath(path);
 
 	return buildFileType(obsidian, fileRef as TFile);
@@ -112,14 +112,14 @@ export async function _getFileByPath(
 export async function getFileByPath(
 	obsidian: Plugin,
 	path: string
-): Promise<Filey> {
+): Promise<StoredFile> {
 	const fileRef = obsidian.app.vault.getAbstractFileByPath(path) as TFile;
 	const fileContent = await obsidian.app.vault.cachedRead(fileRef);
 
 	return makeFile(fileRef, fileContent);
 }
 
-export function makeFile(file: TFile, content: string): Filey {
+export function makeFile(file: TFile, content: string): StoredFile {
 	return {
 		name: file.name,
 		path: file.path,
@@ -132,9 +132,9 @@ export function makeFile(file: TFile, content: string): Filey {
 async function parseFiles(
 	obsidian: Plugin,
 	files: TFile[]
-): Promise<{ files: FileyMap; tasks: TaskeyMap }> {
-	const fMap: FileyMap = new Map();
-	const tMap: TaskeyMap = new Map();
+): Promise<{ files: StoredFileMap; tasks: StoredTaskMap }> {
+	const fMap: StoredFileMap = new Map();
+	const tMap: StoredTaskMap = new Map();
 
 	const contents = await Promise.all(
 		files.map((f) => obsidian.app.vault.cachedRead(f))
@@ -153,6 +153,6 @@ async function parseFiles(
 
 export async function getFiles(
 	obsidian: Plugin
-): Promise<{ files: FileyMap; tasks: TaskeyMap }> {
+): Promise<{ files: StoredFileMap; tasks: StoredTaskMap }> {
 	return parseFiles(obsidian, obsidian.app.vault.getMarkdownFiles());
 }

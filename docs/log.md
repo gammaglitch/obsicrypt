@@ -11,3 +11,9 @@
 - Added `docs/task-format.md` with canonical task examples and edge cases for future automated edits.
 - Moved completion and task-metadata rewrites onto parse/mutate/serialize helpers so task edits use the same formatting path.
 - Cleaned up TypeScript config hygiene by moving `paths` into `compilerOptions`, enabling `skipLibCheck`, and adding local Jest global declarations to reduce verification noise.
+
+## 2026-01-31
+
+- Added a short task-change checklist to `AGENTS.md` covering docs, tests, type-checking, and implementation log updates.
+- Renamed the file models from `FileType`/`Filey` to `ParsedFile`/`StoredFile` to make the parsed-vs-stored distinction explicit without changing behavior.
+- Renamed the task models from `TaskType`/`Taskey` to `ParsedTask`/`StoredTask` and renamed the remaining `Taskey`-named helper methods for consistency.
