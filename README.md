@@ -1,6 +1,13 @@
-This project is an Obsidian plugin that renders tasks from markdown files in a Todoist-like interface.
+This repository is being reshaped into an opinionated Obsidian plugin boilerplate.
 
-It uses Preact for UI, Jotai for state, Tailwind for styling, and Obsidian's vault and metadata cache APIs for file access.
+It currently keeps the existing task manager as the example feature while the reusable plugin shell is extracted around it.
+
+The default stack is:
+
+- Preact for UI
+- Jotai for state
+- Tailwind for styling
+- Obsidian's vault and metadata cache APIs for file access
 
 ## Setup
 
@@ -29,7 +36,19 @@ pnpm test
 pnpm test:tasks
 ```
 
-## Core Task Pipeline
+## Boilerplate Core
+
+The reusable plugin shell now lives in a small set of generic files:
+
+1. `src/main.ts` registers the custom view and mounts the app root.
+2. `src/obsidian/view.ts` owns the "open or reveal" custom view behavior.
+3. `src/obsidian/events.ts` registers Obsidian vault and metadata listeners.
+4. `src/obsidian/VaultSync.tsx` bridges those listeners into Jotai state updates.
+5. `src/store/atoms/files.tsx` stores the plugin reference and shared vault-derived data.
+
+See `docs/boilerplate.md` for the intended split between boilerplate code and example feature code.
+
+## Current Example Feature
 
 The task flow is intentionally small:
 

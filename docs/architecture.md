@@ -2,12 +2,25 @@
 
 ## Overview
 
-This plugin reads markdown tasks from the Obsidian vault, derives task views in memory, and writes updates back to the original files.
+This repository now has two layers:
 
-## Main Flow
+- A generic Obsidian plugin shell
+- A task manager example feature
 
-1. `src/main.ts` registers and opens the custom Obsidian view.
-2. `src/store/atoms/files.tsx` loads files and task data into Jotai atoms.
+The goal is to keep the shell reusable while the task feature remains replaceable.
+
+## Boilerplate Core
+
+1. `src/main.ts` registers the custom view and mounts the Preact app.
+2. `src/obsidian/constants.ts` holds view identifiers and display metadata.
+3. `src/obsidian/view.ts` owns the "open or reveal" behavior for the custom view.
+4. `src/obsidian/events.ts` registers vault and metadata listeners through the plugin lifecycle.
+5. `src/obsidian/VaultSync.tsx` translates Obsidian events into Jotai store updates.
+6. `src/store/atoms/files.tsx` stores the plugin reference and shared file/task maps.
+
+## Example Feature Flow
+
+1. `src/store/atoms/files.tsx` loads files and task data into Jotai atoms.
 3. `src/helpers/files/util.ts` reads file contents and Obsidian list-item cache data.
 4. `src/helpers/tasks/util.ts` parses markdown task lines into structured task objects.
 5. `src/helpers/tasks/serialize.ts` emits canonical markdown task lines from structured task data.
@@ -24,6 +37,8 @@ This plugin reads markdown tasks from the Obsidian vault, derives task views in 
 
 ## Guidance For Automated Edits
 
+- Keep generic plugin-shell edits inside `src/main.ts`, `src/obsidian/*`, and shared store setup.
+- Keep example-feature edits out of the plugin entry layer whenever possible.
 - Prefer editing parser, serializer, or transforms in isolation rather than rebuilding task strings in UI code.
 - Add or update tests under `src/helpers/tasks/*.test.ts` when changing task syntax behavior.
 - Keep documentation in sync in `README.md` and `docs/log.md` when task format rules change.

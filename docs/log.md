@@ -1,5 +1,11 @@
 # Log
 
+## 2026-02-02
+
+- Extracted generic Obsidian view and event helpers into `src/obsidian/` to separate the reusable plugin shell from the example feature.
+- Replaced the old context-shaped event bootstrap with `VaultSync`, which makes the plugin lifecycle wiring explicit and avoids pretending there is shared context state when there is not.
+- Added `docs/boilerplate.md` to define which files belong to the boilerplate core versus the current task-manager example.
+
 ## 2026-01-12
 
 - Added a shared task serializer in `src/helpers/tasks/serialize.ts` so task markdown format has one canonical write path.
