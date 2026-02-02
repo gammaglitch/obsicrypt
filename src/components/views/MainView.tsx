@@ -13,7 +13,6 @@ import {
 } from '../../store/atoms/files';
 import { viewAtom } from '../../store/atoms/view';
 import { Views } from '../../types/Views';
-import { ViewWrapperProps } from '../../ViewWrapper';
 import { config, SidebarSection as SidebarSectionId } from '../../config';
 import DirectoryList from '../DirectoryList';
 import FileList from '../FileList';
@@ -74,10 +73,7 @@ const DirectoryListWrapper: FunctionalComponent<DirectoryListWrapperProps> = ({
 	);
 };
 
-export const MainView: FunctionalComponent<ViewWrapperProps> = ({
-	obsidian,
-}) => {
-	void obsidian;
+export const MainView: FunctionalComponent = () => {
 	const data = useAtomValue(loadableAllDataAtom);
 	const [view, setView] = useAtom(viewAtom);
 	const [file, setFile] = useAtom(activeFileAtom);

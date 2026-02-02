@@ -4,75 +4,57 @@ import { ItemView, Plugin, WorkspaceLeaf } from 'obsidian';
 import { createElement, render } from 'preact';
 
 import { ViewWrapper } from './ViewWrapper';
+import {
+	PLUGIN_VIEW_ICON,
+	PLUGIN_VIEW_NAME,
+	PLUGIN_VIEW_TYPE,
+} from './obsidian/constants';
+import { openOrRevealPluginView } from './obsidian/view';
 
-const VIEW_TYPE = 'task-manager';
+class BoilerplateView extends ItemView {
+	private plugin: Plugin;
 
-class TaskManagerView extends ItemView {
-	private obsidian: Plugin;
-
-	constructor(leaf: WorkspaceLeaf, obsidian: ReactStarterPlugin) {
+	constructor(leaf: WorkspaceLeaf, plugin: BoilerplatePlugin) {
 		super(leaf);
-		this.obsidian = obsidian;
+		this.plugin = plugin;
 	}
 
 	getViewType(): string {
-		return VIEW_TYPE;
+		return PLUGIN_VIEW_TYPE;
 	}
 
 	getDisplayText(): string {
-		return 'Task-Manager';
+		return PLUGIN_VIEW_NAME;
 	}
 
 	getIcon(): string {
-		return 'calendar-with-checkmark';
+		return PLUGIN_VIEW_ICON;
 	}
 
 	async onOpen(): Promise<void> {
-		render(
-			createElement(ViewWrapper, {
-				obsidian: this.obsidian,
-			}),
-			this.contentEl
-		);
+		render(createElement(ViewWrapper, { plugin: this.plugin }), this.contentEl);
+	}
+
+	async onClose(): Promise<void> {
+		render(null, this.contentEl);
 	}
 }
 
-export default class ReactStarterPlugin extends Plugin {
-	private view!: TaskManagerView;
-
+export default class BoilerplatePlugin extends Plugin {
 	onunload(): void {
 		this.app.workspace
-			.getLeavesOfType(VIEW_TYPE)
+			.getLeavesOfType(PLUGIN_VIEW_TYPE)
 			.forEach((leaf) => leaf.detach());
 	}
 
 	async onload(): Promise<void> {
 		this.registerView(
-			VIEW_TYPE,
-			(leaf: WorkspaceLeaf) => (this.view = new TaskManagerView(leaf, this))
+			PLUGIN_VIEW_TYPE,
+			(leaf: WorkspaceLeaf) => new BoilerplateView(leaf, this)
 		);
 
-		this.app.workspace.onLayoutReady(
-			async () => await this.openFileTreeLeaf(true)
-		);
-	}
-
-	async openFileTreeLeaf(showAfterAttach: boolean) {
-		const leafs = this.app.workspace.getLeavesOfType(VIEW_TYPE);
-
-		if (leafs.length === 0) {
-			const leaf = this.app.workspace.getLeaf(true);
-			await leaf.setViewState({ type: VIEW_TYPE });
-
-			if (showAfterAttach) {
-				this.app.workspace.revealLeaf(leaf);
-			}
-		} else {
-			leafs.forEach((leaf) => this.app.workspace.revealLeaf(leaf));
-		}
-	}
-
-	onLayoutReady(): void {
-		this.openFileTreeLeaf(true);
+		this.app.workspace.onLayoutReady(() => {
+			void openOrRevealPluginView(this, { reveal: true });
+		});
 	}
 }

@@ -4,27 +4,27 @@ import { FunctionalComponent } from 'preact';
 import { useEffect } from 'preact/hooks';
 
 import { MainView } from './components/views/MainView';
-import { ObsidianContextProvider } from './context';
-import { obsidianAtom } from './store/atoms/files';
+import { VaultSync } from './obsidian/VaultSync';
+import { pluginAtom } from './store/atoms/files';
 
 export type ViewWrapperProps = {
-	obsidian: Plugin;
+	plugin: Plugin;
 };
 
 export const ViewWrapper: FunctionalComponent<ViewWrapperProps> = ({
-	obsidian,
+	plugin,
 }) => {
-	const [currObsidian, setObsidian] = useAtom(obsidianAtom);
+	const [currentPlugin, setPlugin] = useAtom(pluginAtom);
 
 	useEffect(() => {
-		if (!currObsidian) {
-			setObsidian(obsidian);
+		if (!currentPlugin) {
+			setPlugin(plugin);
 		}
-	}, []);
+	}, [currentPlugin, plugin, setPlugin]);
 
 	return (
-		<ObsidianContextProvider>
-			{currObsidian ? <MainView obsidian={obsidian} /> : <div>loading...</div>}
-		</ObsidianContextProvider>
+		<VaultSync>
+			{currentPlugin ? <MainView /> : <div>loading...</div>}
+		</VaultSync>
 	);
 };

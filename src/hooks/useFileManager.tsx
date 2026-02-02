@@ -10,17 +10,17 @@ import {
 	toggleTaskLine,
 } from '../helpers/tasks/transforms';
 import { updateTaskLineMetadata } from '../helpers/tasks/util';
-import { selectFilesMap, selectObsidian } from '../store/atoms/files';
+import { selectFilesMap, selectPlugin } from '../store/atoms/files';
 import { ParsedTask } from '../types/Task';
 
 export function useFileManager() {
-	const obsidian = useAtomValue(selectObsidian);
+	const plugin = useAtomValue(selectPlugin);
 	const filesMap = useAtomValue(selectFilesMap);
 
 	const toggleTaskStatus = async (task: StoredTask) => {
 		const newText = toggleTaskLine(task.originalText, task.done);
 		const file = filesMap.get(task.filePath);
-		const fileRef = obsidian.app.vault.getAbstractFileByPath(
+		const fileRef = plugin.app.vault.getAbstractFileByPath(
 			task.filePath
 		) as TFile;
 
@@ -30,22 +30,22 @@ export function useFileManager() {
 				task.data.line,
 				newText
 			);
-			return obsidian.app.vault.modify(fileRef, newContent);
+			return plugin.app.vault.modify(fileRef, newContent);
 		}
 	};
 
 	const updateTask = async (task: ParsedTask, text: string) => {
-		const fileRef = obsidian.app.vault.getAbstractFileByPath(
+		const fileRef = plugin.app.vault.getAbstractFileByPath(
 			task.filePath
 		) as TFile;
-		const fileContent = await obsidian.app.vault.read(fileRef);
+		const fileContent = await plugin.app.vault.read(fileRef);
 		const newContent = replaceLineContent(
 			fileContent,
 			task.line.start,
 			task.text,
 			text
 		);
-		return obsidian.app.vault.modify(fileRef, newContent);
+		return plugin.app.vault.modify(fileRef, newContent);
 	};
 
 	const updateTaskMetadata = async (
@@ -54,17 +54,17 @@ export function useFileManager() {
 		value: string
 	) => {
 		const updatedText = updateTaskLineMetadata(task.originalText, key, value);
-		const fileRef = obsidian.app.vault.getAbstractFileByPath(
+		const fileRef = plugin.app.vault.getAbstractFileByPath(
 			task.filePath
 		) as TFile;
-		const fileContent = await obsidian.app.vault.read(fileRef);
+		const fileContent = await plugin.app.vault.read(fileRef);
 		const newContent = replaceLineContent(
 			fileContent,
 			task.line.start,
 			task.originalText,
 			updatedText
 		);
-		return obsidian.app.vault.modify(fileRef, newContent);
+		return plugin.app.vault.modify(fileRef, newContent);
 	};
 
 	const updateDate = async (task: ParsedTask, date: string) => {
@@ -77,7 +77,7 @@ export function useFileManager() {
 		value: string
 	) => {
 		const updatedText = updateTaskLineMetadata(task.originalText, key, value);
-		const fileRef = obsidian.app.vault.getAbstractFileByPath(
+		const fileRef = plugin.app.vault.getAbstractFileByPath(
 			task.filePath
 		) as TFile;
 		const file = filesMap.get(task.filePath);
@@ -88,7 +88,7 @@ export function useFileManager() {
 				task.data.line,
 				updatedText
 			);
-			return obsidian.app.vault.modify(fileRef, newContent);
+			return plugin.app.vault.modify(fileRef, newContent);
 		}
 	};
 
@@ -97,18 +97,18 @@ export function useFileManager() {
 	};
 
 	const addTaskToFile = async (filePath: string, text: string) => {
-		const fileRef = obsidian.app.vault.getAbstractFileByPath(filePath) as TFile;
-		const fileContent = await obsidian.app.vault.read(fileRef);
+		const fileRef = plugin.app.vault.getAbstractFileByPath(filePath) as TFile;
+		const fileContent = await plugin.app.vault.read(fileRef);
 
-		const listItems = getListItems(obsidian, fileRef);
+		const listItems = getListItems(plugin, fileRef);
 		const taskItems = listItems.filter((item) => Object.hasOwn(item, 'task'));
 
 		const newContent = insertTaskIntoLines(fileContent, taskItems, text);
-		return obsidian.app.vault.modify(fileRef, newContent);
+		return plugin.app.vault.modify(fileRef, newContent);
 	};
 
 	const updateTaskText = async (task: StoredTask, newText: string) => {
-		const fileRef = obsidian.app.vault.getAbstractFileByPath(
+		const fileRef = plugin.app.vault.getAbstractFileByPath(
 			task.filePath
 		) as TFile;
 		const file = filesMap.get(task.filePath);
@@ -119,7 +119,7 @@ export function useFileManager() {
 				task.data.line,
 				newText
 			);
-			return obsidian.app.vault.modify(fileRef, newContent);
+			return plugin.app.vault.modify(fileRef, newContent);
 		}
 	};
 

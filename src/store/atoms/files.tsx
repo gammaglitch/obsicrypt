@@ -5,25 +5,25 @@ import { Plugin } from 'obsidian';
 import { StoredFile } from '../../helpers/files/types';
 import { getFiles } from '../../helpers/files/util';
 
-export const obsidianAtom = atom<Plugin | null>(null);
+export const pluginAtom = atom<Plugin | null>(null);
 
-export const selectObsidian = atom((get) => {
-	const obsidian = get(obsidianAtom);
+export const selectPlugin = atom((get) => {
+	const plugin = get(pluginAtom);
 
-	if (obsidian) {
-		return obsidian;
+	if (plugin) {
+		return plugin;
 	}
-	throw new Error('missing reference to obsidian');
+	throw new Error('missing reference to plugin');
 });
 
 export const filesAtom = atomWithDefault((get) => {
-	const obsidian = get(obsidianAtom);
+	const plugin = get(pluginAtom);
 
-	if (obsidian) {
-		return getFiles(obsidian);
+	if (plugin) {
+		return getFiles(plugin);
 	}
 
-	throw new Error('missing obsidian');
+	throw new Error('missing plugin');
 });
 
 export const selectFilesMap = selectAtom(filesAtom, (data) => data.files);
