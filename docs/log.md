@@ -1,5 +1,13 @@
 # Log
 
+## 2026-02-08
+
+- Replaced the task manager example with a minimal file browser + append-line demo.
+- Stripped all task-specific helpers, components, atoms, hooks, and types.
+- Simplified VaultSync to track files only (no task extraction).
+- Slimmed tailwind.config.js to Obsidian theme colors only.
+- Updated AGENTS.md, README, and boilerplate docs for the new structure.
+
 ## 2026-02-02
 
 - Extracted generic Obsidian view and event helpers into `src/obsidian/` to separate the reusable plugin shell from the example feature.

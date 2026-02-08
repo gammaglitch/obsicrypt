@@ -26,47 +26,12 @@ export const filesAtom = atomWithDefault((get) => {
 	throw new Error('missing plugin');
 });
 
-export const selectFilesMap = selectAtom(filesAtom, (data) => data.files);
+export const selectFilesMap = selectAtom(filesAtom, (data) => data);
 
-export const selectFiles = selectAtom(filesAtom, (data) => [
-	...data.files.values(),
+export const selectFilesList = selectAtom(filesAtom, (data) => [
+	...data.values(),
 ]);
 
-export const loadableFiles = loadable(selectFiles);
-
-export const allDataAtom = selectAtom(filesAtom, (data) => ({
-	files: [...data.files.values()],
-	tasks: [...data.tasks.values()],
-}));
-
-export const loadableAllDataAtom = loadable(allDataAtom);
+export const loadableFiles = loadable(selectFilesList);
 
 export const activeFileAtom = atom<StoredFile | null>(null);
-
-export const activeTagAtom = atom<string | null>(null);
-
-export const activeDirectoryAtom = atom<string | null>(null);
-
-export const allDirectoriesAtom = selectAtom(filesAtom, (data) => {
-	const dirSet = new Set<string>();
-
-	for (const path of data.files.keys()) {
-		const dir = path.substring(0, path.lastIndexOf('/'));
-
-		if (dir) {
-			dirSet.add(dir);
-		}
-	}
-
-	return Array.from(dirSet);
-});
-
-export const allTagsAtom = selectAtom(filesAtom, (data) => {
-	const tagSet = new Set<string>();
-	for (const tasks of data.tasks.values()) {
-		tasks.forEach((task) => {
-			task.tags.forEach((tag) => tagSet.add(tag));
-		});
-	}
-	return Array.from(tagSet).sort();
-});

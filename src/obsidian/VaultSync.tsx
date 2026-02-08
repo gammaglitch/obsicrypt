@@ -1,11 +1,10 @@
 import { useAtomValue } from 'jotai';
 import { useUpdateAtom } from 'jotai/utils';
-import { CachedMetadata, TFile } from 'obsidian';
+import { TFile } from 'obsidian';
 import { ComponentChildren } from 'preact';
 import { useEffect, useRef } from 'preact/hooks';
 
-import { getListItems, makeFile } from '../helpers/files/util';
-import { makeTasks } from '../helpers/tasks/util';
+import { makeFile } from '../helpers/files/util';
 import { filesAtom, pluginAtom } from '../store/atoms/files';
 import { registerVaultEventHandlers, VaultEventListeners } from './events';
 
@@ -23,72 +22,54 @@ export function VaultSync({ children }: VaultSyncProps): JSX.Element {
 			return;
 		}
 
-		const replaceFileByPath = async (filePath: string, previousPath: string) => {
-			const fileRef = plugin.app.vault.getAbstractFileByPath(filePath) as TFile;
-			const fileContent = await plugin.app.vault.cachedRead(fileRef);
-			const file = makeFile(fileRef, fileContent);
-			const tasks = makeTasks(getListItems(plugin, fileRef), fileRef, fileContent);
-
+		const updateFile = async (file: TFile, data: string) => {
 			setFiles((current) => {
-				current.files.delete(previousPath);
-				current.tasks.delete(previousPath);
-				current.files.set(filePath, file);
-				current.tasks.set(filePath, tasks);
-				return { ...current };
-			});
-		};
-
-		const updateFile = async (
-			file: TFile,
-			data: string,
-			cache: CachedMetadata
-		) => {
-			setFiles((current) => {
-				const currentFile = current.files.get(file.path);
+				const currentFile = current.get(file.path);
 
 				if (!currentFile) {
-					return { ...current };
+					return new Map(current);
 				}
 
-				current.files.set(file.path, {
-					...currentFile,
-					data: { content: data },
-				});
-
-				if (cache.listItems) {
-					current.tasks.set(file.path, makeTasks(cache.listItems, file, data));
-				}
-
-				return { ...current };
+				const updated = new Map(current);
+				updated.set(file.path, { ...currentFile, data: { content: data } });
+				return updated;
 			});
 		};
 
-		const addFile = async (path: string) => {
-			const fileRef = plugin.app.vault.getAbstractFileByPath(path) as TFile;
-			const fileContent = await plugin.app.vault.cachedRead(fileRef);
-			const file = makeFile(fileRef, fileContent);
-			const tasks = makeTasks(getListItems(plugin, fileRef), fileRef, fileContent);
+		const addFile = async (file: TFile) => {
+			const content = await plugin.app.vault.cachedRead(file);
 
 			setFiles((current) => {
-				current.files.set(file.path, file);
-				current.tasks.set(file.path, tasks);
-				return { ...current };
+				const updated = new Map(current);
+				updated.set(file.path, makeFile(file, content));
+				return updated;
 			});
 		};
 
-		const deleteFile = (path: string) => {
+		const deleteFile = (file: TFile) => {
 			setFiles((current) => {
-				current.files.delete(path);
-				current.tasks.delete(path);
-				return { ...current };
+				const updated = new Map(current);
+				updated.delete(file.path);
+				return updated;
+			});
+		};
+
+		const renameFile = async (file: TFile, oldPath: string) => {
+			const content = await plugin.app.vault.cachedRead(file);
+
+			setFiles((current) => {
+				const updated = new Map(current);
+				updated.delete(oldPath);
+				updated.set(file.path, makeFile(file, content));
+				return updated;
 			});
 		};
 
 		const listeners: VaultEventListeners = {
-			changed: (file, data, cache) => void updateFile(file, data, cache),
-			create: (file) => void addFile(file.path),
-			delete: (file) => deleteFile(file.path),
-			rename: (file, oldPath) => void replaceFileByPath(file.path, oldPath),
+			changed: (file, data) => void updateFile(file, data),
+			create: (file) => void addFile(file),
+			delete: (file) => deleteFile(file),
+			rename: (file, oldPath) => void renameFile(file, oldPath),
 		};
 
 		registerVaultEventHandlers(plugin, listeners);

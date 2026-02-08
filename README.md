@@ -1,6 +1,4 @@
-This repository is being reshaped into an opinionated Obsidian plugin boilerplate.
-
-It currently keeps the existing task manager as the example feature while the reusable plugin shell is extracted around it.
+An opinionated Obsidian plugin boilerplate with built-in LLM support.
 
 The default stack is:
 
@@ -15,6 +13,12 @@ Install dependencies:
 
 ```bash
 pnpm install
+```
+
+Set `OBSIDIAN_PATH` in a `.env` file to point to your dev vault:
+
+```
+OBSIDIAN_PATH=/path/to/your/vault
 ```
 
 Run the plugin build in watch mode:
@@ -33,50 +37,33 @@ Run tests:
 
 ```bash
 pnpm test
-pnpm test:tasks
 ```
 
-## Boilerplate Core
+## Architecture
 
-The reusable plugin shell now lives in a small set of generic files:
+The reusable plugin shell lives in a small set of generic files:
 
-1. `src/main.ts` registers the custom view and mounts the app root.
-2. `src/obsidian/view.ts` owns the "open or reveal" custom view behavior.
-3. `src/obsidian/events.ts` registers Obsidian vault and metadata listeners.
-4. `src/obsidian/VaultSync.tsx` bridges those listeners into Jotai state updates.
-5. `src/store/atoms/files.tsx` stores the plugin reference and shared vault-derived data.
+1. `src/main.ts` registers the custom view and mounts the Preact app.
+2. `src/obsidian/constants.ts` holds view identifiers and display metadata.
+3. `src/obsidian/view.ts` opens or reveals the plugin view in the workspace.
+4. `src/obsidian/events.ts` registers vault and metadata cache listeners.
+5. `src/obsidian/VaultSync.tsx` bridges vault events into Jotai state.
+6. `src/store/atoms/files.tsx` stores the plugin reference and file data.
 
-See `docs/boilerplate.md` for the intended split between boilerplate code and example feature code.
+## Example Feature
 
-## Current Example Feature
+The boilerplate ships with a minimal example that demonstrates the full data flow:
 
-The task flow is intentionally small:
+**Read:** `src/store/atoms/files.tsx` loads all markdown files from the vault on startup.
 
-1. `src/main.ts` registers the custom Obsidian view.
-2. `src/store/atoms/files.tsx` loads vault files and exposes derived state through Jotai atoms.
-3. `src/helpers/files/util.ts` reads markdown files and list item cache data from Obsidian.
-4. `src/helpers/tasks/util.ts` parses task lines into structured metadata.
-5. `src/helpers/tasks/serialize.ts` converts structured task data back into a canonical markdown task line.
-6. `src/helpers/tasks/transforms.ts` applies line-based content updates.
-7. `src/hooks/useFileManager.tsx` writes those updates back to the vault.
+**Display:** `src/components/ExampleView.tsx` lists files in a sidebar and shows the selected file's contents.
 
-## Invariants
+**Write:** Typing into the input and pressing Append calls `appendToFile` in `src/helpers/files/util.ts`, which appends a line to the selected file via `vault.modify()`.
 
-- `originalText` is the source markdown line for a task.
-- `displayText` excludes metadata markers such as `{due:...}`, `#tag`, and `@context`.
-- Parser and serializer should round-trip without dropping metadata.
-- File mutations are currently line-based, so stable task formatting matters.
+**Test:** `src/helpers/lines.ts` contains the pure append/parse logic with unit tests in `src/helpers/lines.test.ts`.
+
+To build your own plugin, replace `ExampleView` with your feature and add helpers under `src/helpers/`.
 
 ## LLM Working Notes
 
-If an LLM is editing this repo, these are the safest seams:
-
-- Parsing: `src/helpers/tasks/util.ts`
-- Serialization: `src/helpers/tasks/serialize.ts`
-- Line transforms: `src/helpers/tasks/transforms.ts`
-- Vault writes: `src/hooks/useFileManager.tsx`
-- Derived task/file state: `src/store/atoms/files.tsx`
-
-Avoid duplicating task-line construction in UI components. Use the shared serializer instead.
-
-Representative task syntax examples live in `docs/task-format.md`.
+This repo is designed for LLM-assisted development. See `CLAUDE.md` / `AGENTS.md` for safe edit seams and conventions.

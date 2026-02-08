@@ -3,7 +3,7 @@ import { Plugin } from 'obsidian';
 import { FunctionalComponent } from 'preact';
 import { useEffect } from 'preact/hooks';
 
-import { MainView } from './components/views/MainView';
+import { ExampleView } from './components/ExampleView';
 import { VaultSync } from './obsidian/VaultSync';
 import { pluginAtom } from './store/atoms/files';
 
@@ -24,7 +24,7 @@ export const ViewWrapper: FunctionalComponent<ViewWrapperProps> = ({
 
 	return (
 		<VaultSync>
-			{currentPlugin ? <MainView /> : <div>loading...</div>}
+			{currentPlugin ? <ExampleView /> : <div>loading...</div>}
 		</VaultSync>
 	);
 };
