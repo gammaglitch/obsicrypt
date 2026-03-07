@@ -3,3 +3,5 @@ node_modules
 .env
 *.js.map
 .DS_Store
+.e2e/
+.pnpm-store

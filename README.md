@@ -39,6 +39,10 @@ Run tests:
 pnpm test
 ```
 
+## E2E
+
+A Dockerized Obsidian e2e harness is included. See `docs/e2e.md` for setup and usage.
+
 ## Architecture
 
 The reusable plugin shell lives in a small set of generic files:

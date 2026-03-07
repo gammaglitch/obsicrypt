@@ -88,8 +88,8 @@ export const ExampleView: FunctionalComponent = () => {
 	const [activeFile, setActiveFile] = useAtom(activeFileAtom);
 
 	return (
-		<div className="flex w-full h-full">
-			<div className="flex-shrink-0 w-1/3 px-4 pt-4 overflow-auto bg-obsidian-bg-secondary">
+		<div data-testid="plugin-root" className="flex w-full h-full">
+			<div data-testid="plugin-sidebar" className="flex-shrink-0 w-1/3 px-4 pt-4 overflow-auto bg-obsidian-bg-secondary">
 				<h3 className="text-xs font-bold text-obsidian-text-faint uppercase mb-2">
 					Files
 				</h3>

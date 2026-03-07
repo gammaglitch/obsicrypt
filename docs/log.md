@@ -1,5 +1,11 @@
 # Log
 
+## 2026-03-07
+
+- Added Dockerized Obsidian e2e scaffold with Playwright Electron support.
+- Ported smoke test, vault fixture, and launch helpers from obsidian-ist.
+- Added `data-testid` attributes to ExampleView for stable e2e selectors.
+
 ## 2026-02-08
 
 - Replaced the task manager example with a minimal file browser + append-line demo.
