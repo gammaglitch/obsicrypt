@@ -10,6 +10,12 @@ services:
       VITE_OBSIDIAN_DEBUG_BRIDGE_HOST: "0.0.0.0"
       VITE_OBSIDIAN_DEBUG_BRIDGE_PORT: ${OBSIDIAN_DEBUG_BRIDGE_PORT:-27124}
       VITE_OBSIDIAN_DEBUG_BRIDGE_TOKEN: ${OBSIDIAN_DEBUG_BRIDGE_TOKEN:-}
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://127.0.0.1:${OBSIDIAN_DEBUG_BRIDGE_PORT:-27124}/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 60s
     ports:
       - "${OBSIDIAN_DEBUG_BRIDGE_PORT:-27124}:${OBSIDIAN_DEBUG_BRIDGE_PORT:-27124}"
     volumes:

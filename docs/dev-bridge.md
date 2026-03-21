@@ -28,9 +28,14 @@ Methods:
 - `getPluginState`
 - `openPluginView`
 - `listFiles`
+- `listFolders`
 - `readVaultFile`
 - `writeVaultFile`
+- `createFile`
+- `deleteFile`
 - `appendToFile`
+- `searchVault`
+- `getFileMetadata`
 - `getActiveFile`
 - `getActiveViewInfo`
 - `getRecentErrors`

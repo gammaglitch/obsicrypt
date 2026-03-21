@@ -1,6 +1,6 @@
 import type { IncomingMessage, Server, ServerResponse } from 'node:http';
 
-import { ItemView, Plugin, TFile } from 'obsidian';
+import { ItemView, Plugin, TFile, TFolder } from 'obsidian';
 
 import { appendToFile } from '../helpers/files/util';
 import { PLUGIN_VIEW_TYPE } from './constants';
@@ -35,15 +35,20 @@ type JsonResponse =
 
 type BridgeMethod =
 	| 'appendToFile'
+	| 'createFile'
+	| 'deleteFile'
 	| 'describe'
 	| 'getActiveFile'
 	| 'getActiveViewInfo'
+	| 'getFileMetadata'
 	| 'getPluginState'
 	| 'getRecentErrors'
 	| 'listFiles'
+	| 'listFolders'
 	| 'openPluginView'
 	| 'ping'
 	| 'readVaultFile'
+	| 'searchVault'
 	| 'writeVaultFile';
 
 const BRIDGE_METHODS: BridgeMethod[] = [
@@ -52,9 +57,14 @@ const BRIDGE_METHODS: BridgeMethod[] = [
 	'getPluginState',
 	'openPluginView',
 	'listFiles',
+	'listFolders',
 	'readVaultFile',
 	'writeVaultFile',
+	'createFile',
+	'deleteFile',
 	'appendToFile',
+	'searchVault',
+	'getFileMetadata',
 	'getActiveFile',
 	'getActiveViewInfo',
 	'getRecentErrors',
@@ -412,6 +422,22 @@ export class TestBridgeServer {
 				return { path, appended: true };
 			}
 
+			case 'createFile': {
+				const path = getRequiredString(request.params, 'path');
+				const content = getRequiredString(request.params, 'content', {
+					allowEmpty: true,
+				});
+				const file = await this.plugin.app.vault.create(path, content);
+				return { path: file.path, created: true };
+			}
+
+			case 'deleteFile': {
+				const path = getRequiredString(request.params, 'path');
+				const file = this.getVaultFile(path);
+				await this.plugin.app.vault.trash(file, true);
+				return { path, deleted: true };
+			}
+
 			case 'describe':
 				return {
 					methods: BRIDGE_METHODS,
@@ -451,6 +477,24 @@ export class TestBridgeServer {
 					vaultName: this.plugin.app.vault.getName(),
 				};
 
+			case 'getFileMetadata': {
+				const path = getRequiredString(request.params, 'path');
+				const file = this.getVaultFile(path);
+				const cache =
+					this.plugin.app.metadataCache.getFileCache(file);
+				return {
+					path: file.path,
+					name: file.name,
+					stat: {
+						ctime: file.stat.ctime,
+						mtime: file.stat.mtime,
+						size: file.stat.size,
+					},
+					frontmatter: cache?.frontmatter ?? null,
+					tags: cache?.tags?.map((t) => t.tag) ?? [],
+				};
+			}
+
 			case 'getRecentErrors':
 				return {
 					errors: [...this.recentErrors],
@@ -465,12 +509,54 @@ export class TestBridgeServer {
 				};
 			}
 
+			case 'listFolders': {
+				const folders = this.plugin.app.vault
+					.getAllLoadedFiles()
+					.filter((f): f is TFolder => f instanceof TFolder)
+					.map((f) => ({ path: f.path, name: f.name }));
+				return { folders };
+			}
+
 			case 'openPluginView':
 				await openOrRevealPluginView(this.plugin, { reveal: true });
 				return { opened: true };
 
 			case 'ping':
 				return { status: 'ok' };
+
+			case 'searchVault': {
+				const query = getRequiredString(request.params, 'query');
+				const lowerQuery = query.toLowerCase();
+				const files = this.plugin.app.vault.getMarkdownFiles();
+				const results: {
+					path: string;
+					name: string;
+					match: 'filename' | 'content';
+				}[] = [];
+
+				for (const file of files) {
+					if (file.path.toLowerCase().includes(lowerQuery)) {
+						results.push({
+							path: file.path,
+							name: file.name,
+							match: 'filename',
+						});
+						continue;
+					}
+
+					const content =
+						await this.plugin.app.vault.cachedRead(file);
+					if (content.toLowerCase().includes(lowerQuery)) {
+						results.push({
+							path: file.path,
+							name: file.name,
+							match: 'content',
+						});
+					}
+				}
+
+				return { query, results };
+			}
 
 			case 'readVaultFile': {
 				const path = getRequiredString(request.params, 'path');
