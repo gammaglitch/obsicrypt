@@ -43,6 +43,10 @@ pnpm test
 
 A Dockerized Obsidian e2e harness is included. See `docs/e2e.md` for setup and usage.
 
+## Dev Bridge
+
+For long-running development and agent-debug sessions, the plugin can expose a localhost HTTP bridge. See `docs/dev-bridge.md` for the bridge API, env flags, and the persistent Docker harness.
+
 ## Architecture
 
 The reusable plugin shell lives in a small set of generic files:

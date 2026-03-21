@@ -9,6 +9,7 @@ import {
 	PLUGIN_VIEW_NAME,
 	PLUGIN_VIEW_TYPE,
 } from './obsidian/constants';
+import { maybeStartTestBridge, TestBridgeServer } from './obsidian/testBridge';
 import { openOrRevealPluginView } from './obsidian/view';
 
 class BoilerplateView extends ItemView {
@@ -41,7 +42,14 @@ class BoilerplateView extends ItemView {
 }
 
 export default class BoilerplatePlugin extends Plugin {
+	private testBridge: TestBridgeServer | null = null;
+
 	onunload(): void {
+		if (this.testBridge) {
+			void this.testBridge.stop();
+			this.testBridge = null;
+		}
+
 		this.app.workspace
 			.getLeavesOfType(PLUGIN_VIEW_TYPE)
 			.forEach((leaf) => leaf.detach());
@@ -56,5 +64,11 @@ export default class BoilerplatePlugin extends Plugin {
 		this.app.workspace.onLayoutReady(() => {
 			void openOrRevealPluginView(this, { reveal: true });
 		});
+
+		try {
+			this.testBridge = await maybeStartTestBridge(this);
+		} catch (error) {
+			console.error('[test-bridge] failed to start', error);
+		}
 	}
 }

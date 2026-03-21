@@ -1,5 +1,11 @@
 # Log
 
+## 2026-03-21
+
+- Added a test-bridge module that can expose a small localhost HTTP control surface from inside the plugin when `VITE_OBSIDIAN_DEBUG_BRIDGE=1`.
+- Added a long-running Docker dev harness in `docker-compose.dev.yml` so Obsidian can stay up during interactive debug sessions while external tools connect through the bridge.
+- Documented the bridge API, auth, and startup flow in `docs/dev-bridge.md`.
+
 ## 2026-03-07
 
 - Added Dockerized Obsidian e2e scaffold with Playwright Electron support.
