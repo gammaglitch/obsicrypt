@@ -1,5 +1,10 @@
 # Log
 
+## 2026-04-05
+
+- Added an MCP server (`mcp/bridge-server.mjs`) that wraps the bridge HTTP API so Claude Code can call vault operations as native tools. Configured in `.mcp.json`.
+- Fixed Docker dev harness: replaced `--frozen-lockfile` with `--no-frozen-lockfile` for pnpm 10 compatibility, added `--no-sandbox` for headless Electron, and added `--remote-debugging-port=9222` for CDP access.
+
 ## 2026-03-21
 
 - Added a test-bridge module that can expose a small localhost HTTP control surface from inside the plugin when `VITE_OBSIDIAN_DEBUG_BRIDGE=1`.
