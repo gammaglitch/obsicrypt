@@ -12,10 +12,10 @@ import {
 import { maybeStartTestBridge, TestBridgeServer } from './obsidian/testBridge';
 import { openOrRevealPluginView } from './obsidian/view';
 
-class BoilerplateView extends ItemView {
+class ObsikitView extends ItemView {
 	private plugin: Plugin;
 
-	constructor(leaf: WorkspaceLeaf, plugin: BoilerplatePlugin) {
+	constructor(leaf: WorkspaceLeaf, plugin: ObsikitPlugin) {
 		super(leaf);
 		this.plugin = plugin;
 	}
@@ -41,7 +41,7 @@ class BoilerplateView extends ItemView {
 	}
 }
 
-export default class BoilerplatePlugin extends Plugin {
+export default class ObsikitPlugin extends Plugin {
 	private testBridge: TestBridgeServer | null = null;
 
 	onunload(): void {
@@ -58,7 +58,7 @@ export default class BoilerplatePlugin extends Plugin {
 	async onload(): Promise<void> {
 		this.registerView(
 			PLUGIN_VIEW_TYPE,
-			(leaf: WorkspaceLeaf) => new BoilerplateView(leaf, this)
+			(leaf: WorkspaceLeaf) => new ObsikitView(leaf, this)
 		);
 
 		this.app.workspace.onLayoutReady(() => {

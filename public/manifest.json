@@ -1,6 +1,6 @@
 {
-    "id": "obsidian-boilerplate",
-    "name": "Obsidian Plugin Boilerplate",
+    "id": "obsikit",
+    "name": "Obsikit",
     "version": "0.0.1",
     "minAppVersion": "0.12.0",
     "description": "An opinionated Obsidian plugin starter with Preact, Jotai, and Tailwind.",
