@@ -1,5 +1,10 @@
 # Log
 
+## 2026-04-08
+
+- Added `mcp/cli-server.mjs`: a self-contained MCP server that wraps the official Obsidian CLI instead of the custom HTTP bridge. Exposes 15 tools covering the plugin development debug loop (reload, commands, errors, console, DOM, CSS, screenshots, eval). Not enabled in `.mcp.json` by default — opt-in until backend auto-selection ships.
+- Wrote `docs/cli-mcp-plan.md` defining the two-backend architecture: official CLI as preferred backend, bridge as fallback for Docker/CI. Plan follows a flat-first approach — shared abstractions deferred until real duplication between backends is visible.
+
 ## 2026-04-05
 
 - Added an MCP server (`mcp/bridge-server.mjs`) that wraps the bridge HTTP API so Claude Code can call vault operations as native tools. Configured in `.mcp.json`.

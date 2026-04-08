@@ -317,7 +317,7 @@ This protects the project from two bad outcomes:
 
 ## Recommended implementation phases
 
-## Phase 0: document the backend strategy
+## Phase 0: document the backend strategy — DONE
 
 Deliverables:
 
@@ -325,61 +325,63 @@ Deliverables:
 - updated `README.md`
 - updated `docs/dev-bridge.md`
 
-Success criteria:
+Status: plan written and refined. README and dev-bridge updates deferred to Phase 4.
 
-- contributors understand that bridge is fallback infrastructure, not the only future path
-- contributors understand that the shared contract only covers true overlap, with backend-specific extensions where needed
-
-## Phase 1: extract backend-independent MCP definitions
+## Phase 1: implement CLI backend — DONE
 
 Deliverables:
 
-- shared tool definition module
-- shared parameter schemas
-- shared normalization helpers
-- initial capability-reporting shape
+- `mcp/cli-server.mjs` — flat, self-contained MCP server wrapping the official CLI
+
+Implemented tools (15):
+
+- `obsidian_ping` — probes `vault info=name` to confirm the app is running, not just that the CLI binary exists
+- `obsidian_version` — `version`
+- `obsidian_plugins` — `plugins format=json`
+- `obsidian_plugin_info` — `plugin id=<id>`
+- `obsidian_reload_plugin` — `plugin:reload id=<id>`
+- `obsidian_list_commands` — `commands`
+- `obsidian_execute_command` — `command id=<id>`
+- `obsidian_get_errors` — `dev:errors`
+- `obsidian_get_console` — `dev:console` (requires debugger attached)
+- `obsidian_debug_attach` — `dev:debug on`
+- `obsidian_debug_detach` — `dev:debug off`
+- `obsidian_query_dom` — `dev:dom`
+- `obsidian_get_css` — `dev:css`
+- `obsidian_take_screenshot` — `dev:screenshot`
+- `obsidian_eval` — `eval`
+
+Design decisions made during implementation:
+
+- started flat (no shared abstractions) per the refined plan
+- added `debug_attach`/`debug_detach` because `dev:console` requires the debugger — without them agents hit a dead end
+- response helpers handle arrays without corruption (`{ data: [...], _meta }` for arrays, spread for objects)
+- `_meta` carries the raw CLI command for debugging, agents can ignore it
+- errors use MCP native `isError` mechanism
+- CLI server is NOT in `.mcp.json` by default — users opt in manually until backend selection ships
+
+What remains before this phase is fully validated:
+
+- test all tools against a running Obsidian instance (reload, commands, errors, DOM, screenshot, eval)
+- verify error paths (missing plugin, bad selector, eval syntax error)
+
+## Phase 2: validate the CLI debug loop
 
 Tasks:
 
-- identify which existing `bridge-server.mjs` tools should remain canonical
-- classify every tool as shared, CLI-only, or bridge-only
-- separate tool registration from bridge transport details
-- define normalized result envelopes
-- define capability discovery output
+- reload a plugin via `obsidian_reload_plugin` and confirm it takes effect
+- list and execute a command via `obsidian_list_commands` / `obsidian_execute_command`
+- trigger an error and retrieve it via `obsidian_get_errors`
+- attach debugger and read console via `obsidian_debug_attach` / `obsidian_get_console`
+- inspect DOM via `obsidian_query_dom`
+- take a screenshot via `obsidian_take_screenshot`
+- run `obsidian_eval` against app state
+- verify error paths: missing plugin, bad selector, eval syntax error, CLI not found
 
 Success criteria:
 
-- adding a second backend does not duplicate every tool schema by hand
-
-## Phase 2: implement CLI backend and validate
-
-Deliverables:
-
-- `mcp/cli-server.mjs` (self-contained: tool definitions, CLI execution, output formatting)
-- documented local verification flow
-
-Tasks:
-
-- execute `obsidian` commands using `child_process`
-- prefer machine-readable output when available
-- capture stdout, stderr, exit code
-- convert failures into MCP errors using native `isError` mechanism
-- expose backend diagnostics via `_meta`
-
-Validation (part of this phase, not a separate phase):
-
-- reload plugin via MCP
-- list commands
-- execute a plugin command
-- inspect errors
-- inspect DOM
-- take a screenshot
-- run `eval` against app state
-
-Success criteria:
-
-- CLI-backed MCP tools work for the Phase 1 tool set on a supported local machine
-- an agent can complete the normal plugin debug cycle without using the bridge
+- an agent can complete the full plugin debug cycle without the bridge
+- error responses are clear enough for agents to self-correct
 
 ## Phase 3: compare CLI and bridge backend coverage
 
@@ -449,26 +451,16 @@ Success criteria:
 - shared modules reflect real duplication, not speculative abstraction
 - regressions in tool output or backend selection are caught early
 
-## Suggested initial implementation order
+## Implementation progress
 
-This is the order with the best risk-to-value ratio:
-
-1. Build `cli-server.mjs` as a flat, self-contained module with `obsidian_reload_plugin`
-2. Add `obsidian_list_commands` and `obsidian_execute_command`
-3. Add `obsidian_get_errors` and `obsidian_eval`
-4. Validate the debug loop end-to-end against a running Obsidian instance
-5. Add `obsidian_query_dom` and `obsidian_take_screenshot`
-6. Add backend auto-selection (~20 lines of startup logic)
-7. Compare CLI and bridge coverage, document the capability matrix
-8. Extract shared modules from real duplication between the two backends
-9. Update docs and examples
-
-Reasoning:
-
-- steps 1–4 prove the architecture with the core debug loop before anything else
-- no shared abstractions are created until real duplication is visible (step 8)
-- backend auto-selection ships early (step 6) because it's trivial and avoids dual entry points during stabilization
-- DOM and screenshot come after the core loop works, not before
+1. ~~Build `cli-server.mjs` as a flat, self-contained module~~ — DONE (Phase 1)
+2. ~~All Phase 1 tools implemented~~ — DONE (15 tools including debug_attach/detach)
+3. ~~Smoke test server startup and basic tool calls~~ — DONE
+4. Validate the debug loop end-to-end against a running Obsidian instance (Phase 2)
+5. Compare CLI and bridge coverage, document the capability matrix (Phase 3)
+6. Add backend auto-selection (~20 lines of startup logic) (Phase 4)
+7. Extract shared modules from real duplication between the two backends (Phase 5)
+8. Update docs and examples
 
 ## Output normalization plan
 

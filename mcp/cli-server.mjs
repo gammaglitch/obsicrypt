@@ -1,0 +1,438 @@
+/**
+ * MCP server that wraps the official Obsidian CLI for LLM-driven plugin development.
+ *
+ * Usage:
+ *   node mcp/cli-server.mjs
+ *
+ * Environment:
+ *   OBSIDIAN_CLI_BIN  — path to obsidian binary (default: "obsidian")
+ *   OBSIDIAN_VAULT    — vault name to target (optional, uses active vault if omitted)
+ *
+ * Configure in Claude Code settings:
+ *   "mcpServers": {
+ *     "obsidian-cli": {
+ *       "command": "node",
+ *       "args": ["mcp/cli-server.mjs"]
+ *     }
+ *   }
+ */
+
+import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import { z } from 'zod';
+import { execFile } from 'node:child_process';
+
+const CLI_BIN = process.env.OBSIDIAN_CLI_BIN || 'obsidian';
+const VAULT = process.env.OBSIDIAN_VAULT || '';
+
+// ---------------------------------------------------------------------------
+// CLI execution helper
+// ---------------------------------------------------------------------------
+
+function runCli(args, { timeout = 15000 } = {}) {
+	if (VAULT) {
+		args = [`vault=${VAULT}`, ...args];
+	}
+
+	return new Promise((resolve, reject) => {
+		execFile(CLI_BIN, args, { timeout }, (err, stdout, stderr) => {
+			if (err) {
+				// Exit code errors still carry useful stdout/stderr
+				if (err.killed) {
+					reject(new Error(`CLI timed out after ${timeout}ms`));
+					return;
+				}
+				reject(new Error(stderr?.trim() || err.message));
+				return;
+			}
+			resolve({ stdout: stdout.trim(), stderr: stderr?.trim() || '' });
+		});
+	});
+}
+
+function tryParseJson(text) {
+	try {
+		return JSON.parse(text);
+	} catch {
+		return null;
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Response helpers
+// ---------------------------------------------------------------------------
+
+function textResult(data, meta) {
+	let payload;
+	if (!meta) {
+		payload = data;
+	} else if (Array.isArray(data)) {
+		payload = { data, _meta: meta };
+	} else {
+		payload = { ...data, _meta: meta };
+	}
+	return {
+		content: [{ type: 'text', text: JSON.stringify(payload, null, 2) }],
+	};
+}
+
+function textResultRaw(text, meta) {
+	if (meta) {
+		return {
+			content: [
+				{
+					type: 'text',
+					text: JSON.stringify({ output: text, _meta: meta }, null, 2),
+				},
+			],
+		};
+	}
+	return { content: [{ type: 'text', text }] };
+}
+
+function errorResult(message, meta) {
+	const payload = meta
+		? JSON.stringify({ message, _meta: meta }, null, 2)
+		: message;
+	return { content: [{ type: 'text', text: payload }], isError: true };
+}
+
+// ---------------------------------------------------------------------------
+// Server
+// ---------------------------------------------------------------------------
+
+const server = new McpServer({
+	name: 'obsidian-cli',
+	version: '0.1.0',
+});
+
+// -- Connectivity -----------------------------------------------------------
+
+server.tool(
+	'obsidian_ping',
+	'Check if Obsidian is running with an active vault (not just CLI installed)',
+	async () => {
+		try {
+			const [version, vault] = await Promise.all([
+				runCli(['version'], { timeout: 5000 }),
+				runCli(['vault', 'info=name'], { timeout: 5000 }),
+			]);
+			return textResult({
+				status: 'ok',
+				version: version.stdout,
+				vault: vault.stdout,
+			});
+		} catch (e) {
+			return errorResult(`Obsidian not reachable: ${e.message}`);
+		}
+	}
+);
+
+server.tool(
+	'obsidian_version',
+	'Get the Obsidian app version',
+	async () => {
+		const { stdout } = await runCli(['version']);
+		return textResult({ version: stdout });
+	}
+);
+
+// -- Plugins ----------------------------------------------------------------
+
+server.tool(
+	'obsidian_plugins',
+	'List installed plugins with optional version info',
+	{
+		filter: z
+			.enum(['core', 'community'])
+			.optional()
+			.describe('Filter by plugin type'),
+		versions: z
+			.boolean()
+			.optional()
+			.describe('Include version numbers'),
+	},
+	async ({ filter, versions }) => {
+		const args = ['plugins', 'format=json'];
+		if (filter) args.push(`filter=${filter}`);
+		if (versions) args.push('versions');
+		const { stdout } = await runCli(args);
+		const parsed = tryParseJson(stdout);
+		return textResult(
+			parsed ?? { output: stdout },
+			{ command: [CLI_BIN, ...args].join(' ') }
+		);
+	}
+);
+
+server.tool(
+	'obsidian_plugin_info',
+	'Get detailed info about a specific plugin',
+	{
+		id: z.string().describe('Plugin ID'),
+	},
+	async ({ id }) => {
+		const args = ['plugin', `id=${id}`];
+		const { stdout } = await runCli(args);
+		const parsed = tryParseJson(stdout);
+		return textResult(
+			parsed ?? { output: stdout },
+			{ command: [CLI_BIN, ...args].join(' ') }
+		);
+	}
+);
+
+server.tool(
+	'obsidian_reload_plugin',
+	'Reload a plugin (hot-reload for development)',
+	{
+		id: z.string().describe('Plugin ID to reload'),
+	},
+	async ({ id }) => {
+		const args = ['plugin:reload', `id=${id}`];
+		const { stdout } = await runCli(args);
+		return textResult(
+			{ reloaded: id, output: stdout || 'ok' },
+			{ command: [CLI_BIN, ...args].join(' ') }
+		);
+	}
+);
+
+// -- Commands ---------------------------------------------------------------
+
+server.tool(
+	'obsidian_list_commands',
+	'List available Obsidian commands',
+	{
+		filter: z
+			.string()
+			.optional()
+			.describe('Filter commands by ID prefix'),
+	},
+	async ({ filter }) => {
+		const args = ['commands'];
+		if (filter) args.push(`filter=${filter}`);
+		const { stdout } = await runCli(args);
+		const commands = stdout
+			.split('\n')
+			.map((l) => l.trim())
+			.filter(Boolean);
+		return textResult({ commands, count: commands.length });
+	}
+);
+
+server.tool(
+	'obsidian_execute_command',
+	'Execute an Obsidian command by ID',
+	{
+		id: z.string().describe('Command ID to execute (e.g. "app:reload")'),
+	},
+	async ({ id }) => {
+		const args = ['command', `id=${id}`];
+		const { stdout } = await runCli(args);
+		return textResult(
+			{ executed: id, output: stdout || 'ok' },
+			{ command: [CLI_BIN, ...args].join(' ') }
+		);
+	}
+);
+
+// -- Diagnostics ------------------------------------------------------------
+
+server.tool(
+	'obsidian_get_errors',
+	'Get captured runtime errors from Obsidian',
+	{
+		clear: z
+			.boolean()
+			.optional()
+			.describe('Clear the error buffer after reading'),
+	},
+	async ({ clear }) => {
+		const args = ['dev:errors'];
+		if (clear) args.push('clear');
+		const { stdout } = await runCli(args);
+		return textResultRaw(stdout, { command: [CLI_BIN, ...args].join(' ') });
+	}
+);
+
+server.tool(
+	'obsidian_get_console',
+	'Get captured console messages (requires dev:debug to be attached)',
+	{
+		limit: z
+			.number()
+			.optional()
+			.describe('Max messages to return (default 50)'),
+		level: z
+			.enum(['log', 'warn', 'error', 'info', 'debug'])
+			.optional()
+			.describe('Filter by log level'),
+		clear: z
+			.boolean()
+			.optional()
+			.describe('Clear the console buffer after reading'),
+	},
+	async ({ limit, level, clear }) => {
+		const args = ['dev:console'];
+		if (limit !== undefined) args.push(`limit=${limit}`);
+		if (level) args.push(`level=${level}`);
+		if (clear) args.push('clear');
+
+		try {
+			const { stdout } = await runCli(args);
+			return textResultRaw(stdout, {
+				command: [CLI_BIN, ...args].join(' '),
+			});
+		} catch (e) {
+			if (e.message.includes('Debugger not attached')) {
+				return errorResult(
+					'Debugger not attached. Use obsidian_debug_attach to start capturing console messages.',
+					{ command: [CLI_BIN, ...args].join(' ') }
+				);
+			}
+			throw e;
+		}
+	}
+);
+
+server.tool(
+	'obsidian_debug_attach',
+	'Attach the debugger to start capturing console messages',
+	async () => {
+		const args = ['dev:debug', 'on'];
+		const { stdout } = await runCli(args);
+		return textResult(
+			{ attached: true, output: stdout || 'ok' },
+			{ command: [CLI_BIN, ...args].join(' ') }
+		);
+	}
+);
+
+server.tool(
+	'obsidian_debug_detach',
+	'Detach the debugger and stop capturing console messages',
+	async () => {
+		const args = ['dev:debug', 'off'];
+		const { stdout } = await runCli(args);
+		return textResult(
+			{ attached: false, output: stdout || 'ok' },
+			{ command: [CLI_BIN, ...args].join(' ') }
+		);
+	}
+);
+
+// -- DOM & CSS inspection ---------------------------------------------------
+
+server.tool(
+	'obsidian_query_dom',
+	'Query DOM elements by CSS selector',
+	{
+		selector: z.string().describe('CSS selector to query'),
+		total: z
+			.boolean()
+			.optional()
+			.describe('Return only the element count'),
+		text: z
+			.boolean()
+			.optional()
+			.describe('Return text content instead of HTML'),
+		inner: z
+			.boolean()
+			.optional()
+			.describe('Return innerHTML instead of outerHTML'),
+		all: z
+			.boolean()
+			.optional()
+			.describe('Return all matches instead of first'),
+		attr: z
+			.string()
+			.optional()
+			.describe('Get a specific attribute value'),
+		css: z
+			.string()
+			.optional()
+			.describe('Get a specific CSS property value'),
+	},
+	async ({ selector, total, text, inner, all, attr, css }) => {
+		const args = ['dev:dom', `selector=${selector}`];
+		if (total) args.push('total');
+		if (text) args.push('text');
+		if (inner) args.push('inner');
+		if (all) args.push('all');
+		if (attr) args.push(`attr=${attr}`);
+		if (css) args.push(`css=${css}`);
+		const { stdout } = await runCli(args, { timeout: 10000 });
+		return textResultRaw(stdout, { command: [CLI_BIN, ...args].join(' ') });
+	}
+);
+
+server.tool(
+	'obsidian_get_css',
+	'Inspect computed CSS rules for a selector',
+	{
+		selector: z.string().describe('CSS selector to inspect'),
+		prop: z
+			.string()
+			.optional()
+			.describe('Filter by CSS property name'),
+	},
+	async ({ selector, prop }) => {
+		const args = ['dev:css', `selector=${selector}`];
+		if (prop) args.push(`prop=${prop}`);
+		const { stdout } = await runCli(args, { timeout: 10000 });
+		return textResultRaw(stdout, { command: [CLI_BIN, ...args].join(' ') });
+	}
+);
+
+// -- Screenshots ------------------------------------------------------------
+
+server.tool(
+	'obsidian_take_screenshot',
+	'Take a screenshot of the Obsidian window',
+	{
+		path: z
+			.string()
+			.optional()
+			.describe('Output file path (default: auto-generated)'),
+	},
+	async ({ path: filepath }) => {
+		const args = ['dev:screenshot'];
+		if (filepath) args.push(`path=${filepath}`);
+		const { stdout } = await runCli(args, { timeout: 30000 });
+		return textResult(
+			{ output: stdout || 'screenshot saved' },
+			{ command: [CLI_BIN, ...args].join(' ') }
+		);
+	}
+);
+
+// -- Eval -------------------------------------------------------------------
+
+server.tool(
+	'obsidian_eval',
+	'Execute JavaScript in the Obsidian app context and return the result',
+	{
+		code: z.string().describe('JavaScript code to execute'),
+	},
+	async ({ code }) => {
+		const args = ['eval', `code=${code}`];
+		const { stdout } = await runCli(args, { timeout: 30000 });
+		// CLI returns "=> result", strip the prefix
+		const result = stdout.startsWith('=>')
+			? stdout.slice(2).trim()
+			: stdout;
+		const parsed = tryParseJson(result);
+		return textResult(
+			{ result: parsed ?? result },
+			{ command: [CLI_BIN, 'eval', 'code=...'].join(' ') }
+		);
+	}
+);
+
+// ---------------------------------------------------------------------------
+// Start
+// ---------------------------------------------------------------------------
+
+const transport = new StdioServerTransport();
+await server.connect(transport);
