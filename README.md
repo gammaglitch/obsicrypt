@@ -43,6 +43,20 @@ pnpm test
 
 A Dockerized Obsidian e2e harness is included. See `docs/e2e.md` for setup and usage.
 
+## MCP Tooling
+
+`obsikit` now ships with a unified MCP server at `mcp/server.mjs`.
+
+It assembles tools from:
+
+- the official Obsidian CLI for developer-control and verification features
+- the custom bridge for plugin-specific state and current vault/file operations
+
+See:
+
+- `docs/dev-cli.md` for unified MCP usage, backend modes, and examples
+- `docs/dev-bridge.md` for the bridge API and bridge-specific setup details
+
 ## Dev Bridge
 
 For long-running development and agent-debug sessions, the plugin can expose a localhost HTTP bridge. See `docs/dev-bridge.md` for the bridge API, env flags, and the persistent Docker harness.

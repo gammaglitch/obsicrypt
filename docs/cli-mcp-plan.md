@@ -480,9 +480,11 @@ Important current limitation:
 
 Env contract: `OBSIDIAN_MCP_BACKEND=auto|cli|bridge`, `OBSIDIAN_CLI_BIN`, `OBSIDIAN_VAULT`, `OBSIDIAN_BRIDGE_URL`, `OBSIDIAN_BRIDGE_TOKEN`
 
-## Phase 5: extract shared layer and harden
+## Phase 5: extract shared layer and harden — OPTIONAL / DEFERRED
 
-This is when abstraction pays off — both backends exist, real duplication is visible, and the shared surface is informed by experience.
+This is now optional work, not a required next step.
+
+Right now the codebase does not have enough harmful duplication to justify extracting a shared framework. Keep the current flat structure unless maintenance pain becomes real.
 
 Deliverables:
 
@@ -503,6 +505,11 @@ Success criteria:
 - shared modules reflect real duplication, not speculative abstraction
 - regressions in tool output or capability assembly are caught early
 
+Current decision:
+
+- skip this phase for now unless duplication becomes painful
+- prioritize docs, examples, and future CLI-backed tool migrations instead
+
 ## Implementation progress
 
 1. ~~Build `cli-server.mjs` as a flat, self-contained module~~ — DONE (Phase 1)
@@ -512,8 +519,8 @@ Success criteria:
 5. ~~Fix CLI error detection (`isCliError`)~~ — DONE (Phase 2)
 6. ~~Compare CLI and bridge coverage, document the capability matrix~~ — DONE (Phase 3)
 7. ~~Add unified server and capability assembly~~ — DONE (Phase 4)
-8. Extract shared modules from real duplication between the two backends (Phase 5)
-9. Update docs and examples
+8. Skip shared-layer extraction for now unless duplication becomes painful
+9. ~~Update docs and examples~~ — DONE
 
 ## Output normalization plan
 
