@@ -131,6 +131,11 @@ Potentially also:
 
 Those should only move to CLI-backed shared tools if the output shape is good enough for agents and the semantics match what current bridge consumers expect.
 
+Current implementation note:
+
+- these tools should remain bridge-backed in the unified server until CLI-backed versions are actually implemented and validated
+- theoretical CLI overlap is not enough to suppress the current bridge implementations in `auto` mode
+
 ### Bridge-only tools
 
 Keep these as bridge-only for now:
@@ -165,6 +170,29 @@ Near-term guidance for `obsikit`:
 - do not force duplicate MCP tools where CLI is clearly the better source
 - do preserve bridge-only tools that expose plugin-specific runtime context
 - do move toward one unified MCP server that assembles capabilities from both sources
+
+## Future migration note
+
+Several vault/file tools are candidates for future migration from bridge-backed implementations to CLI-backed implementations, but that migration is not complete just because the CLI has related commands.
+
+Candidate migration set:
+
+- `obsidian_list_files`
+- `obsidian_list_folders`
+- `obsidian_search`
+- `obsidian_read_file`
+- `obsidian_create_file`
+- `obsidian_append_to_file`
+- `obsidian_delete_file`
+
+Migration rule:
+
+- only switch a tool from bridge-backed to CLI-backed after a real implementation exists, output normalization is in place, and the CLI behavior has been validated against the current bridge-facing contract
+
+Until then:
+
+- keep these tools bridge-backed in the unified server
+- treat CLI support for them as a future migration consideration, not current ownership
 
 ## Open questions to re-evaluate later
 

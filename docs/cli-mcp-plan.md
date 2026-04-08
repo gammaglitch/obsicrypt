@@ -444,30 +444,41 @@ Success criteria:
 Status:
 
 - `docs/cli-vs-bridge-capability-matrix.md` now captures the current ownership model
+- several vault/file tools remain bridge-backed in the current implementation even though the CLI has related commands; CLI-backed replacements are a future migration path, not a Phase 4 assumption
 
-## Phase 4: add unified server and capability assembly
-
-This should stay small and should not wait until the abstraction layer is extracted. Ship it as soon as the capability matrix is clear.
+## Phase 4: add unified server and capability assembly — DONE
 
 Deliverables:
 
-- unified `mcp/server.mjs` entry point
+- `mcp/server.mjs` — unified entry point
+- `obsidian_get_capabilities` tool
+- `.mcp.json` updated to use `server.mjs`
 
-Tasks:
+Implementation:
 
-- probe CLI availability
-- probe bridge reachability
-- register CLI-backed tools where CLI is preferred
-- register bridge-backed tools for bridge-only capabilities
-- register bridge fallbacks for overlapping tools only when CLI is absent
-- emit clear startup logs describing which capability groups were registered
-- fail clearly when forced mode is unavailable
-- implement `obsidian_get_capabilities`
+- refactored `cli-server.mjs` to export `registerCliTools(server)` and `probeCli()`; standalone mode preserved via `isMain` check
+- `server.mjs` probes both backends at startup and assembles tools:
+  - `auto` mode (default): register CLI tools + bridge-only tools from whichever sources are available
+  - `cli` mode: CLI tools only, fail fast if unavailable
+  - `bridge` mode: all bridge tools (including fallbacks for overlapping capabilities), fail fast if unavailable
+- bridge-only tools: `get_plugin_state`, `get_active_file`, `get_active_view`, `open_plugin_view`, `get_metadata`, `write_file`
+- bridge fallback tools (registered only when CLI is absent): `ping`, `list_files`, `list_folders`, `search`, `read_file`, `create_file`, `append_to_file`, `delete_file`, `get_errors`
+- note: the vault/file fallback set above is a future migration target for CLI-backed replacements, not an area where CLI ownership is already implemented today
+- startup logs to stderr describing backend availability and tool count
+- `bridge-server.mjs` left untouched — bridge tool logic inlined in `server.mjs`
 
-Success criteria:
+Tool counts by mode:
 
-- agents can use one MCP setup in most environments
-- the MCP surface reflects actual available capabilities instead of pretending all backends are equal
+- auto (both up): 22 (15 CLI + 6 bridge-only + 1 capabilities)
+- cli only: 16 (15 CLI + 1 capabilities)
+- bridge only: 16 (6 bridge-only + 9 bridge fallback + 1 capabilities)
+
+Important current limitation:
+
+- in `auto` mode, several vault/file tools are still bridge-backed because CLI-backed implementations for those tools have not been built yet
+- this is intentional for now and should be treated as a future migration area
+
+Env contract: `OBSIDIAN_MCP_BACKEND=auto|cli|bridge`, `OBSIDIAN_CLI_BIN`, `OBSIDIAN_VAULT`, `OBSIDIAN_BRIDGE_URL`, `OBSIDIAN_BRIDGE_TOKEN`
 
 ## Phase 5: extract shared layer and harden
 
@@ -499,8 +510,8 @@ Success criteria:
 3. ~~Smoke test server startup and basic tool calls~~ — DONE
 4. ~~Validate all tools against running Obsidian~~ — DONE (Phase 2)
 5. ~~Fix CLI error detection (`isCliError`)~~ — DONE (Phase 2)
-6. Compare CLI and bridge coverage, document the capability matrix (Phase 3)
-7. Add unified server and capability assembly (Phase 4)
+6. ~~Compare CLI and bridge coverage, document the capability matrix~~ — DONE (Phase 3)
+7. ~~Add unified server and capability assembly~~ — DONE (Phase 4)
 8. Extract shared modules from real duplication between the two backends (Phase 5)
 9. Update docs and examples
 

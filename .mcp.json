@@ -2,7 +2,7 @@
   "mcpServers": {
     "obsidian": {
       "command": "node",
-      "args": ["mcp/bridge-server.mjs"],
+      "args": ["mcp/server.mjs"],
       "env": {
         "OBSIDIAN_BRIDGE_URL": "http://127.0.0.1:27124"
       }
