@@ -125,6 +125,11 @@ server.tool(
 				runCli(['version'], { timeout: 5000 }),
 				runCli(['vault', 'info=name'], { timeout: 5000 }),
 			]);
+			if (isCliError(version.stdout) || isCliError(vault.stdout)) {
+				return errorResult(
+					`Obsidian not reachable: ${version.stdout} / ${vault.stdout}`
+				);
+			}
 			return textResult({
 				status: 'ok',
 				version: version.stdout,
@@ -141,6 +146,9 @@ server.tool(
 	'Get the Obsidian app version',
 	async () => {
 		const { stdout } = await runCli(['version']);
+		if (isCliError(stdout)) {
+			return errorResult(stdout);
+		}
 		return textResult({ version: stdout });
 	}
 );
@@ -165,11 +173,12 @@ server.tool(
 		if (filter) args.push(`filter=${filter}`);
 		if (versions) args.push('versions');
 		const { stdout } = await runCli(args);
+		const meta = { command: [CLI_BIN, ...args].join(' ') };
+		if (isCliError(stdout)) {
+			return errorResult(stdout, meta);
+		}
 		const parsed = tryParseJson(stdout);
-		return textResult(
-			parsed ?? { output: stdout },
-			{ command: [CLI_BIN, ...args].join(' ') }
-		);
+		return textResult(parsed ?? { output: stdout }, meta);
 	}
 );
 
@@ -223,6 +232,9 @@ server.tool(
 		const args = ['commands'];
 		if (filter) args.push(`filter=${filter}`);
 		const { stdout } = await runCli(args);
+		if (isCliError(stdout)) {
+			return errorResult(stdout, { command: [CLI_BIN, ...args].join(' ') });
+		}
 		const commands = stdout
 			.split('\n')
 			.map((l) => l.trim())
@@ -263,7 +275,11 @@ server.tool(
 		const args = ['dev:errors'];
 		if (clear) args.push('clear');
 		const { stdout } = await runCli(args);
-		return textResultRaw(stdout, { command: [CLI_BIN, ...args].join(' ') });
+		const meta = { command: [CLI_BIN, ...args].join(' ') };
+		if (isCliError(stdout)) {
+			return errorResult(stdout, meta);
+		}
+		return textResultRaw(stdout, meta);
 	}
 );
 
@@ -292,9 +308,11 @@ server.tool(
 
 		try {
 			const { stdout } = await runCli(args);
-			return textResultRaw(stdout, {
-				command: [CLI_BIN, ...args].join(' '),
-			});
+			const meta = { command: [CLI_BIN, ...args].join(' ') };
+			if (isCliError(stdout)) {
+				return errorResult(stdout, meta);
+			}
+			return textResultRaw(stdout, meta);
 		} catch (e) {
 			if (e.message.includes('Debugger not attached')) {
 				return errorResult(
@@ -313,10 +331,11 @@ server.tool(
 	async () => {
 		const args = ['dev:debug', 'on'];
 		const { stdout } = await runCli(args);
-		return textResult(
-			{ attached: true, output: stdout || 'ok' },
-			{ command: [CLI_BIN, ...args].join(' ') }
-		);
+		const meta = { command: [CLI_BIN, ...args].join(' ') };
+		if (isCliError(stdout)) {
+			return errorResult(stdout, meta);
+		}
+		return textResult({ attached: true, output: stdout || 'ok' }, meta);
 	}
 );
 
@@ -326,10 +345,11 @@ server.tool(
 	async () => {
 		const args = ['dev:debug', 'off'];
 		const { stdout } = await runCli(args);
-		return textResult(
-			{ attached: false, output: stdout || 'ok' },
-			{ command: [CLI_BIN, ...args].join(' ') }
-		);
+		const meta = { command: [CLI_BIN, ...args].join(' ') };
+		if (isCliError(stdout)) {
+			return errorResult(stdout, meta);
+		}
+		return textResult({ attached: false, output: stdout || 'ok' }, meta);
 	}
 );
 
