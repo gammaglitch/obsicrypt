@@ -15,8 +15,9 @@ The next step is not to expand the custom bridge further by default. The next st
 
 Target end state:
 
-- the official `obsidian` CLI is the preferred backend for local plugin development
-- the current bridge remains available as a fallback backend
+- the official `obsidian` CLI is the preferred implementation for overlapping plugin-development capabilities
+- the current bridge remains available for capabilities the CLI does not expose cleanly and as fallback infrastructure
+- one unified MCP server assembles tools from both capability sources
 - skills and agents call a stable set of shared `obsidian_*` tools for overlapping capabilities
 - backend-specific capabilities remain exposed explicitly instead of being hidden behind false parity
 
@@ -41,7 +42,8 @@ For `obsikit`, this creates a better architecture:
 
 - official CLI for primary runtime control
 - MCP as the LLM-facing interface
-- bridge backend only when the CLI is unavailable or unsuitable
+- bridge used where it still adds unique value
+- unified capability assembly instead of winner-takes-all backend selection
 
 ## Non-goals
 
@@ -85,14 +87,14 @@ Important current limitation:
 
 Adopt a two-layer design:
 
-### Layer 1: backend adapters
+### Layer 1: capability providers
 
-Independent backend implementations for the same logical operations:
+Independent capability sources:
 
 - CLI backend
 - bridge backend
 
-Each backend is responsible for:
+Each provider is responsible for:
 
 - validating required runtime availability
 - executing the underlying action
@@ -107,7 +109,7 @@ One MCP surface for agents:
 - stable parameter schemas
 - stable output shapes where practical
 
-This keeps skill instructions and agent workflows backend-agnostic.
+This keeps skill instructions and agent workflows capability-agnostic where overlap is real.
 
 ### Layer 3: backend-specific extensions
 
@@ -172,12 +174,15 @@ Initial recommendation:
 - keep `bridge-server.mjs` working and untouched
 - extract shared pieces and unify entry points only after the CLI backend stabilizes
 
-## Backend selection model
+## Capability assembly model
 
 Preferred long-term behavior:
 
-- default to CLI backend when `obsidian` exists on `PATH`
-- fall back to bridge backend when CLI is unavailable and bridge config is present
+- start one unified MCP server
+- probe which capability sources are available at startup
+- register CLI-backed tools where the CLI is the preferred implementation
+- register bridge-backed tools where the bridge provides unique value
+- register bridge-backed fallback implementations for overlapping tools only when the CLI is unavailable
 
 Suggested env contract:
 
@@ -188,9 +193,22 @@ Suggested env contract:
 
 Behavior:
 
-- `auto`: prefer CLI, otherwise use bridge if configured
-- `cli`: fail fast if CLI is missing or unsupported
-- `bridge`: fail fast if bridge is unavailable
+- `auto`: assemble tools from all available capability sources
+- `cli`: register only CLI-backed tools, fail fast if CLI is unavailable
+- `bridge`: register only bridge-backed tools, fail fast if bridge is unavailable
+
+Default recommendation:
+
+- `auto` should become the normal mode once the unified server exists
+
+Important clarification:
+
+- this is no longer a pure "pick one backend" design
+- it is a "register the best available implementation for each capability" design
+
+Reference:
+
+- see `docs/cli-vs-bridge-capability-matrix.md`
 
 ## First-pass MCP tool set
 
@@ -358,7 +376,7 @@ Design decisions made during implementation:
 - response helpers handle arrays without corruption (`{ data: [...], _meta }` for arrays, spread for objects)
 - `_meta` carries the raw CLI command for debugging, agents can ignore it
 - errors use MCP native `isError` mechanism
-- CLI server is NOT in `.mcp.json` by default — users opt in manually until backend selection ships
+- CLI server is NOT in `.mcp.json` by default — users opt in manually until unified capability assembly ships
 
 What remains before this phase is fully validated:
 
@@ -395,7 +413,7 @@ Error paths verified (all return `isError: true`):
 
 Issue found and fixed during validation: the CLI returns errors as stdout with exit code 0, using an `Error:` prefix. Added `isCliError()` detection so all tools now check for this pattern and return MCP-native `isError: true` responses instead of silently claiming success.
 
-## Phase 3: compare CLI and bridge backend coverage
+## Phase 3: compare CLI and bridge coverage
 
 Deliverables:
 
@@ -420,25 +438,36 @@ Tasks:
 
 Success criteria:
 
-- backend differences are intentional and documented
+- capability ownership is intentional and documented
+- it is clear which shared tools should prefer CLI and which tools remain bridge-only
 
-## Phase 4: add backend auto-selection
+Status:
 
-This is ~20 lines of startup logic and should not wait until the abstraction layer is extracted. Ship it as soon as the CLI backend works.
+- `docs/cli-vs-bridge-capability-matrix.md` now captures the current ownership model
+
+## Phase 4: add unified server and capability assembly
+
+This should stay small and should not wait until the abstraction layer is extracted. Ship it as soon as the capability matrix is clear.
 
 Deliverables:
 
-- unified `mcp/server.mjs` entry point (or selection logic in `cli-server.mjs`)
+- unified `mcp/server.mjs` entry point
 
 Tasks:
 
-- implement `auto` backend selection: prefer CLI when `obsidian` is on PATH, fall back to bridge
-- emit clear startup logs describing chosen backend
-- fail clearly when requested backend is unavailable
+- probe CLI availability
+- probe bridge reachability
+- register CLI-backed tools where CLI is preferred
+- register bridge-backed tools for bridge-only capabilities
+- register bridge fallbacks for overlapping tools only when CLI is absent
+- emit clear startup logs describing which capability groups were registered
+- fail clearly when forced mode is unavailable
+- implement `obsidian_get_capabilities`
 
 Success criteria:
 
 - agents can use one MCP setup in most environments
+- the MCP surface reflects actual available capabilities instead of pretending all backends are equal
 
 ## Phase 5: extract shared layer and harden
 
@@ -461,7 +490,7 @@ Tasks:
 Success criteria:
 
 - shared modules reflect real duplication, not speculative abstraction
-- regressions in tool output or backend selection are caught early
+- regressions in tool output or capability assembly are caught early
 
 ## Implementation progress
 
@@ -471,7 +500,7 @@ Success criteria:
 4. ~~Validate all tools against running Obsidian~~ — DONE (Phase 2)
 5. ~~Fix CLI error detection (`isCliError`)~~ — DONE (Phase 2)
 6. Compare CLI and bridge coverage, document the capability matrix (Phase 3)
-7. Add backend auto-selection (~20 lines of startup logic) (Phase 4)
+7. Add unified server and capability assembly (Phase 4)
 8. Extract shared modules from real duplication between the two backends (Phase 5)
 9. Update docs and examples
 
