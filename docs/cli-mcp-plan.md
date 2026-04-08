@@ -365,23 +365,35 @@ What remains before this phase is fully validated:
 - test all tools against a running Obsidian instance (reload, commands, errors, DOM, screenshot, eval)
 - verify error paths (missing plugin, bad selector, eval syntax error)
 
-## Phase 2: validate the CLI debug loop
+## Phase 2: validate the CLI debug loop — DONE
 
-Tasks:
+All 15 tools validated against a running Obsidian instance (v1.12.7, vault: dev-vault).
 
-- reload a plugin via `obsidian_reload_plugin` and confirm it takes effect
-- list and execute a command via `obsidian_list_commands` / `obsidian_execute_command`
-- trigger an error and retrieve it via `obsidian_get_errors`
-- attach debugger and read console via `obsidian_debug_attach` / `obsidian_get_console`
-- inspect DOM via `obsidian_query_dom`
-- take a screenshot via `obsidian_take_screenshot`
-- run `obsidian_eval` against app state
-- verify error paths: missing plugin, bad selector, eval syntax error, CLI not found
+Happy paths verified:
 
-Success criteria:
+- `obsidian_ping` — returns version + vault name
+- `obsidian_version` — returns version string
+- `obsidian_plugins` — returns JSON array (community filter tested)
+- `obsidian_plugin_info` — returns TSV plugin details (hot-reload tested)
+- `obsidian_reload_plugin` — confirms reload (hot-reload tested)
+- `obsidian_list_commands` — returns filtered command list (editor: prefix tested)
+- `obsidian_execute_command` — executes command (app:show-debug-info tested)
+- `obsidian_get_errors` — returns "No errors captured." when clean
+- `obsidian_debug_attach` / `obsidian_debug_detach` — attach/detach confirmed
+- `obsidian_get_console` — returns captured console messages when debugger attached
+- `obsidian_query_dom` — returns element count (`.workspace` tested)
+- `obsidian_get_css` — returns matched rules (body background-color tested)
+- `obsidian_take_screenshot` — writes valid PNG (1570x649)
+- `obsidian_eval` — executes JS, returns parsed result (app.vault.getName() tested)
 
-- an agent can complete the full plugin debug cycle without the bridge
-- error responses are clear enough for agents to self-correct
+Error paths verified (all return `isError: true`):
+
+- missing plugin: `Plugin "x" not found. Use "plugins" to list available plugins.`
+- bad command ID: `Command "x" not found. Use "commands" to list available command IDs.`
+- eval syntax error: `Error: Unexpected identifier 'is'`
+- bad CSS selector: `Error: Invalid selector: ... '###invalid' is not a valid selector.`
+
+Issue found and fixed during validation: the CLI returns errors as stdout with exit code 0, using an `Error:` prefix. Added `isCliError()` detection so all tools now check for this pattern and return MCP-native `isError: true` responses instead of silently claiming success.
 
 ## Phase 3: compare CLI and bridge backend coverage
 
@@ -456,11 +468,12 @@ Success criteria:
 1. ~~Build `cli-server.mjs` as a flat, self-contained module~~ — DONE (Phase 1)
 2. ~~All Phase 1 tools implemented~~ — DONE (15 tools including debug_attach/detach)
 3. ~~Smoke test server startup and basic tool calls~~ — DONE
-4. Validate the debug loop end-to-end against a running Obsidian instance (Phase 2)
-5. Compare CLI and bridge coverage, document the capability matrix (Phase 3)
-6. Add backend auto-selection (~20 lines of startup logic) (Phase 4)
-7. Extract shared modules from real duplication between the two backends (Phase 5)
-8. Update docs and examples
+4. ~~Validate all tools against running Obsidian~~ — DONE (Phase 2)
+5. ~~Fix CLI error detection (`isCliError`)~~ — DONE (Phase 2)
+6. Compare CLI and bridge coverage, document the capability matrix (Phase 3)
+7. Add backend auto-selection (~20 lines of startup logic) (Phase 4)
+8. Extract shared modules from real duplication between the two backends (Phase 5)
+9. Update docs and examples
 
 ## Output normalization plan
 

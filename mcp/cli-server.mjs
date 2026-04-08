@@ -58,6 +58,14 @@ function tryParseJson(text) {
 	}
 }
 
+/**
+ * The CLI reports errors as stdout text with exit code 0.
+ * Detect the "Error: ..." prefix so we can set isError on the MCP response.
+ */
+function isCliError(stdout) {
+	return stdout.startsWith('Error:');
+}
+
 // ---------------------------------------------------------------------------
 // Response helpers
 // ---------------------------------------------------------------------------
@@ -174,11 +182,12 @@ server.tool(
 	async ({ id }) => {
 		const args = ['plugin', `id=${id}`];
 		const { stdout } = await runCli(args);
+		const meta = { command: [CLI_BIN, ...args].join(' ') };
+		if (isCliError(stdout)) {
+			return errorResult(stdout, meta);
+		}
 		const parsed = tryParseJson(stdout);
-		return textResult(
-			parsed ?? { output: stdout },
-			{ command: [CLI_BIN, ...args].join(' ') }
-		);
+		return textResult(parsed ?? { output: stdout }, meta);
 	}
 );
 
@@ -191,10 +200,11 @@ server.tool(
 	async ({ id }) => {
 		const args = ['plugin:reload', `id=${id}`];
 		const { stdout } = await runCli(args);
-		return textResult(
-			{ reloaded: id, output: stdout || 'ok' },
-			{ command: [CLI_BIN, ...args].join(' ') }
-		);
+		const meta = { command: [CLI_BIN, ...args].join(' ') };
+		if (isCliError(stdout)) {
+			return errorResult(stdout, meta);
+		}
+		return textResult({ reloaded: id, output: stdout || 'ok' }, meta);
 	}
 );
 
@@ -230,10 +240,11 @@ server.tool(
 	async ({ id }) => {
 		const args = ['command', `id=${id}`];
 		const { stdout } = await runCli(args);
-		return textResult(
-			{ executed: id, output: stdout || 'ok' },
-			{ command: [CLI_BIN, ...args].join(' ') }
-		);
+		const meta = { command: [CLI_BIN, ...args].join(' ') };
+		if (isCliError(stdout)) {
+			return errorResult(stdout, meta);
+		}
+		return textResult({ executed: id, output: stdout || 'ok' }, meta);
 	}
 );
 
@@ -363,7 +374,11 @@ server.tool(
 		if (attr) args.push(`attr=${attr}`);
 		if (css) args.push(`css=${css}`);
 		const { stdout } = await runCli(args, { timeout: 10000 });
-		return textResultRaw(stdout, { command: [CLI_BIN, ...args].join(' ') });
+		const meta = { command: [CLI_BIN, ...args].join(' ') };
+		if (isCliError(stdout)) {
+			return errorResult(stdout, meta);
+		}
+		return textResultRaw(stdout, meta);
 	}
 );
 
@@ -381,7 +396,11 @@ server.tool(
 		const args = ['dev:css', `selector=${selector}`];
 		if (prop) args.push(`prop=${prop}`);
 		const { stdout } = await runCli(args, { timeout: 10000 });
-		return textResultRaw(stdout, { command: [CLI_BIN, ...args].join(' ') });
+		const meta = { command: [CLI_BIN, ...args].join(' ') };
+		if (isCliError(stdout)) {
+			return errorResult(stdout, meta);
+		}
+		return textResultRaw(stdout, meta);
 	}
 );
 
@@ -400,10 +419,11 @@ server.tool(
 		const args = ['dev:screenshot'];
 		if (filepath) args.push(`path=${filepath}`);
 		const { stdout } = await runCli(args, { timeout: 30000 });
-		return textResult(
-			{ output: stdout || 'screenshot saved' },
-			{ command: [CLI_BIN, ...args].join(' ') }
-		);
+		const meta = { command: [CLI_BIN, ...args].join(' ') };
+		if (isCliError(stdout)) {
+			return errorResult(stdout, meta);
+		}
+		return textResult({ output: stdout || 'screenshot saved' }, meta);
 	}
 );
 
@@ -418,15 +438,20 @@ server.tool(
 	async ({ code }) => {
 		const args = ['eval', `code=${code}`];
 		const { stdout } = await runCli(args, { timeout: 30000 });
+		const meta = { command: [CLI_BIN, 'eval', 'code=...'].join(' ') };
+		if (isCliError(stdout)) {
+			return errorResult(stdout, meta);
+		}
 		// CLI returns "=> result", strip the prefix
 		const result = stdout.startsWith('=>')
 			? stdout.slice(2).trim()
 			: stdout;
+		// "=> Error: ..." is a runtime eval error, not a CLI error
+		if (isCliError(result)) {
+			return errorResult(result, meta);
+		}
 		const parsed = tryParseJson(result);
-		return textResult(
-			{ result: parsed ?? result },
-			{ command: [CLI_BIN, 'eval', 'code=...'].join(' ') }
-		);
+		return textResult({ result: parsed ?? result }, meta);
 	}
 );
 

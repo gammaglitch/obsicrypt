@@ -3,6 +3,7 @@
 ## 2026-04-08
 
 - Added `mcp/cli-server.mjs`: a self-contained MCP server that wraps the official Obsidian CLI instead of the custom HTTP bridge. Exposes 15 tools covering the plugin development debug loop (reload, commands, errors, console, DOM, CSS, screenshots, eval). Not enabled in `.mcp.json` by default — opt-in until backend auto-selection ships.
+- Validated all 15 CLI MCP tools against a running Obsidian instance (v1.12.7). Found that the CLI reports errors as stdout with exit code 0; added `isCliError()` detection so error responses use MCP-native `isError: true` instead of silently claiming success.
 - Wrote `docs/cli-mcp-plan.md` defining the two-backend architecture: official CLI as preferred backend, bridge as fallback for Docker/CI. Plan follows a flat-first approach — shared abstractions deferred until real duplication between backends is visible.
 
 ## 2026-04-05
