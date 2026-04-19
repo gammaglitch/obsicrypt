@@ -13,7 +13,7 @@ export type EnvelopeParts = {
 	ciphertext: Uint8Array;
 };
 
-export const ENVELOPE_VERSION_TAG = 'obsikit:v1';
+export const ENVELOPE_VERSION_TAG = 'obsicrypt:v1';
 
 export function format(parts: EnvelopeParts): string {
 	return [

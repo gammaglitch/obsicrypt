@@ -5,7 +5,7 @@ const PBKDF2_ITERATIONS = 600_000;
 const KEY_LENGTH = 256;
 const SALT_LENGTH = 16;
 const IV_LENGTH = 12;
-const VERIFIER_PLAINTEXT = 'obsikit-verify-v1';
+const VERIFIER_PLAINTEXT = 'obsicrypt-verify-v1';
 
 async function deriveKey(
 	password: string,

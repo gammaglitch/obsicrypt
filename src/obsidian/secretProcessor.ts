@@ -24,13 +24,13 @@ export function registerSecretProcessor(plugin: Plugin): void {
 					// Obsidian's Notice API is the standard feedback channel.
 					const { Notice } = await import('obsidian');
 					new Notice(
-						'Set a master password in Obsikit settings before unlocking secrets.'
+						'Set a master password in Obsicrypt settings before unlocking secrets.'
 					);
 					return;
 				}
 				if (isUnlocked()) return;
 				const pw = await promptForPassword(plugin.app, {
-					title: 'Unlock Obsikit vault',
+					title: 'Unlock Obsicrypt vault',
 					submitLabel: 'Unlock',
 					verify: true,
 				});

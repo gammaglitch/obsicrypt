@@ -1,11 +1,11 @@
 # Unified MCP And CLI Dev Workflow
 
-`obsikit` now exposes a unified MCP server at `mcp/server.mjs`.
+`obsicrypt` now exposes a unified MCP server at `mcp/server.mjs`.
 
 This server assembles tools from two capability sources:
 
 - the official Obsidian CLI
-- the local `obsikit` dev bridge
+- the local `obsicrypt` dev bridge
 
 The goal is:
 

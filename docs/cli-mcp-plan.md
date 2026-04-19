@@ -1,10 +1,10 @@
 # Official Obsidian CLI MCP Plan
 
-Plan for evolving `obsikit` from a bridge-first LLM development stack into a backend-flexible tool layer that prefers the official Obsidian CLI.
+Plan for evolving `obsicrypt` from a bridge-first LLM development stack into a backend-flexible tool layer that prefers the official Obsidian CLI.
 
 ## Summary
 
-`obsikit` already has:
+`obsicrypt` already has:
 
 - a working plugin scaffold
 - a Dockerized Obsidian harness
@@ -38,7 +38,7 @@ The official CLI now exposes most of the developer controls an LLM needs:
 
 That covers most of the capability gaps previously motivating custom bridge expansion.
 
-For `obsikit`, this creates a better architecture:
+For `obsicrypt`, this creates a better architecture:
 
 - official CLI for primary runtime control
 - MCP as the LLM-facing interface
@@ -658,9 +658,9 @@ After implementation starts, update:
 - selecting backend mode
 - troubleshooting common CLI failures
 
-## Recommended final positioning for obsikit
+## Recommended final positioning for obsicrypt
 
-Once this lands, `obsikit` should be presented as:
+Once this lands, `obsicrypt` should be presented as:
 
 - an Obsidian plugin boilerplate
 - with LLM-friendly tooling

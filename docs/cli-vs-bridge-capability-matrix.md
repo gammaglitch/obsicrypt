@@ -1,6 +1,6 @@
 # Obsidian CLI vs Bridge Capability Matrix
 
-Current comparison of the official Obsidian CLI and the custom `obsikit` bridge/MCP surface.
+Current comparison of the official Obsidian CLI and the custom `obsicrypt` bridge/MCP surface.
 
 Purpose:
 
@@ -164,7 +164,7 @@ Instead, the unified MCP server should:
 
 ## Immediate implementation guidance
 
-Near-term guidance for `obsikit`:
+Near-term guidance for `obsicrypt`:
 
 - do not add more bridge features in areas already covered by the CLI
 - do not force duplicate MCP tools where CLI is clearly the better source

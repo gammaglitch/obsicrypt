@@ -13,13 +13,13 @@ import {
 async function ensureUnlocked(plugin: Plugin): Promise<string | null> {
 	if (!hasVerifier()) {
 		new Notice(
-			'Set a master password in Obsikit settings before encrypting.'
+			'Set a master password in Obsicrypt settings before encrypting.'
 		);
 		return null;
 	}
 	if (isUnlocked()) return getMasterPassword();
 	const pw = await promptForPassword(plugin.app, {
-		title: 'Unlock Obsikit vault',
+		title: 'Unlock Obsicrypt vault',
 		submitLabel: 'Unlock',
 		verify: true,
 	});
@@ -30,8 +30,8 @@ async function ensureUnlocked(plugin: Plugin): Promise<string | null> {
 
 export function registerSecretsCommands(plugin: Plugin): void {
 	plugin.addCommand({
-		id: 'obsikit-encrypt-selection',
-		name: 'Obsikit: Encrypt selection',
+		id: 'obsicrypt-encrypt-selection',
+		name: 'Obsicrypt: Encrypt selection',
 		editorCallback: (editor: Editor) => {
 			void (async () => {
 				const selection = editor.getSelection();
@@ -50,11 +50,11 @@ export function registerSecretsCommands(plugin: Plugin): void {
 	});
 
 	plugin.addCommand({
-		id: 'obsikit-lock-vault',
-		name: 'Obsikit: Lock vault',
+		id: 'obsicrypt-lock-vault',
+		name: 'Obsicrypt: Lock vault',
 		callback: () => {
 			setMasterPassword(null);
-			new Notice('Obsikit vault locked.');
+			new Notice('Obsicrypt vault locked.');
 		},
 	});
 }
