@@ -1,5 +1,13 @@
 # Log
 
+## 2026-04-20
+
+- Added an encrypted-secrets feature: content inside a fenced `` ```secret `` block is encrypted with AES-GCM-256 and a key derived from a user-set master password via PBKDF2-SHA256 (600k iterations, 16-byte salt, 12-byte IV, all per-secret). Ciphertext is stored inline in the note so the note remains self-contained.
+- Envelope format (inside the fenced block): `obsikit:v1|<saltB64>|<ivB64>|<ciphertextB64>`. Parser is in `src/helpers/crypto/envelope.ts`; the actual encrypt/decrypt lives in `src/helpers/crypto/crypto.ts`.
+- Session model: master password is cached in memory in `src/obsidian/secretsStore.ts` (plain module-level ref + subscribe hook — Jotai v1 lacks a non-React store API) and cleared on `onunload` or the `Obsikit: Lock vault` command. Only a verifier (AES-GCM of a fixed plaintext `"obsikit-verify-v1"`) is persisted via `plugin.saveData`; the password itself is never written to disk.
+- Reading view renders `secret` blocks via `registerMarkdownCodeBlockProcessor`, mounting a Preact `SecretBlock`. Selection → envelope via the `Obsikit: Encrypt selection` command.
+- Known v1 caveats: (1) Live Preview shows the raw source (ciphertext, not plaintext) when the cursor enters a rendered block — acceptable, no plaintext leak. (2) `editor.replaceSelection` pushes the original plaintext onto CodeMirror's undo stack; users can undo back to cleartext until the note is closed. A hardened future version would use a CodeMirror decoration widget and wrap the replacement in an atomic transaction with history cleared.
+
 ## 2026-04-08
 
 - Added `mcp/server.mjs`: unified MCP entry point that assembles tools from both the CLI and bridge backends based on availability at startup. Probes both, registers CLI-backed tools when CLI is available and bridge-only tools when the bridge is reachable. Fallback bridge tools registered for overlapping capabilities only when CLI is absent. `.mcp.json` now points here.

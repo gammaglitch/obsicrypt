@@ -9,6 +9,10 @@ import {
 	PLUGIN_VIEW_NAME,
 	PLUGIN_VIEW_TYPE,
 } from './obsidian/constants';
+import { registerSecretsCommands } from './obsidian/commands';
+import { SecretsSettingTab } from './obsidian/SecretsSettingTab';
+import { registerSecretProcessor } from './obsidian/secretProcessor';
+import { initSecretsStore, setMasterPassword } from './obsidian/secretsStore';
 import { maybeStartTestBridge, TestBridgeServer } from './obsidian/testBridge';
 import { openOrRevealPluginView } from './obsidian/view';
 
@@ -45,6 +49,8 @@ export default class ObsikitPlugin extends Plugin {
 	private testBridge: TestBridgeServer | null = null;
 
 	onunload(): void {
+		setMasterPassword(null);
+
 		if (this.testBridge) {
 			void this.testBridge.stop();
 			this.testBridge = null;
@@ -56,6 +62,12 @@ export default class ObsikitPlugin extends Plugin {
 	}
 
 	async onload(): Promise<void> {
+		await initSecretsStore(this);
+
+		this.addSettingTab(new SecretsSettingTab(this.app, this));
+		registerSecretProcessor(this);
+		registerSecretsCommands(this);
+
 		this.registerView(
 			PLUGIN_VIEW_TYPE,
 			(leaf: WorkspaceLeaf) => new ObsikitView(leaf, this)
