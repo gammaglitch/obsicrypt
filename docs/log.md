@@ -2,6 +2,11 @@
 
 ## 2026-04-20
 
+- Added a Secrets Dashboard view. Opens in a new tab via a left-sidebar ribbon icon (🔒). Drill-down layout: left pane lists notes that contain at least one `` ```secret `` block (with per-note count); right pane shows each secret as a row with Unlock / Show-Hide / Copy buttons. Plaintext is masked by default once the vault is unlocked. Vault events (`create` / `delete` / `rename` / `metadataCache:changed`) drive auto-refresh via a new module-level pub/sub in `src/obsidian/vaultSecrets.ts`. Pure `scanFileForSecrets` helper with Jest tests in `src/helpers/scanSecrets.ts`. Reuses `PasswordModal`, `secretsStore`, `decryptString`, and the envelope parser — no duplication.
+- Copy path: `navigator.clipboard.writeText(plaintext)` with a `document.execCommand('copy')` fallback via a hidden textarea for environments where the Async Clipboard API is blocked. Result surfaced via an Obsidian `Notice`.
+
+## 2026-04-20
+
 - Rebranded from `obsikit` to `obsicrypt` across manifest, package name, plugin class, command IDs/names, user-facing notices, envelope version tag, verifier plaintext constant, docs, and e2e fixtures. Envelope format is now `obsicrypt:v1|…`; existing verifier-in-`data.json` from a prior `obsikit:v1`-era run would be invalidated on first load — acceptable since nothing has shipped externally.
 - Removed the file-browser example feature (`ExampleView`, `ViewWrapper`, `VaultSync`, `events.ts`, `store/atoms/files.tsx`, `helpers/lines.*`, e2e `smoke.spec.ts`, `docs/boilerplate.md`). The plugin is now a focused encryption tool with no custom pane; UI surfaces only in reading view, the settings tab, and the command palette. The main.ts lifecycle no longer registers a view or opens one on layout-ready.
 - Kept `src/helpers/files/util.ts`, `src/obsidian/constants.ts`, and `src/obsidian/view.ts` — these are imported by `src/obsidian/testBridge.ts` (dev-only HTTP bridge for MCP/e2e tooling) and are considered plugin infrastructure, not part of the example.
