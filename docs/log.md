@@ -1,6 +1,10 @@
 # Log
 
-## 2026-06-25 (memory-only encrypted notes — prototype, flag-gated)
+## 2026-06-26 (release automation + v-less tags)
+
+- Added a GitHub Action (`.github/workflows/release.yml`) that builds and publishes a release when a version tag is pushed. It sets `OBSIDIAN_PATH` to a throwaway dir (since `vite.config.ts` writes the bundle under `$OBSIDIAN_PATH/.obsidian/plugins/<id>`), runs `pnpm build`, and attaches `main.js` + `manifest.json` (and `styles.css` if a future build emits one) with auto-generated notes. Uses `pnpm install --no-frozen-lockfile` because the repo hit frozen-lockfile issues under pnpm 10.
+- Added `scripts/bump-version.mjs` (`pnpm run bump <x.y.z>`) — updates `package.json`, `public/manifest.json`, and a new `versions.json` (plugin version → minAppVersion). `docs/releasing.md` documents the flow.
+- Switched the tag convention to **no `v` prefix** (e.g. `0.2.0`) to match the Obsidian community-store requirement that the tag equal the manifest version exactly. The existing `v0.1.0` release predates this.
 
 - Added a parallel whole-note encryption mode where the decrypted plaintext **never touches disk** — unlike the existing decrypt-to-disk `.md` flow. Gated behind `FEATURES.memoryNote` (off). New files under `src/obsidian/memoryNote/` + `src/components/secrets/MemoryNoteApp.tsx`.
 - **How:** a dedicated `.ocnote` extension is registered to `MemoryNoteView` (a `TextFileView`). Obsidian hands the view the ciphertext envelope; the view decrypts into a private `plaintext` field and `getViewData()` only ever returns the ciphertext envelope, so autosave can never persist plaintext. Edits debounce (400ms) and re-encrypt with the cached key (`encryptWithKey`, fresh IV, same salt — no PBKDF2). The dedicated extension also keeps these files out of Obsidian's metadata cache / search index (so plaintext isn't indexed). Editor is a plain `<textarea>` (no live preview / links / backlinks — that's the prototype tradeoff). Deliberately **no `@codemirror`** import (a self-hosted CM6 editor is a possible future enhancement; never register an editor extension against Obsidian's CM — prior dual-instance crash).

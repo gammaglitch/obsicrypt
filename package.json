@@ -4,6 +4,7 @@
 	"description": "",
 	"main": "index.js",
 	"scripts": {
+		"bump": "node scripts/bump-version.mjs",
 		"test": "jest",
 		"e2e:prepare-vault": "node scripts/prepare-e2e-vault.mjs",
 		"e2e:build": "node scripts/build-e2e-plugin.mjs",

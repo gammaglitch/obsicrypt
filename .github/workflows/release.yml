@@ -1,0 +1,55 @@
+name: Release
+
+# Fires when a version tag (e.g. 0.2.0 — no "v" prefix) is pushed.
+on:
+  push:
+    tags:
+      - "*.*.*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: pnpm
+
+      # The repo had frozen-lockfile issues under pnpm 10 (see docs/log.md), so
+      # don't fail the release on a slightly stale lockfile.
+      - run: pnpm install --no-frozen-lockfile
+
+      - name: Build
+        env:
+          # vite.config.ts writes the bundle under
+          # $OBSIDIAN_PATH/.obsidian/plugins/<id>; point it at a throwaway dir in CI.
+          OBSIDIAN_PATH: ${{ github.workspace }}/build-output
+        run: pnpm build
+
+      - name: Collect release assets
+        id: assets
+        run: |
+          out="build-output/.obsidian/plugins/obsicrypt"
+          mkdir -p release
+          cp "$out/main.js" release/main.js
+          cp public/manifest.json release/manifest.json
+          # CSS is inlined into main.js today, but ship styles.css if a future
+          # build emits one.
+          [ -f "$out/styles.css" ] && cp "$out/styles.css" release/styles.css || true
+          files=$(ls release | sed 's#^#release/#' | tr '\n' ' ')
+          echo "files=$files" >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${{ github.ref_name }}" ${{ steps.assets.outputs.files }} \
+            --title "${{ github.ref_name }}" \
+            --generate-notes
