@@ -1,5 +1,5 @@
 import { FunctionalComponent } from 'preact';
-import { useMemo, useState } from 'preact/hooks';
+import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 
 import { checkVerifier, decryptString } from '../../helpers/crypto/crypto';
 import { EnvelopeError, EnvelopeParts, parse } from '../../helpers/crypto/envelope';
@@ -81,6 +81,21 @@ export const LockedNoteOverlay: FunctionalComponent<LockedNoteOverlayProps> = ({
 			setBusy(false);
 		}
 	};
+
+	// Auto-open (decrypt-to-disk) when the setting is on and the vault is already
+	// unlocked, instead of waiting for a click. Runs once.
+	const autoOpened = useRef(false);
+	useEffect(() => {
+		if (
+			parsed.ok &&
+			isUnlocked &&
+			settings.autoOpenWholeNote &&
+			!autoOpened.current
+		) {
+			autoOpened.current = true;
+			void unlockWithCached();
+		}
+	}, [parsed.ok, isUnlocked, settings.autoOpenWholeNote]);
 
 	const Shell: FunctionalComponent = ({ children }) => (
 		<div className="flex w-full h-full items-center justify-center p-6 bg-obsidian-bg">

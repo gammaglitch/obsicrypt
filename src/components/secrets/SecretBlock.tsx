@@ -36,10 +36,11 @@ export const SecretBlock: FunctionalComponent<SecretBlockProps> = ({
 		}
 	}, [source]);
 
-	const { masterPassword, isUnlocked } = useSecretsStore();
+	const { masterPassword, isUnlocked, settings } = useSecretsStore();
 	const [plaintext, setPlaintext] = useState<string | null>(null);
 	const [error, setError] = useState<string | null>(null);
-	const [revealed, setRevealed] = useState(true);
+	// When auto-reveal is off, the secret stays hidden until the user clicks Show.
+	const [revealed, setRevealed] = useState(settings.autoRevealInline);
 
 	useEffect(() => {
 		if (!parsed.ok) {
@@ -47,7 +48,7 @@ export const SecretBlock: FunctionalComponent<SecretBlockProps> = ({
 			setError(parsed.error);
 			return;
 		}
-		if (!isUnlocked || masterPassword === null) {
+		if (!isUnlocked || masterPassword === null || !revealed) {
 			setPlaintext(null);
 			setError(null);
 			return;
@@ -66,7 +67,7 @@ export const SecretBlock: FunctionalComponent<SecretBlockProps> = ({
 		return () => {
 			cancelled = true;
 		};
-	}, [parsed, isUnlocked, masterPassword]);
+	}, [parsed, isUnlocked, masterPassword, revealed]);
 
 	if (!parsed.ok) {
 		return (
@@ -85,6 +86,21 @@ export const SecretBlock: FunctionalComponent<SecretBlockProps> = ({
 					onClick={onRequestUnlock}
 				>
 					Unlock
+				</button>
+			</div>
+		);
+	}
+
+	// Unlocked but kept hidden (auto-reveal off, or user clicked Hide).
+	if (!revealed) {
+		return (
+			<div className="flex items-center gap-2 p-2 rounded border border-obsidian-border bg-obsidian-bg-secondary text-sm text-obsidian-text-muted">
+				<span>🔒 Encrypted content — hidden</span>
+				<button
+					className="ml-auto px-2 py-0.5 rounded bg-obsidian-interactive text-obsidian-text text-xs hover:bg-obsidian-interactive-hover"
+					onClick={() => setRevealed(true)}
+				>
+					Show
 				</button>
 			</div>
 		);
@@ -109,20 +125,14 @@ export const SecretBlock: FunctionalComponent<SecretBlockProps> = ({
 	return (
 		<div className="flex items-start gap-2 p-2 rounded border border-obsidian-border bg-obsidian-bg-secondary text-sm text-obsidian-text">
 			<span className="pt-0.5">🔓</span>
-			{revealed ? (
-				<pre className="flex-1 whitespace-pre-wrap break-all font-mono">
-					{plaintext}
-				</pre>
-			) : (
-				<span className="flex-1 italic text-obsidian-text-muted">
-					Hidden
-				</span>
-			)}
+			<pre className="flex-1 whitespace-pre-wrap break-all font-mono">
+				{plaintext}
+			</pre>
 			<button
 				className="px-2 py-0.5 rounded bg-obsidian-bg-secondary text-obsidian-text-muted text-xs hover:bg-obsidian-bg-hover"
-				onClick={() => setRevealed((r) => !r)}
+				onClick={() => setRevealed(false)}
 			>
-				{revealed ? 'Hide' : 'Show'}
+				Hide
 			</button>
 		</div>
 	);

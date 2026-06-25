@@ -24,7 +24,7 @@ export const SecretsSettings: FunctionalComponent<SecretsSettingsProps> = () => 
 
 	const handleSetNew = async (password: string): Promise<void> => {
 		const verifier = await makeVerifier(password);
-		await updateSettings({ version: 1, verifier });
+		await updateSettings({ ...settings, verifier });
 		setMasterPassword(password);
 		setMode('view');
 		setError(null);
@@ -50,7 +50,7 @@ export const SecretsSettings: FunctionalComponent<SecretsSettingsProps> = () => 
 			setError('Incorrect master password.');
 			return;
 		}
-		await updateSettings({ version: 1, verifier: null });
+		await updateSettings({ ...settings, verifier: null });
 		setMasterPassword(null);
 		setMode('view');
 		setError(null);
@@ -174,6 +174,36 @@ export const SecretsSettings: FunctionalComponent<SecretsSettingsProps> = () => 
 					</>
 				)}
 			</div>
+
+			<div className="text-xs font-bold text-obsidian-text-faint uppercase mt-2">
+				Behavior
+			</div>
+			<label className="flex items-center gap-2 text-sm text-obsidian-text">
+				<input
+					type="checkbox"
+					checked={settings.autoRevealInline}
+					onChange={(e) =>
+						void updateSettings({
+							...settings,
+							autoRevealInline: (e.target as HTMLInputElement).checked,
+						})
+					}
+				/>
+				Auto-reveal inline secrets when the vault is unlocked
+			</label>
+			<label className="flex items-center gap-2 text-sm text-obsidian-text">
+				<input
+					type="checkbox"
+					checked={settings.autoOpenWholeNote}
+					onChange={(e) =>
+						void updateSettings({
+							...settings,
+							autoOpenWholeNote: (e.target as HTMLInputElement).checked,
+						})
+					}
+				/>
+				Auto-open encrypted notes when the vault is unlocked
+			</label>
 		</div>
 	);
 };
