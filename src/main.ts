@@ -12,19 +12,28 @@ import {
 import { DashboardView } from './obsidian/dashboard/DashboardView';
 import { openOrRevealDashboard } from './obsidian/dashboard/openDashboard';
 import { LockedNoteView } from './obsidian/LockedNoteView';
+import { MEMORY_NOTE_VIEW_TYPE } from './obsidian/memoryNote/constants';
+import { SessionKeyCache } from './obsidian/memoryNote/SessionKeyCache';
+import { registerMemoryNotes } from './obsidian/memoryNote/setup';
 import { registerSecretViewGuard } from './obsidian/secretViewGuard';
 import { registerVaultLockRibbon } from './obsidian/vaultLockRibbon';
 import { SecretsSettingTab } from './obsidian/SecretsSettingTab';
 import { registerSecretProcessor } from './obsidian/secretProcessor';
-import { initSecretsStore, setMasterPassword } from './obsidian/secretsStore';
+import {
+	getSettings,
+	initSecretsStore,
+	setMasterPassword,
+} from './obsidian/secretsStore';
 import { maybeStartTestBridge, TestBridgeServer } from './obsidian/testBridge';
 import { initVaultSecrets } from './obsidian/vaultSecrets';
 
 export default class ObsicryptPlugin extends Plugin {
 	private testBridge: TestBridgeServer | null = null;
+	private memoryNoteKeys = new SessionKeyCache();
 
 	onunload(): void {
 		setMasterPassword(null);
+		this.memoryNoteKeys.clear();
 
 		if (this.testBridge) {
 			void this.testBridge.stop();
@@ -36,6 +45,9 @@ export default class ObsicryptPlugin extends Plugin {
 			.forEach((leaf) => leaf.detach());
 		this.app.workspace
 			.getLeavesOfType(LOCKED_NOTE_VIEW_TYPE)
+			.forEach((leaf) => leaf.detach());
+		this.app.workspace
+			.getLeavesOfType(MEMORY_NOTE_VIEW_TYPE)
 			.forEach((leaf) => leaf.detach());
 	}
 
@@ -56,6 +68,12 @@ export default class ObsicryptPlugin extends Plugin {
 
 		// Ribbon button: shows vault lock state and toggles it.
 		registerVaultLockRibbon(this);
+
+		// Memory-only encrypted notes (.ocnote) — opt-in via settings. Read at
+		// load to register the extension/view; toggling requires a reload.
+		if (getSettings().enableMemoryNotes) {
+			registerMemoryNotes(this, this.memoryNoteKeys);
+		}
 
 		// Secrets Dashboard — gated behind a feature flag (off for now).
 		if (FEATURES.dashboard) {

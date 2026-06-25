@@ -11,6 +11,9 @@ export type SecretsSettings = {
 	// Whole-note encrypted files auto-open (decrypt-to-disk) when opened with an
 	// unlocked vault, instead of showing a one-click unlock prompt.
 	autoOpenWholeNote: boolean;
+	// Enable memory-only encrypted notes (.ocnote). Read at plugin load to
+	// register the file extension/view; changing it requires a reload.
+	enableMemoryNotes: boolean;
 };
 
 const DEFAULT_SETTINGS: SecretsSettings = {
@@ -18,6 +21,7 @@ const DEFAULT_SETTINGS: SecretsSettings = {
 	verifier: null,
 	autoRevealInline: true,
 	autoOpenWholeNote: false,
+	enableMemoryNotes: false,
 };
 
 type Listener = () => void;
@@ -41,6 +45,7 @@ export async function initSecretsStore(plugin: Plugin): Promise<void> {
 					verifier: raw.verifier ?? null,
 					autoRevealInline: raw.autoRevealInline ?? true,
 					autoOpenWholeNote: raw.autoOpenWholeNote ?? false,
+					enableMemoryNotes: raw.enableMemoryNotes ?? false,
 			  }
 			: DEFAULT_SETTINGS;
 	notify();
