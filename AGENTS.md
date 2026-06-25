@@ -11,8 +11,14 @@ Reference docs/ for architecture details. When implementing something that requi
 - `src/obsidian/secretsStore.ts` — in-memory master password + persisted verifier.
 - `src/obsidian/PasswordModal.ts` — prompt-for-password Obsidian modal.
 - `src/obsidian/SecretsSettingTab.ts` — settings tab for set/change/remove master password.
-- `src/obsidian/secretProcessor.ts` — `` ```secret `` markdown code block processor.
-- `src/obsidian/commands.ts` — `Obsicrypt: Encrypt selection` and `Obsicrypt: Lock vault` commands.
+- `src/obsidian/secretProcessor.ts` — `` ```secret `` markdown code block processor (inline secrets).
+- `src/helpers/wholeNote.ts` — pure helpers for whole-note encryption (frontmatter flag + raw envelope body; tests alongside).
+- `src/obsidian/LockedNoteView.ts` — a plain `ItemView` (no CodeMirror) that shows the unlock UI; a flagged note's leaf is swapped to it.
+- `src/obsidian/secretViewGuard.ts` — listens for `file-open` and swaps a markdown leaf showing a whole-note-encrypted file to the LockedNoteView.
+- `src/components/secrets/LockedNoteOverlay.tsx` — Preact unlock UI (inline password field, decrypt-to-disk) used by LockedNoteView.
+- `src/obsidian/commands.ts` — `Obsicrypt: Encrypt selection`, `Obsicrypt: Lock note`, `Obsicrypt: Unlock note`, and `Obsicrypt: Lock vault` commands.
+
+Whole-note (frontmatter flag) and inline (`` ```secret `` blocks) are independent paths; the view guard gates only on the flag so inline secrets are never affected. Do NOT import `@codemirror/*` — Obsidian shares a single instance and a second one breaks editor extensions ("multiple instances of @codemirror/state"); the leaf-swap approach avoids it.
 
 ## Plugin shell (modify with care)
 
