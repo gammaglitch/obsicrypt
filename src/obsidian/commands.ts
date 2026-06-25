@@ -7,14 +7,16 @@ import {
 	isWholeNoteEncrypted,
 	readEncryptedNote,
 } from '../helpers/wholeNote';
+import { formatSecretFence } from '../helpers/secretLabel';
 import { LOCKED_NOTE_VIEW_TYPE } from './constants';
 import { ensureUnlocked } from './ensureUnlocked';
 import { setMasterPassword } from './secretsStore';
+import { promptForText } from './TextModal';
 
 export function registerSecretsCommands(plugin: Plugin): void {
 	plugin.addCommand({
 		id: 'obsicrypt-encrypt-selection',
-		name: 'Obsicrypt: Encrypt selection',
+		name: 'Encrypt selection',
 		editorCallback: (editor: Editor) => {
 			void (async () => {
 				const selection = editor.getSelection();
@@ -24,9 +26,19 @@ export function registerSecretsCommands(plugin: Plugin): void {
 				}
 				const pw = await ensureUnlocked(plugin);
 				if (pw === null) return;
+				// Optional cleartext label so the secret is findable in the
+				// dashboard while locked. Cancel/empty just omits it.
+				const label = await promptForText(plugin.app, {
+					title: 'Label this secret',
+					description:
+						'Optional name shown in the dashboard (e.g. STRIPE_KEY). Stored unencrypted.',
+					placeholder: 'Leave blank for no label',
+					submitLabel: 'Encrypt',
+				});
 				const parts = await encryptString(selection, pw);
 				const envelope = format(parts);
-				const replacement = `\n\`\`\`${'secret'}\n${envelope}\n\`\`\`\n`;
+				const fence = formatSecretFence(label);
+				const replacement = `\n\`\`\`${fence}\n${envelope}\n\`\`\`\n`;
 				editor.replaceSelection(replacement);
 			})();
 		},
@@ -34,7 +46,7 @@ export function registerSecretsCommands(plugin: Plugin): void {
 
 	plugin.addCommand({
 		id: 'obsicrypt-lock-note',
-		name: 'Obsicrypt: Lock note',
+		name: 'Lock note',
 		editorCallback: (editor: Editor, ctx) => {
 			void (async () => {
 				const content = editor.getValue();
@@ -75,7 +87,7 @@ export function registerSecretsCommands(plugin: Plugin): void {
 
 	plugin.addCommand({
 		id: 'obsicrypt-unlock-note',
-		name: 'Obsicrypt: Unlock note',
+		name: 'Unlock note',
 		editorCallback: (editor: Editor) => {
 			void (async () => {
 				const { flagged, envelope } = readEncryptedNote(editor.getValue());
@@ -100,7 +112,7 @@ export function registerSecretsCommands(plugin: Plugin): void {
 
 	plugin.addCommand({
 		id: 'obsicrypt-lock-vault',
-		name: 'Obsicrypt: Lock vault',
+		name: 'Lock vault',
 		callback: () => {
 			setMasterPassword(null);
 			new Notice('Obsicrypt vault locked.');

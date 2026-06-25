@@ -205,6 +205,24 @@ export const SecretsSettings: FunctionalComponent<SecretsSettingsProps> = () => 
 				Auto-open encrypted notes when the vault is unlocked
 			</label>
 
+			<label className="flex items-center gap-2 text-sm text-obsidian-text">
+				<input
+					type="checkbox"
+					checked={settings.enableDashboard}
+					onChange={(e) =>
+						void updateSettings({
+							...settings,
+							enableDashboard: (e.target as HTMLInputElement).checked,
+						})
+					}
+				/>
+				Show the secrets dashboard (ribbon icon + view)
+			</label>
+			<p className="text-xs text-obsidian-text-muted">
+				Browse every inline secret in your vault, grouped by note. Reload
+				Obsidian (or disable/enable the plugin) to apply this change.
+			</p>
+
 			<div className="text-xs font-bold text-obsidian-text-faint uppercase mt-2">
 				Experimental
 			</div>

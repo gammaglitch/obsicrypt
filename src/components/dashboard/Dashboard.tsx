@@ -79,7 +79,7 @@ export const Dashboard: FunctionalComponent<DashboardProps> = ({ plugin }) => {
 							<SecretItem
 								key={`${activePath}:${ref.index}`}
 								app={plugin.app}
-								label={`Secret ${ref.index + 1}`}
+								label={ref.label ?? `Secret ${ref.index + 1}`}
 								envelope={ref.envelope}
 							/>
 						))}

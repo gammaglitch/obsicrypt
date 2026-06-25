@@ -2,6 +2,7 @@ import { Plugin } from 'obsidian';
 import { createElement, render } from 'preact';
 
 import { SecretBlock } from '../components/secrets/SecretBlock';
+import { parseSecretLabel } from '../helpers/secretLabel';
 import { promptForPassword } from './PasswordModal';
 import {
 	getSettings,
@@ -15,8 +16,17 @@ export const SECRET_BLOCK_LANG = 'secret';
 export function registerSecretProcessor(plugin: Plugin): void {
 	plugin.registerMarkdownCodeBlockProcessor(
 		SECRET_BLOCK_LANG,
-		(source, el) => {
+		(source, el, ctx) => {
 			const mount = el.createDiv();
+
+			// The block body (`source`) excludes the fence line, so the label
+			// lives on the opening ```secret line — recover it from the section
+			// text. getSectionInfo can be null in some render contexts (exports,
+			// hover popovers); fall back to no label there.
+			const section = ctx.getSectionInfo(el);
+			const fenceLine =
+				section?.text.split('\n')[section.lineStart] ?? '';
+			const label = parseSecretLabel(fenceLine);
 
 			const onRequestUnlock = async (): Promise<void> => {
 				if (!hasVerifier()) {
@@ -38,7 +48,7 @@ export function registerSecretProcessor(plugin: Plugin): void {
 			};
 
 			render(
-				createElement(SecretBlock, { source, onRequestUnlock }),
+				createElement(SecretBlock, { source, label, onRequestUnlock }),
 				mount
 			);
 

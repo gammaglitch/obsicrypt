@@ -11,6 +11,8 @@ import { useSecretsStore } from '../../obsidian/secretsStore';
 
 export type SecretBlockProps = {
 	source: string;
+	/** Optional cleartext label from the fence (`name="..."`). */
+	label?: string | null;
 	onRequestUnlock: () => void;
 };
 
@@ -20,8 +22,10 @@ type ParseResult =
 
 export const SecretBlock: FunctionalComponent<SecretBlockProps> = ({
 	source,
+	label,
 	onRequestUnlock,
 }) => {
+	const name = label ?? 'Encrypted content';
 	const parsed: ParseResult = useMemo(() => {
 		try {
 			return { ok: true, parts: parse(source) };
@@ -80,7 +84,7 @@ export const SecretBlock: FunctionalComponent<SecretBlockProps> = ({
 	if (!isUnlocked) {
 		return (
 			<div className="flex items-center gap-2 p-2 rounded border border-obsidian-border bg-obsidian-bg-secondary text-sm text-obsidian-text-muted">
-				<span>🔒 Encrypted content — locked</span>
+				<span>🔒 {name} — locked</span>
 				<button
 					className="ml-auto px-2 py-0.5 rounded bg-obsidian-interactive text-obsidian-text text-xs hover:bg-obsidian-interactive-hover"
 					onClick={onRequestUnlock}
@@ -95,7 +99,7 @@ export const SecretBlock: FunctionalComponent<SecretBlockProps> = ({
 	if (!revealed) {
 		return (
 			<div className="flex items-center gap-2 p-2 rounded border border-obsidian-border bg-obsidian-bg-secondary text-sm text-obsidian-text-muted">
-				<span>🔒 Encrypted content — hidden</span>
+				<span>🔒 {name} — hidden</span>
 				<button
 					className="ml-auto px-2 py-0.5 rounded bg-obsidian-interactive text-obsidian-text text-xs hover:bg-obsidian-interactive-hover"
 					onClick={() => setRevealed(true)}
@@ -125,9 +129,16 @@ export const SecretBlock: FunctionalComponent<SecretBlockProps> = ({
 	return (
 		<div className="flex items-start gap-2 p-2 rounded border border-obsidian-border bg-obsidian-bg-secondary text-sm text-obsidian-text">
 			<span className="pt-0.5">🔓</span>
-			<pre className="flex-1 whitespace-pre-wrap break-all font-mono">
-				{plaintext}
-			</pre>
+			<div className="flex-1 min-w-0">
+				{label && (
+					<div className="text-xs text-obsidian-text-muted mb-1">
+						{label}
+					</div>
+				)}
+				<pre className="whitespace-pre-wrap break-all font-mono">
+					{plaintext}
+				</pre>
+			</div>
 			<button
 				className="px-2 py-0.5 rounded bg-obsidian-bg-secondary text-obsidian-text-muted text-xs hover:bg-obsidian-bg-hover"
 				onClick={() => setRevealed(false)}

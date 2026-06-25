@@ -113,3 +113,14 @@
 - Added a short task-change checklist to `AGENTS.md` covering docs, tests, type-checking, and implementation log updates.
 - Renamed the file models from `FileType`/`Filey` to `ParsedFile`/`StoredFile` to make the parsed-vs-stored distinction explicit without changing behavior.
 - Renamed the task models from `TaskType`/`Taskey` to `ParsedTask`/`StoredTask` and renamed the remaining `Taskey`-named helper methods for consistency.
+
+## 2026-06-26
+
+- Added optional cleartext labels to inline secrets via a fence param (```secret name="STRIPE_KEY"). The label is **intentionally not encrypted** so the dashboard (and the in-editor block header) stay scannable while the vault is locked — finding an env var should not require unlocking. The tradeoff: anyone reading the raw `.md` can see a secret's name and which note holds it, just not its value.
+- Format lives in one place: `src/helpers/secretLabel.ts` (`parseSecretLabel` / `formatSecretFence`), shared by the vault scanner (`scanSecrets.ts`), the reading-mode processor (`secretProcessor.ts`, which recovers the fence line via `ctx.getSectionInfo`), and the `Encrypt selection` command (which now prompts for an optional label).
+- The scanner regex requires a whitespace boundary after `secret` so languages like `secrets` are not matched as secret blocks.
+
+## 2026-06-26 (dashboard toggle)
+
+- Promoted the Secrets Dashboard from the hardcoded `FEATURES.dashboard` compile-time flag to a persisted `enableDashboard` setting with a toggle in the settings tab (under Behavior). Mirrors the `enableMemoryNotes` pattern: read once at plugin load to register the view + ribbon, so toggling needs a reload (noted in the UI).
+- Removed `src/featureFlags.ts` — it only ever gated the dashboard, so it is now dead.

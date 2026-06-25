@@ -2,7 +2,6 @@ import './style/index.css';
 
 import { Plugin, WorkspaceLeaf } from 'obsidian';
 
-import { FEATURES } from './featureFlags';
 import { registerSecretsCommands } from './obsidian/commands';
 import {
 	DASHBOARD_VIEW_ICON,
@@ -75,8 +74,9 @@ export default class ObsicryptPlugin extends Plugin {
 			registerMemoryNotes(this, this.memoryNoteKeys);
 		}
 
-		// Secrets Dashboard — gated behind a feature flag (off for now).
-		if (FEATURES.dashboard) {
+		// Secrets Dashboard — opt-in via settings. Read at load to register the
+		// view/ribbon; toggling requires a reload.
+		if (getSettings().enableDashboard) {
 			this.registerView(
 				DASHBOARD_VIEW_TYPE,
 				(leaf: WorkspaceLeaf) => new DashboardView(leaf, this)
