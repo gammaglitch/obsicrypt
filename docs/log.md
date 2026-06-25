@@ -1,5 +1,27 @@
 # Log
 
+## 2026-06-23 (drop CodeMirror — leaf swap instead of editor overlay)
+
+- Replaced the CodeMirror 6 editor overlay with a leaf-swap approach, because importing `@codemirror/view` produced a second `@codemirror/state` instance at runtime (Obsidian shares its own), throwing "Unrecognized extension value … multiple instances of @codemirror/state" and breaking editor creation. Switching the bundle to CJS + externalizing the full `@codemirror` set did not reliably fix it, so the robust fix is to not import `@codemirror` at all.
+- `src/obsidian/LockedNoteView.ts` — a plain `ItemView` (no CodeMirror) that renders the unlock UI for a whole-note-encrypted file. `src/obsidian/secretViewGuard.ts` listens for `file-open`, and when a markdown leaf shows a flagged note it swaps that leaf to the LockedNoteView. On unlock the view writes plaintext back (decrypt-to-disk) and swaps the leaf back to the markdown editor.
+- The guard reads `vault.cachedRead` (disk-accurate, updated synchronously by `vault.modify`) rather than `metadataCache` (parsed async), so decrypt-to-disk doesn't momentarily re-trigger a lock. `Lock note` sets the ciphertext buffer, swaps to the locked view (passing the envelope so it doesn't race the disk write), then `vault.modify`s the ciphertext after the markdown view unloaded — so plaintext can't be saved back.
+- Removed `encryptedNoteOverlay.ts`, `encryptedReadingCard.ts`, the `@codemirror/*` dev deps, and the CJS/externals changes to `vite.config.ts` (reverted to the original UMD build). Inline `` ```secret `` and the dashboard remain unchanged.
+
+## 2026-06-23 (whole-note format change)
+
+- Reworked whole-note encryption from a `` ```secret `` block to a **frontmatter flag + raw envelope body**: a locked note is `---\nobsicrypt: encrypted\n---\n<envelope>`. The note's entire original content (including its own frontmatter) is encrypted into the envelope; unlocking restores it verbatim. `src/helpers/wholeNote.ts` now exposes `buildEncryptedNote` / `readEncryptedNote` / `isWholeNoteEncrypted` / `parseFrontmatter` (lightweight flat-YAML reader for our controlled flag).
+- Added a **CodeMirror 6 editor overlay** (`src/obsidian/encryptedNoteOverlay.ts`, registered via `registerEditorExtension`): when the open document carries the encrypted flag, a block `Decoration.replace` covers the whole doc with an unlock widget (`components/secrets/LockedNoteOverlay.tsx`) — so edit/live-preview never shows ciphertext. The widget embeds the password field inline (no modal) and adapts to vault state via `useSecretsStore` (password prompt when locked, one-click when already unlocked). On unlock it dispatches plaintext into the buffer → flag clears → overlay vanishes (**decrypt-to-disk**).
+- Gating is purely on the frontmatter flag, so notes containing inline `` ```secret `` blocks are untouched — inline encryption, the reading-view processor, and the dashboard are unchanged.
+- Reading view: `src/obsidian/encryptedReadingCard.ts` post-processor swaps the rendered envelope for a static "🔒 encrypted — edit to unlock" card (unlocking is an edit-mode action).
+- Build: CodeMirror is provided by Obsidian at runtime — added `@codemirror/view` + `@codemirror/state` as dev deps (types) and to `vite.config.ts` rollup `external` + `output.globals`. `@codemirror/state` is type-only (erased); the bundle `require()`s `@codemirror/view`.
+
+## 2026-06-23
+
+- Added whole-note locking: `Obsicrypt: Lock note` encrypts the entire active note and replaces its body with a single `` ```secret `` block; `Obsicrypt: Unlock note` decrypts that block back to plaintext in the editor. Lock/unlock is an explicit, conscious user action — while unlocked the plaintext lives in the `.md` and edits in the real Obsidian editor (no custom view); re-lock when done.
+- This is the whole-note counterpart to inline `Encrypt selection`. It reuses everything: `encryptString`/`decryptString`, the envelope `format`/`parse`, the master-password store, and `ensureUnlocked`. The produced block is the identical `` ```secret `` format, so the reading-view processor and the dashboard already render whole-note-locked files for free.
+- New pure helper `src/helpers/wholeNote.ts` (+ Jest tests): `wrapSecretBlock`, `extractWholeNoteEnvelope`, `isWholeNoteLocked`. `extractWholeNoteEnvelope` only matches when the *entire* note is one secret block, so `Unlock note` never clobbers a note that merely contains an inline secret alongside other text.
+- Originated as a separate plugin (`obsidian-secret-note`) but folded in here: every primitive already existed in obsicrypt, the on-disk format is identical, and one master password / unlock state is shared across inline + whole-note rather than split across two plugins.
+
 ## 2026-04-20
 
 - Added a Secrets Dashboard view. Opens in a new tab via a left-sidebar ribbon icon (🔒). Drill-down layout: left pane lists notes that contain at least one `` ```secret `` block (with per-note count); right pane shows each secret as a row with Unlock / Show-Hide / Copy buttons. Plaintext is masked by default once the vault is unlocked. Vault events (`create` / `delete` / `rename` / `metadataCache:changed`) drive auto-refresh via a new module-level pub/sub in `src/obsidian/vaultSecrets.ts`. Pure `scanFileForSecrets` helper with Jest tests in `src/helpers/scanSecrets.ts`. Reuses `PasswordModal`, `secretsStore`, `decryptString`, and the envelope parser — no duplication.

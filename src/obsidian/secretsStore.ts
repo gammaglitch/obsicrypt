@@ -6,11 +6,18 @@ import { Verifier } from '../helpers/crypto/crypto';
 export type SecretsSettings = {
 	version: 1;
 	verifier: Verifier | null;
+	// Inline ```secret blocks auto-decrypt and reveal when the vault is unlocked.
+	autoRevealInline: boolean;
+	// Whole-note encrypted files auto-open (decrypt-to-disk) when opened with an
+	// unlocked vault, instead of showing a one-click unlock prompt.
+	autoOpenWholeNote: boolean;
 };
 
 const DEFAULT_SETTINGS: SecretsSettings = {
 	version: 1,
 	verifier: null,
+	autoRevealInline: true,
+	autoOpenWholeNote: false,
 };
 
 type Listener = () => void;
@@ -29,7 +36,12 @@ export async function initSecretsStore(plugin: Plugin): Promise<void> {
 	const raw = ((await plugin.loadData()) ?? {}) as Partial<SecretsSettings>;
 	settings =
 		raw.version === 1
-			? { version: 1, verifier: raw.verifier ?? null }
+			? {
+					version: 1,
+					verifier: raw.verifier ?? null,
+					autoRevealInline: raw.autoRevealInline ?? true,
+					autoOpenWholeNote: raw.autoOpenWholeNote ?? false,
+			  }
 			: DEFAULT_SETTINGS;
 	notify();
 }
@@ -63,7 +75,8 @@ export function hasVerifier(): boolean {
 	return settings.verifier !== null;
 }
 
-function subscribe(listener: Listener): () => void {
+/** Subscribe to store changes (lock state / settings). Returns an unsubscribe. */
+export function subscribe(listener: Listener): () => void {
 	listeners.add(listener);
 	return () => {
 		listeners.delete(listener);
