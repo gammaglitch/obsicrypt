@@ -4,6 +4,14 @@ An Obsidian plugin that encrypts sensitive content — a selection, or a whole n
 
 This plugin was built with Claude (Claude Code) across several iterations; see `docs/log.md` for the build log.
 
+> ## ⚠️ Important: unlocking a whole note writes plaintext to disk
+>
+> Whole-note encryption uses a **decrypt-to-disk** model. Unlocking an encrypted note — via the unlock prompt, *Obsicrypt: Unlock note*, or the auto-open setting — **replaces the encrypted file with its plaintext on disk**, and it **stays plaintext until you explicitly run *Obsicrypt: Lock note* again**.
+>
+> While a note is unlocked it is an ordinary `.md` file, so the cleartext will be picked up by **Obsidian Sync, cloud backups, file indexers, and anything else watching your vault**. If Obsidian closes or crashes while a note is unlocked, it stays plaintext. **Re-lock notes when you're done**, and decide whether this model is acceptable before relying on it.
+>
+> This applies to **whole-note** encryption only. Inline `` ```secret `` blocks are decrypted **in memory** for display — the file on disk stays encrypted.
+
 ## Features
 
 - **Inline secrets** — *Obsicrypt: Encrypt selection* wraps the selected text in a `` ```secret `` block and encrypts it. In reading view the block shows as locked; click **Unlock** to reveal the plaintext.
