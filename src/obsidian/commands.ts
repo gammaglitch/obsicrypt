@@ -8,31 +8,8 @@ import {
 	readEncryptedNote,
 } from '../helpers/wholeNote';
 import { LOCKED_NOTE_VIEW_TYPE } from './constants';
-import { promptForPassword } from './PasswordModal';
-import {
-	getMasterPassword,
-	hasVerifier,
-	isUnlocked,
-	setMasterPassword,
-} from './secretsStore';
-
-async function ensureUnlocked(plugin: Plugin): Promise<string | null> {
-	if (!hasVerifier()) {
-		new Notice(
-			'Set a master password in Obsicrypt settings before encrypting.'
-		);
-		return null;
-	}
-	if (isUnlocked()) return getMasterPassword();
-	const pw = await promptForPassword(plugin.app, {
-		title: 'Unlock Obsicrypt vault',
-		submitLabel: 'Unlock',
-		verify: true,
-	});
-	if (pw === null) return null;
-	setMasterPassword(pw);
-	return pw;
-}
+import { ensureUnlocked } from './ensureUnlocked';
+import { setMasterPassword } from './secretsStore';
 
 export function registerSecretsCommands(plugin: Plugin): void {
 	plugin.addCommand({

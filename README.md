@@ -8,7 +8,7 @@ This plugin was built with Claude (Claude Code) across several iterations; see `
 
 - **Inline secrets** — *Obsicrypt: Encrypt selection* wraps the selected text in a `` ```secret `` block and encrypts it. In reading view the block shows as locked; click **Unlock** to reveal the plaintext.
 - **Whole-note encryption** — *Obsicrypt: Lock note* encrypts the entire note (flagged in frontmatter as `obsicrypt: encrypted`). Opening a locked note shows an unlock prompt instead of the editor; entering the password decrypts it back into the normal editor. *Obsicrypt: Unlock note* does the same from the command palette.
-- **Master password** — set once in Settings → Obsicrypt and held in memory for the session. *Obsicrypt: Lock vault* clears it from memory.
+- **Master password** — set once in Settings → Obsicrypt and held in memory for the session. The ribbon button (🔒 / 🔓) shows whether the vault is currently locked and toggles it; *Obsicrypt: Lock vault* also clears it from memory.
 
 > A **Secrets Dashboard** (a panel listing every note containing secrets) is implemented but currently disabled behind a feature flag (`src/featureFlags.ts`); a user-facing toggle will come later.
 

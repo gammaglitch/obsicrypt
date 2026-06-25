@@ -63,7 +63,8 @@ export function hasVerifier(): boolean {
 	return settings.verifier !== null;
 }
 
-function subscribe(listener: Listener): () => void {
+/** Subscribe to store changes (lock state / settings). Returns an unsubscribe. */
+export function subscribe(listener: Listener): () => void {
 	listeners.add(listener);
 	return () => {
 		listeners.delete(listener);

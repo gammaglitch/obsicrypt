@@ -13,6 +13,7 @@ import { DashboardView } from './obsidian/dashboard/DashboardView';
 import { openOrRevealDashboard } from './obsidian/dashboard/openDashboard';
 import { LockedNoteView } from './obsidian/LockedNoteView';
 import { registerSecretViewGuard } from './obsidian/secretViewGuard';
+import { registerVaultLockRibbon } from './obsidian/vaultLockRibbon';
 import { SecretsSettingTab } from './obsidian/SecretsSettingTab';
 import { registerSecretProcessor } from './obsidian/secretProcessor';
 import { initSecretsStore, setMasterPassword } from './obsidian/secretsStore';
@@ -52,6 +53,9 @@ export default class ObsicryptPlugin extends Plugin {
 			(leaf: WorkspaceLeaf) => new LockedNoteView(leaf)
 		);
 		registerSecretViewGuard(this);
+
+		// Ribbon button: shows vault lock state and toggles it.
+		registerVaultLockRibbon(this);
 
 		// Secrets Dashboard — gated behind a feature flag (off for now).
 		if (FEATURES.dashboard) {
