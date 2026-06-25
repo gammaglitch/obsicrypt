@@ -204,6 +204,27 @@ export const SecretsSettings: FunctionalComponent<SecretsSettingsProps> = () => 
 				/>
 				Auto-open encrypted notes when the vault is unlocked
 			</label>
+
+			<div className="text-xs font-bold text-obsidian-text-faint uppercase mt-2">
+				Experimental
+			</div>
+			<label className="flex items-center gap-2 text-sm text-obsidian-text">
+				<input
+					type="checkbox"
+					checked={settings.enableMemoryNotes}
+					onChange={(e) =>
+						void updateSettings({
+							...settings,
+							enableMemoryNotes: (e.target as HTMLInputElement).checked,
+						})
+					}
+				/>
+				Enable memory-only encrypted notes (.ocnote)
+			</label>
+			<p className="text-xs text-obsidian-text-muted">
+				Whole-note encryption that never writes plaintext to disk. Reload
+				Obsidian (or disable/enable the plugin) to apply this change.
+			</p>
 		</div>
 	);
 };

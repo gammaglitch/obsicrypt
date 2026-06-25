@@ -7,7 +7,12 @@ const SALT_LENGTH = 16;
 const IV_LENGTH = 12;
 const VERIFIER_PLAINTEXT = 'obsicrypt-verify-v1';
 
-async function deriveKey(
+/**
+ * Derive the AES-GCM key from a password + salt (PBKDF2, 600k, SHA-256). This is
+ * the expensive step; callers that re-encrypt repeatedly (e.g. the memory-only
+ * editor) should derive once and reuse the key via encryptWithKey/decryptWithKey.
+ */
+export async function deriveKey(
 	password: string,
 	salt: Uint8Array
 ): Promise<CryptoKey> {
@@ -32,13 +37,17 @@ async function deriveKey(
 	);
 }
 
-export async function encryptString(
+/**
+ * Encrypt with an already-derived key. Generates a fresh IV but REUSES the
+ * caller's salt, so the on-disk salt (and therefore the cached key) stays valid
+ * across re-encryptions. No PBKDF2 — cheap enough to run on every save.
+ */
+export async function encryptWithKey(
 	plaintext: string,
-	password: string
+	key: CryptoKey,
+	salt: Uint8Array
 ): Promise<EnvelopeParts> {
-	const salt = crypto.getRandomValues(new Uint8Array(SALT_LENGTH));
 	const iv = crypto.getRandomValues(new Uint8Array(IV_LENGTH));
-	const key = await deriveKey(password, salt);
 	const ciphertext = await crypto.subtle.encrypt(
 		{ name: 'AES-GCM', iv },
 		key,
@@ -47,17 +56,49 @@ export async function encryptString(
 	return { salt, iv, ciphertext: new Uint8Array(ciphertext) };
 }
 
-export async function decryptString(
+/** Decrypt with an already-derived key. The GCM auth tag is the wrong-key check. */
+export async function decryptWithKey(
 	parts: EnvelopeParts,
-	password: string
+	key: CryptoKey
 ): Promise<string> {
-	const key = await deriveKey(password, parts.salt);
 	const buffer = await crypto.subtle.decrypt(
 		{ name: 'AES-GCM', iv: parts.iv },
 		key,
 		parts.ciphertext
 	);
 	return new TextDecoder().decode(buffer);
+}
+
+export async function encryptString(
+	plaintext: string,
+	password: string
+): Promise<EnvelopeParts> {
+	const salt = crypto.getRandomValues(new Uint8Array(SALT_LENGTH));
+	const key = await deriveKey(password, salt);
+	return encryptWithKey(plaintext, key, salt);
+}
+
+export async function decryptString(
+	parts: EnvelopeParts,
+	password: string
+): Promise<string> {
+	const key = await deriveKey(password, parts.salt);
+	return decryptWithKey(parts, key);
+}
+
+/**
+ * Encrypt fresh content and return BOTH the envelope parts and the derived key,
+ * so callers can cache the key (e.g. to open a newly created note already
+ * unlocked) without re-running PBKDF2.
+ */
+export async function createEncrypted(
+	plaintext: string,
+	password: string
+): Promise<{ parts: EnvelopeParts; key: CryptoKey }> {
+	const salt = crypto.getRandomValues(new Uint8Array(SALT_LENGTH));
+	const key = await deriveKey(password, salt);
+	const parts = await encryptWithKey(plaintext, key, salt);
+	return { parts, key };
 }
 
 export type Verifier = {
