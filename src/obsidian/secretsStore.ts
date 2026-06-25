@@ -14,6 +14,10 @@ export type SecretsSettings = {
 	// Enable memory-only encrypted notes (.ocnote). Read at plugin load to
 	// register the file extension/view; changing it requires a reload.
 	enableMemoryNotes: boolean;
+	// Enable the Secrets Dashboard (ribbon icon + view listing notes with
+	// secrets). Read at plugin load to register the view/ribbon; changing it
+	// requires a reload.
+	enableDashboard: boolean;
 };
 
 const DEFAULT_SETTINGS: SecretsSettings = {
@@ -22,6 +26,7 @@ const DEFAULT_SETTINGS: SecretsSettings = {
 	autoRevealInline: true,
 	autoOpenWholeNote: false,
 	enableMemoryNotes: false,
+	enableDashboard: false,
 };
 
 type Listener = () => void;
@@ -46,6 +51,7 @@ export async function initSecretsStore(plugin: Plugin): Promise<void> {
 					autoRevealInline: raw.autoRevealInline ?? true,
 					autoOpenWholeNote: raw.autoOpenWholeNote ?? false,
 					enableMemoryNotes: raw.enableMemoryNotes ?? false,
+					enableDashboard: raw.enableDashboard ?? false,
 			  }
 			: DEFAULT_SETTINGS;
 	notify();
