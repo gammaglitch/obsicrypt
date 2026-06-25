@@ -2,6 +2,7 @@ import './style/index.css';
 
 import { Plugin, WorkspaceLeaf } from 'obsidian';
 
+import { FEATURES } from './featureFlags';
 import { registerSecretsCommands } from './obsidian/commands';
 import {
 	DASHBOARD_VIEW_ICON,
@@ -52,22 +53,25 @@ export default class ObsicryptPlugin extends Plugin {
 		);
 		registerSecretViewGuard(this);
 
-		this.registerView(
-			DASHBOARD_VIEW_TYPE,
-			(leaf: WorkspaceLeaf) => new DashboardView(leaf, this)
-		);
+		// Secrets Dashboard — gated behind a feature flag (off for now).
+		if (FEATURES.dashboard) {
+			this.registerView(
+				DASHBOARD_VIEW_TYPE,
+				(leaf: WorkspaceLeaf) => new DashboardView(leaf, this)
+			);
 
-		this.addRibbonIcon(
-			DASHBOARD_VIEW_ICON,
-			'Open Obsicrypt dashboard',
-			() => {
-				void openOrRevealDashboard(this);
-			}
-		);
+			this.addRibbonIcon(
+				DASHBOARD_VIEW_ICON,
+				'Open Obsicrypt dashboard',
+				() => {
+					void openOrRevealDashboard(this);
+				}
+			);
 
-		this.app.workspace.onLayoutReady(() => {
-			void initVaultSecrets(this);
-		});
+			this.app.workspace.onLayoutReady(() => {
+				void initVaultSecrets(this);
+			});
+		}
 
 		try {
 			this.testBridge = await maybeStartTestBridge(this);
